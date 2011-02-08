@@ -28,22 +28,22 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package metno.kvalobs.kl2kvnew;
+package metno.kvalobs.kl;
 
 import java.lang.Integer;
 import java.util.*;
 
-public class Station {
+public class Range {
 
 	int first;
 	int last;
 	
-	public Station(){
+	public Range(){
 		first=0;
 		last=0;
 	}
 	
-	public Station(String first) {
+	public Range(String first) {
 		try {
 			this.first=Integer.parseInt(first);
 		} catch (NumberFormatException e) {
@@ -53,7 +53,7 @@ public class Station {
 		last=0;
 	}
 	
-	public Station(String first, String last){
+	public Range(String first, String last){
 
 		try {
 			this.first=Integer.parseInt(first);
@@ -89,28 +89,14 @@ public class Station {
 
 	public int getFirst(){ return first;}
 	public int getLast(){return last;}
-	
-	public String query(){
-
-		if(last<0 || first<0)
-			return null;
 		
-		if(last==0 && first==0)
-			return "";
-		
-		if(last==0)
-			return " stationid="+first;
-		
-		return " stationid>="+first + " AND stationid<="+last;
-	}
-	
 	public String toString(){
 		return new String("["+first+"-"+last+"]");
 	}
 	
-	static public String toString(Station[] stlist){
+	static public String toString( Range[] rangeList){
 		String r=null;
-		for(Station s : stlist)
+		for(Range s : rangeList)
 			if(r==null)
 				r=s.toString();
 			else
@@ -121,29 +107,28 @@ public class Station {
 	
 	/**
 	 * Take a list of strings, where each string specifies
-	 * a stationid or a stationid interval.
+	 * a element or a range of elements.
 	 * 
 	 * Format of the string:
-	 * stationspec: stationid | stationinterval
-	 * stationinterval: stationid - stationid
+	 * rangespec: element | elementrange
+	 * elementtange: element - element
 	 * 
 	 * Ex.
 	 *  1. A station 14000
 	 *  2. An interval 18700-20000
 	 *  
-	 * @param st A stationlist
-	 * @return A list of stations and stations intervals.
+	 * @param range A list of range and/or elements
+	 * @return A list of Range elements intervals.
 	 */
-	public static Station[] stations(List<String> st){
-		if(st==null || st.size()==0){
-			Station[] stl=new Station[1];
-			stl[0]=new Station();
+	public static Range[] ranges( List<String> rangeList ){
+		if(rangeList==null || rangeList.size()==0){
+			Range[] stl=new Range[0];
 			return stl;
 		}
 		
-		Vector<Station> stv=new Vector<Station>();
+		Vector<Range> stv=new Vector<Range>();
 		
-		for(String s : (List<String>)st){
+		for(String s : (List<String>)rangeList ){
 			String[] e=s.split("-");
 		
 			if(e.length==0) //s is an empty string
@@ -152,12 +137,12 @@ public class Station {
 			if(e.length>2) //An invalid specification
 				return null;
 		
-			Station myst;
+			Range myst;
 			
 			if(e.length==1)
-				myst=new Station(e[0]);
+				myst=new Range(e[0]);
 			else
-				myst=new Station(e[0], e[1]);
+				myst=new Range(e[0], e[1]);
 			
 			if(!myst.ok())
 				return null;
@@ -165,7 +150,7 @@ public class Station {
 			stv.add(myst);
 		}
 		
-		Station[] myst=new Station[stv.size()];
+		Range[] myst=new Range[stv.size()];
 		
 		return stv.toArray(myst);
 	}

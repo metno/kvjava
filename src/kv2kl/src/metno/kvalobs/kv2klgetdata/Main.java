@@ -32,9 +32,11 @@ package metno.kvalobs.kv2klgetdata;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.lang.Integer;
 import java.util.ListIterator;
 import java.util.TimeZone;
 import metno.kvalobs.kl.KlApp;
+import metno.kvalobs.kl.Range;
 import kvalobs.*;
 import CKvalObs.CService.*;
 import metno.util.*;
@@ -48,7 +50,7 @@ public class Main {
 	
 	static void use(int no){
         System.out.println("\n\n  kv2klgetdata -f fromdate [-s kvserver] [-c conffile] [-t todate] \n");
-        System.out.println("         [-i typeidlist]  [-df] stnr1 stnr2 .. stnrN");
+        System.out.println("         [-i typeidlist]  [-dd] [-nf] stnr1 stnr2 .. stnrN");
         System.out.println("\n   kv2klgetdata henter data fra kvalobs og fyller opp i klimadatabasen.");
         System.out.println("   Dataene filtreres med filterdata fra T_KV2KLIMA_FILTER,   t_kv2klima_param_filter");
         System.out.println("   og t_kv2klima_typeid_param_filter .");
@@ -62,19 +64,21 @@ public class Main {
         System.out.println("               er angitt i konfigurasjonsfilen!");
         System.out.println("   -f fromdate Hent data fra og med denne observasjonsterminen.");
         System.out.println("   -t todate hent data til og med denne observasjonsterminen.");
-        System.out.println("             Hvis -t ikke angis hentes data frem til n�tid.");
+        System.out.println("             Hvis -t ikke angis hentes data frem til nåtid.");
         System.out.println("   -i typeid En liste av typeid som skal hentes.");
         System.out.println("             Hvis -i ikke angis lagres data for alle typeid.");
-        System.out.println("   stnr1 stnr2 .. stnrN er stasjonene man �nsker � hente data");
+        System.out.println("   stnr1 stnr2 .. stnrN er stasjonene man ønsker å hente data");
         System.out.println("   for. Hvis man ikke angir noen stasjoner hentes data for alle");
-        System.out.println("   stasjonene.");
+        System.out.println("   stasjonene. Stasjonsnummer kan også være et interval. Da angis");
+        System.out.println("   det med stnrLav-stnrHøy. Det må ikke være mellomrom mellom - og");
+        System.out.println("   stasjonsnumrene. Stasjonsnummrene må være større enn 0.");
         System.out.println("\n  Datoformatet til fromdate og todate er:");
         System.out.println("  'YYYY-MM-DD hh:mm:ss'."); 
-        System.out.println("  Fnuttene rundt m� v�re med!");
+        System.out.println("  Fnuttene rundt må være med!");
         System.out.println("\n  Foramatet til typeid er: ");
         System.out.println("  'typeid1 typeid2 .. typeidN'");
-        System.out.println("  Fnuttene m� v�re med hvis det angis mer enn en typeid");
-        System.out.println("\n\n");
+        System.out.println("  Fnuttene må være med hvis det angis mer enn en typeid");
+        System.out.println("\n\n ");
         
         System.exit(no);
         
@@ -149,7 +153,7 @@ public class Main {
     	String fromDate=null;
     	String typeid=null;
         List<String> list=null;
-        LinkedList<Integer> stationList=null;
+        //LinkedList<Integer> stationList=null;
         LinkedList typelist=null;
         WhichData[] whichData=null;
         int        nObservations=0;
@@ -188,6 +192,7 @@ public class Main {
             }
         }
 
+    	
     	int ii=conffile.lastIndexOf(".conf");
      	
     	if(ii==-1){
@@ -240,47 +245,64 @@ public class Main {
         	use(1);
         }
          
-        stationList=new LinkedList<Integer>();
-         
-        for (String s  : list) {
-        	try {
-        		stationList.add(Integer.parseInt(s));
-            } catch (NumberFormatException e) {
-                e.printStackTrace();
-            }
+        Range stationList[]=Range.ranges( list );
+      
+        if( stationList == null ) {
+        	System.out.println("ERROR: stasjons listen er ugyldig.");
+        	logger.error("Stasjons listen er ugyldig.");
+        	use( 1 );
         }
-
+        
         typelist=createtTypelist(typeid);
          
-        logger.info("Options: ");
-        logger.info("toDate: " + toDate );
-        logger.info("fromDate: " + fromDate );
-        logger.info("Stations: "+stationList);
-        logger.info("typeid:   "+typelist);
-        logger.info("kvserver: "+kvserver);
-        logger.info("disable filter: "+disableFilter);
          
-        if(stationList.size()==0){
+        if( stationList.length == 0 ){
         	whichData=new WhichData[1];
             whichData[0]=new WhichData(0, StatusId.All,
             						   fromDate, 
             						   toDate);
         }else{
-            whichData=new WhichData[stationList.size()];
-             
-            int k=0;
-            for(Integer i : stationList)
-                whichData[k++]=new WhichData(i, StatusId.All,
-                                             fromDate, toDate);
-             
-             
-            for(int i=0; i<whichData.length; i++)
-            	logger.info("WhichData["+i+"] ["+
-                         whichData[i].stationid+","+
-                         whichData[i].fromObsTime+","+
-                         whichData[i].toObsTime+"]");
-       }
-    	
+        	int size = 0;
+        	for( Range station : stationList ){
+        		if( ! station.ok() )
+        			continue;
+        		
+        		if( station.isInterval() )
+        			size += 2;
+        		else
+        			size += 1;
+        	}
+        	
+        	whichData=new WhichData[ size ];
+        	int k=0;
+        	for(Range station : stationList ){
+        		if( ! station.ok() )
+        			continue;
+        		if( station.isInterval() ) {
+            		whichData[k++]=new WhichData( -1*station.getFirst(), StatusId.All,
+            		                              fromDate, toDate);
+            		whichData[k++]=new WhichData( station.getLast(), StatusId.All,
+            				                      fromDate, toDate );
+            		logger.info("Range: WhichData["+(k-2)+"] ["+
+                            whichData[k-2].stationid+","+
+                            whichData[k-2].fromObsTime+","+
+                            whichData[k-2].toObsTime+"]");
+            		logger.info("Range: WhichData["+(k-1)+"] ["+
+                            whichData[k-1].stationid+","+
+                            whichData[k-1].fromObsTime+","+
+                            whichData[k-1].toObsTime+"]");
+            	
+
+        		} else {
+        			whichData[k++]=new WhichData( station.getFirst(), StatusId.All,
+                            			          fromDate, toDate);
+        			logger.info("WhichData["+(k-1)+"] ["+
+                            whichData[k-1].stationid+","+
+                            whichData[k-1].fromObsTime+","+
+                            whichData[k-1].toObsTime+"]");
+        		}
+        	}
+        }
 
        if(disableFilter)
     	   insertstmt=new SqlInsertHelper(app.getConnectionMgr(), null, false);
@@ -288,7 +310,16 @@ public class Main {
     	   insertstmt=new SqlInsertHelper(app.getConnectionMgr());
          
        MiGMTTime start=new MiGMTTime();	
-         
+       
+       logger.info("Options: ");
+       logger.info("toDate: " + toDate );
+       logger.info("fromDate: " + fromDate );
+       logger.info("Stations: "+stationList);
+       logger.info("typeid:   "+typelist);
+       logger.info("kvserver: "+kvserver);
+       logger.info("disable filter: "+disableFilter);
+      
+       
        KvDataIterator it=app.getKvData(whichData);
 
        if(it==null){

@@ -57,15 +57,15 @@ public class Kl2KvMain {
 		    "\t-s kvserver Bruk kvserver som kvalobsserver i stedet for den\n"+
 		    "\t   som er angitt i konfigurasjonsfilen!\n"+
 		    "\t-t typeidlist Angi en liste av typeider som skal sendes over\n"+
-		    "\t   til kvalobs. typeidlist er på formen typeid0,typeid1,..,typeidN\n"+
-		    "\t   Det skal ikke være noen mellomrom i listen. Hvis det er \n"+
-		    "\t   mellomrom må listen omsluttes av ' tegn, eks '302, 312' \n\n"+
+		    "\t   til kvalobs. typeidlist er pÃ¥ formen typeid0,typeid1,..,typeidN\n"+
+		    "\t   Det skal ikke vÃ¦re noen mellomrom i listen. Hvis det er \n"+
+		    "\t   mellomrom mÃ¥ listen omsluttes av ' tegn, eks '302, 312' \n\n"+
 		    "\tstationlist er en liste av stationid som det skal sendes data\n"+
 		    "\t   for til kvalobs. Elementene i listen er adskilt med mellomrom\n"+
-		    "\t   Man kan angi interval av stationid på formen 18500-18700. I \n"+
+		    "\t   Man kan angi interval av stationid pÃ¥ formen 18500-18700. I \n"+
 		    "\t   interval angivelsen kan det ikke forekomme mellomrom.\n\n"+
 		    "  Eks. \n"+
-		    "    Hvis man ønsker å sende data for typeid 302 for stasjonene\n"+
+		    "    Hvis man Ã¸nsker Ã¥ sende data for typeid 302 for stasjonene\n"+
 		    "    18500 til 18700 samt stasjonene 17555 og 17000 gir man \n"+
 		    "    kommandoen:\n\n"+
 		    "    kl2kv -t 302 18500-18700 17555 1700\n\n"

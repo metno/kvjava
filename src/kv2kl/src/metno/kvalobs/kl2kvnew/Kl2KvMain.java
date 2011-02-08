@@ -63,29 +63,29 @@ public class Kl2KvMain {
 		    "\t-s kvserver Bruk kvserver som kvalobsserver i stedet for den\n"+
 		    "\t   som er angitt i konfigurasjonsfilen!\n"+
 		    "\t-n \n" +
-		    "\t--no-qc1 Disable kjøring av QC1 i qaBase. Dette gjøres ved å settes hqcflagg til 3\n"+
+		    "\t--no-qc1 Disable kjÃ¸ring av QC1 i qaBase. Dette gjÃ¸res ved Ã¥ settes hqcflagg til 3\n"+
 		    "\t   i controlinfo for hver enkelt observasjon.\n"+
 		    "\t-l \n" +
 		    "\t--time-list Kommaseparert liste over obstime som skal brukes. \n" +
-		    "\t   Format: fromtime-totime, hvor formatet på fromtime og totime er:\n"+
+		    "\t   Format: fromtime-totime, hvor formatet pÃ¥ fromtime og totime er:\n"+
 		    "\t     YYYY-MM-DDThh[:mm:ss] \n"+
 		    "\t   to time kan utelates og blir da satt lik fromtime.\n"+
 		    "\t \n"+
 		    "\t   Eks 1. --time-list '2009-10-1 - 2009-11-1', dette gir alt av data for\n" +
-		    "\t        oktober. Legg merke til at apostrof må brukes dersom listen innhoilder\n" +
+		    "\t        oktober. Legg merke til at apostrof mÃ¥ brukes dersom listen innhoilder\n" +
 		    "\t        mellomrom.\n"+
 		    "\t   Eks 2. --time-list '2009-10-1T00,2009-10-1T02,2009-10-1T05', dette gir data for\n" +
 		    "\t        obstidene 00, 02 og 05 for 1. oktober.\n" +
 		    "\t-t typeidlist Angi en liste av typeider som skal sendes over\n"+
-		    "\t   til kvalobs. typeidlist er på formen typeid0,typeid1,..,typeidN\n"+
-		    "\t   Det skal ikke være noen mellomrom i listen. Hvis det er \n"+
-		    "\t   mellomrom må listen omsluttes av ' tegn, eks '302, 312' \n\n"+
+		    "\t   til kvalobs. typeidlist er pÃ¥ formen typeid0,typeid1,..,typeidN\n"+
+		    "\t   Det skal ikke vÃ¦re noen mellomrom i listen. Hvis det er \n"+
+		    "\t   mellomrom mÃ¥ listen omsluttes av ' tegn, eks '302, 312' \n\n"+
 		    "\tstationlist er en liste av stationid som det skal sendes data\n"+
 		    "\t   for til kvalobs. Elementene i listen er adskilt med mellomrom\n"+
-		    "\t   Man kan angi interval av stationid på formen 18500-18700. I \n"+
+		    "\t   Man kan angi interval av stationid pÃ¥ formen 18500-18700. I \n"+
 		    "\t   interval angivelsen kan det ikke forekomme mellomrom.\n\n"+
 		    "  Eks. \n"+
-		    "    Hvis man ønsker å sende data for typeid 302 for stasjonene\n"+
+		    "    Hvis man Ã¸nsker Ã¥ sende data for typeid 302 for stasjonene\n"+
 		    "    18500 til 18700 samt stasjonene 17555 og 17000 gir man \n"+
 		    "    kommandoen:\n\n"+
 		    "    kl2kv -t 302 18500-8700 17555 1700\n\n" + (extra==null?"":(extra+"\n\n")) 
