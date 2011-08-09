@@ -48,6 +48,8 @@ public class KlApp extends KvApp
     PropertiesHelper conf=null;
     String           kvserver;
     File             pidFile=null;
+    String dataTableName=null;
+    String textDataTableName=null;
     static String           kvpath=null;
     
     String getConfile(String conf){
@@ -93,6 +95,14 @@ public class KlApp extends KvApp
     	this(args, conffile, null, usingSwing);
     }
     
+    public String getDataTableName() {
+    	return dataTableName;
+    }
+    
+    public String getTextDataTableName() {
+    	return textDataTableName;
+    }
+    
     /**
      * 
      * @param args
@@ -117,6 +127,9 @@ public class KlApp extends KvApp
             System.exit(1);
         }
         
+        dataTableName = conf.getProperty("datatable", "kv2klima" );
+        textDataTableName = conf.getProperty("textdatatable", "T_TEXT_DATA" );
+        
         try {
             conMgr=new DbConnectionMgr(conf);
         } catch (IllegalArgumentException e1) {
@@ -131,6 +144,7 @@ public class KlApp extends KvApp
         	this.kvserver=conf.getProperty("kvserver");
         else
         	this.kvserver=kvserver;
+        
         
         String myNameserver=null;
         String myNameserverport=null;
@@ -169,6 +183,10 @@ public class KlApp extends KvApp
     	System.out.println("     dbuser: " + conMgr.getDbuser());
     	System.out.println("   dbdriver: "+conMgr.getDbdriver());
     	System.out.println("  dbconnect: "+conMgr.getDbconnect());
+    	System.out.println("");
+    	System.out.println("Load data into tables: ");
+    	System.out.println("      data: " + dataTableName );
+    	System.out.println("  textdata: " + textDataTableName );
     	System.out.println("");
     	System.out.println("Using kvalobs server: ");
     	System.out.println("          kvserver: "+this.kvserver);

@@ -8,8 +8,13 @@ dbdriver=org.postgresql.Driver
 dbuser=kvalobs
 dbpasswd=kvalobs12
 
+##Hvilke data og textdata tabeller skal vi laste data inn i
+##default er kv2klima (data) og T_TEXT_DATA (textdata).
+#datatable=kv2klima
+#textdatatable=T_TEXT_DATA
+
 kvserver=kvalobs
 
-#Hvilken navn skal overvåkings grensesnitt registreres under
+#Hvilken navn skal overvï¿½kings grensesnitt registreres under
 #i CORBA navnetjeneren.
 admin=kv2kl-kvtest 

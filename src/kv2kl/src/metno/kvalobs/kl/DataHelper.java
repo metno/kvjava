@@ -10,7 +10,11 @@ public class DataHelper {
 	
 
 	public DataHelper( String dbdriver ){
-		query = QueryFactory.createQuery( dbdriver );
+		this( dbdriver, null, null );
+	}
+	
+	public DataHelper( String dbdriver, String dataTableName, String textDataTableName ){
+		query = QueryFactory.createQuery( dbdriver, dataTableName, textDataTableName );
 	}
 	
 	public DataHelper(CKvalObs.CService.DataElem[] dataElem, 

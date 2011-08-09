@@ -47,12 +47,17 @@ public class KlDataReceiver implements KvDataEventListener {
     public KlDataReceiver(Kv2KlApp app, String backupfile){
     	this.app=app;
     	insertstmt=new SqlInsertHelper(app.getConnectionMgr(), backupfile);
+    	insertstmt.setDataTableName( app.getDataTableName() );
+    	insertstmt.setTextDataTableName( app.getTextDataTableName() );
     }
  
     public KlDataReceiver(Kv2KlApp app, String backupfile, boolean enableFilter ){
     	this.app=app;
     	insertstmt=new SqlInsertHelper(app.getConnectionMgr(), backupfile, enableFilter );
+    	insertstmt.setDataTableName( app.getDataTableName() );
+    	insertstmt.setTextDataTableName( app.getTextDataTableName() );
     }
+    
     public void kvDataEvent(KvDataEvent event) {
     	ObsData[] obsData=event.getObsData();
     	app.updateLastKvContact();

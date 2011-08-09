@@ -1,10 +1,14 @@
 package metno.kvalobs.kl;
 
 public class QueryFactory {
-	static public IQuery createQuery( String driver ){
+	static public IQuery createQuery( String driver, String dataTableName, String textDataTableName ){
 		if(driver.indexOf("oracle")>-1)
-    		return new OracleQuery();
+    		return new OracleQuery( dataTableName, textDataTableName );
     	else
-    		return new DefaultQuery();
+    		return new DefaultQuery( dataTableName, textDataTableName );
+	}
+	
+	static public IQuery createQuery( String driver ){
+		return createQuery( driver, null, null );
 	}
 }

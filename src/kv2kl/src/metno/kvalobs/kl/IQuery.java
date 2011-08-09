@@ -3,6 +3,9 @@ package metno.kvalobs.kl;
 import metno.util.MiTime;
 
 public interface IQuery {
+	
+	public String getDataTableName();
+	public String getTextDataTableName();
 	/*Data*/
 	public String createDataUpdateQuery( CKvalObs.CService.DataElem elem );
 	public String createDataInsertQuery(CKvalObs.CService.DataElem elem);

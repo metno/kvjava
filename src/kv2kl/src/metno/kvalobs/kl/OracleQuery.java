@@ -6,14 +6,38 @@ import metno.util.MiTime;
 
 public class OracleQuery implements IQuery {
 	static Logger logger=Logger.getLogger(SqlInsertHelper.class);
+	private String textDataTable;
+	private String dataTable;
 	
 	public OracleQuery(){
+		dataTable = "kv2klima";
+		textDataTable = "T_TEXT_DATA";
+	}
+	
+	public OracleQuery( String dataTableName, String textDataTableName ){
+		if( dataTableName != null )
+			dataTable = dataTableName;
+		else
+			dataTable = "kv2klima";
+		
+		if( textDataTableName != null )
+			textDataTable = textDataTableName;
+		else
+			textDataTable = "T_TEXT_DATA";
+	}
+	
+	public String getDataTableName() {
+		return dataTable;
+	}
+	
+	public String getTextDataTableName(){
+		return textDataTable;
 	}
 	
 	public String createDataUpdateQuery( CKvalObs.CService.DataElem elem ){
 		logger.debug("Update a Oracle database!");
-	   	String query="UPDATE kv2klima "+
-	   				 "SET " +
+	   	String query="UPDATE "+ getDataTableName() +
+	   				 " SET " +
 	   				 "  original="+elem.original + "," +
 	   				 "  kvstamp=to_date('"+elem.tbtime+"','yyyy-mm-dd hh24:mi:ss')," +
 	   				 "  useinfo='"+elem.useinfo + "',"+
@@ -32,7 +56,7 @@ public class OracleQuery implements IQuery {
 	
 	public String createDataInsertQuery( CKvalObs.CService.DataElem elem){
 		logger.debug("Insert data into a Oracle database!");
-	   	String query="insert into kv2klima(stnr,dato,original,kvstamp,paramid,typeid,xlevel,sensor,useinfo,corrected,controlinfo,cfailed) values ("
+	   	String query="insert into " + getDataTableName() + "(stnr,dato,original,kvstamp,paramid,typeid,xlevel,sensor,useinfo,corrected,controlinfo,cfailed) values ("
 	   				 +elem.stationID+",to_date('"
 	   				 +elem.obstime+"','yyyy-mm-dd hh24:mi:ss'),"
 	   				 +elem.original+",to_date('"
@@ -50,8 +74,8 @@ public class OracleQuery implements IQuery {
 	
 	public String createTextDataUpdateQuery( CKvalObs.CService.TextDataElem elem ){
 		logger.debug("Update textData in a Oracle database!");
-	   	String query="UPDATE T_TEXT_DATA "+
-	   				 "SET " +
+	   	String query="UPDATE "+ getTextDataTableName() +
+	   				 " SET " +
 	   				 "  original='"+elem.original + "'," +
 	   				 "  tbtime=to_date('"+elem.tbtime+"','yyyy-mm-dd hh24:mi:ss')" +
 	   				 "WHERE " +
@@ -64,7 +88,7 @@ public class OracleQuery implements IQuery {
 	
 	public String createTextDataInsertQuery(CKvalObs.CService.TextDataElem elem){
 		logger.debug("Insert textData into a Oracle database!");
-	   	String query="insert into T_TEXT_DATA(stationid,obstime,original,paramid,tbtime,typeid) values ("
+	   	String query="insert into " + getTextDataTableName() + "(stationid,obstime,original,paramid,tbtime,typeid) values ("
 	   				 +elem.stationID+",to_date('"
 	   				 +elem.obstime+"','yyyy-mm-dd hh24:mi:ss'),'"
 	   				 +elem.original+"',"

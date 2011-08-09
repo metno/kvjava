@@ -53,7 +53,10 @@ public class SqlInsertHelper {
 	static Logger filterlog=Logger.getLogger("filter");
 	PrintWriter fout;
 	DbConnectionMgr conMgr=null;
+	String dataTableName=null;
+	String textDataTableName=null;
 	boolean    enableFilter;
+	
 	
 		
 	public SqlInsertHelper(DbConnectionMgr conMgr, String backupfile, boolean enableFilter){
@@ -109,7 +112,13 @@ public class SqlInsertHelper {
 		 logger.warn("Cant release the database connection: "+msg);
 	 }
 	
+	 public void setDataTableName( String dataTable ) {
+		 dataTableName = dataTable;
+	 }
 
+	 public void setTextDataTableName( String textDataTable ) {
+		 textDataTableName = textDataTable;
+	 }
 	
 	protected boolean usetypeid(int  typeid, LinkedList typelist){
 		if( typelist == null )
@@ -215,7 +224,7 @@ public class SqlInsertHelper {
    				return true;
    			}
    			
-   			DataHelper dh = new DataHelper( dbconn.getDbdriver() );
+   			DataHelper dh = new DataHelper( dbconn.getDbdriver(), dataTableName, textDataTableName );
    			
    			for(int i=0; i<obsData.length; i++){
    				msg.setValue(null);
