@@ -55,7 +55,7 @@ public class Main {
         System.out.println("   Dataene filtreres med filterdata fra T_KV2KLIMA_FILTER,   t_kv2klima_param_filter");
         System.out.println("   og t_kv2klima_typeid_param_filter .");
         System.out.println("");
-        System.out.println("   -nf Deaktiver filteret, dvs si at filteret ikke skal brukes!");
+        System.out.println("   -nf Deaktiver filteret, dvs. at filteret ikke skal brukes!");
         System.out.println("   -dd Data skal ikke lagres til databasen!");
         System.out.println("   -c conffile Angi en alternativ konfigurationfil");
         System.out.println("               Default konfigurasjonsfil er: $KVALOBS/etc/kv2kl.conf");
