@@ -314,7 +314,7 @@ public class Main {
        logger.info("Options: ");
        logger.info("toDate: " + toDate );
        logger.info("fromDate: " + fromDate );
-       logger.info("Stations: "+stationList);
+       logger.info("Stations: "+Range.toString( stationList );
        logger.info("typeid:   "+typelist);
        logger.info("kvserver: "+kvserver);
        logger.info("disable filter: "+disableFilter);
