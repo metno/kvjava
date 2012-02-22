@@ -205,9 +205,9 @@ public class Main {
     	 
     	if(ii>-1){
     		if(ii<logfile.length()){
-    			logfile.substring(ii+1);
+    			logfile = logfile.substring(ii+1);
     		}else{
-    			System.out.println("FATAL: the name of the configuration file must on the form 'name.conf' <" + conffile +">");
+    			System.out.println("FATAL: the name of the configuration file must be on the form 'name.conf' <" + conffile +">");
         		System.exit(1);
     		}
     	}
