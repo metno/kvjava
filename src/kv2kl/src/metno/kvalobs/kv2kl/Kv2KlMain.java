@@ -78,6 +78,7 @@ public class Kv2KlMain {
     	MiGMTTime now=new MiGMTTime();
     	GetOpt go = new GetOpt("c:hs:d");
     	String kvserver=null;
+    	String kvname=null;
     	boolean enableFilter=true;
 
     	char c;
@@ -106,10 +107,9 @@ public class Kv2KlMain {
     	System.out.println("Configfile (in): " + configfile );
     	 
     	 int i=configfile.lastIndexOf(".conf");
-    	 String kvname;
-     	
-    	 if(i==-1){
-    		 System.out.println("FATAL: the name of the configuration file must end with '.conf' <" + configfile +">");
+         	
+    	 if(i<=0 || i != configfile.length()-5 || configfile.charAt(i-1) == '/') {
+    		 System.out.println("FATAL: the configuration file <" + configfile + "> is not named like 'name.conf'");
     		 System.exit(1);
     	 }
         
@@ -125,19 +125,18 @@ public class Kv2KlMain {
     		 }
     	 }
     	 
-    	 
     	 String logfile=kvname+"_log.conf";
     	 
     	//    	Konfigurer loggesystemet, log4j.
      	System.out.println("log4j conf: "+kvpath+"/etc/"+logfile);
      	PropertyConfigurator.configure(kvpath+"/etc/"+logfile);
     	
-         go=null; //We dont need it anymore.
+     	go=null; //We dont need it anymore.
 
-         app=new Kv2KlApp(args, configfile, kvserver, false);
-         dataSubscribeInfo=new KvDataSubscribeInfo();
-         dataReceiver=new KlDataReceiver( app, kvname+".dat", enableFilter ); 
-         hint=new KvHintListener(app);
+     	app=new Kv2KlApp(args, configfile, kvserver, false);
+     	dataSubscribeInfo=new KvDataSubscribeInfo();
+     	dataReceiver=new KlDataReceiver( app, kvname+".dat", enableFilter ); 
+     	hint=new KvHintListener(app);
          
     	logger.info("Starting: " +now);
 	
