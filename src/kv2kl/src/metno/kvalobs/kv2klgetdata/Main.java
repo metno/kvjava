@@ -191,16 +191,15 @@ public class Main {
                  use(1);
             }
         }
-
     	
     	int ii=conffile.lastIndexOf(".conf");
      	
-    	if(ii==-1){
-    		System.out.println("FATAL: the name of the configuration file must end with '.conf' <" + conffile +">");
-    		System.exit(1);
+    	if(ii<=0 || ii != conffile.length()-5 || conffile.charAt(ii-1) == '/') {
+            System.out.println("FATAL: the configuration file <" + conffile + "> is not named like 'name.conf'");
+            System.exit(1);
     	}
         
-    	String logfile=conffile.substring(0, ii);
+    	String logfile=conffile.substring(0, ii) + "_log.conf";
     	ii=logfile.lastIndexOf('/');
     	 
     	if(ii>-1){
@@ -211,8 +210,7 @@ public class Main {
         		System.exit(1);
     		}
     	}
-    	 
-    	logfile+="_log.conf";
+  	 
     	 
     	//    	Konfigurer loggesystemet, log4j.
      	System.out.println("log4j conf: "+kvpath+"/etc/"+logfile);
@@ -308,13 +306,16 @@ public class Main {
     	   insertstmt=new SqlInsertHelper(app.getConnectionMgr(), null, false);
        else
     	   insertstmt=new SqlInsertHelper(app.getConnectionMgr());
-         
+       
+       insertstmt.setDataTableName( app.getDataTableName() );
+       insertstmt.setTextDataTableName( app.getTextDataTableName() );
+       
        MiGMTTime start=new MiGMTTime();	
        
        logger.info("Options: ");
        logger.info("toDate: " + toDate );
        logger.info("fromDate: " + fromDate );
-       logger.info("Stations: "+Range.toString( stationList );
+       logger.info("Stations: "+Range.toString( stationList ));
        logger.info("typeid:   "+typelist);
        logger.info("kvserver: "+kvserver);
        logger.info("disable filter: "+disableFilter);
