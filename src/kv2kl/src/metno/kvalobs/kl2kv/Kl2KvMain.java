@@ -119,9 +119,9 @@ public class Kl2KvMain {
          }
     	
     	 int i=configfile.lastIndexOf(".conf");
-    	
-    	 if(i==-1){
-    		 System.out.println("FATAL: the name of the configuration file must end with '.conf' <" + configfile +">");
+    	 
+    	 if(i<=0 || i != configfile.length()-5 || configfile.charAt(i-1) == '/') {
+    		 System.out.println("FATAL: the configuration file <" + configfile + "> is not named like 'name.conf'");
     		 System.exit(1);
     	 }
         
