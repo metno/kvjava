@@ -96,7 +96,7 @@ public class Main {
         return t.toString( MiGMTTime.FMT_ISO );
     }
     
-    static LinkedList createtTypelist(String typelist){
+    static LinkedList<Integer> createtTypelist(String typelist){
         if(typelist==null)
             return null;
         
