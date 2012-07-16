@@ -39,6 +39,7 @@ import org.omg.CosNaming.NamingContextPackage.AlreadyBound;
 import org.omg.CosNaming.NamingContextPackage.CannotProceed;
 import org.omg.CosNaming.NamingContextPackage.InvalidName;
 import org.omg.CosNaming.NamingContextPackage.NotFound;
+import metno.util.MiTime;
 
 import CKvalObs.CService.*;
 import CKvalObs.CDataSource.*;
@@ -1517,58 +1518,59 @@ public class KvApp
      * @return KvDataIterator to pull the data from kvalobs or null if failed.
      */
     
-    public KvDataIterator getKvData(CKvalObs.CService.WhichData[] whichData)
+    synchronized public WorkstatistikIterator 
+    	getKvWorkstatistik(
+    			CKvalObs.CService.WorkstatistikTimeType timeType,
+    			MiTime from, MiTime to )
     {
-        boolean resolvedKvService=false;
-        DataIteratorHolder it=new DataIteratorHolder();
-        
-        if(service==null){
-            if(!resolveKvService()){
-                System.out.println("getKvData: Cant connect to kvService!");
-                return null;
-            }else
-                resolvedKvService=true;
-        }
-        
-        for(int i=0; i<2 && service!=null; i++){
-            try{
-                if(!service.getData(whichData, it)){
-                    System.out.println("getKvData: kvService cant deliver the 'DataIterator'");
-                    return null;
-                }else{
-                    return new KvDataIterator(it.value);
-                }
-            }
-            catch(org.omg.CORBA.COMM_FAILURE e){
-                if(!resolvedKvService){
-                    if(!resolveKvService()){
-                        service=null;
-                        System.out.println("getKvData: Cant connect to kvService!");
-                        return null;
-                    }else
-                        resolvedKvService=true;
-                }else{
-                    service=null;
-                    System.out.println("getKvData: Cant connect to kvService!");
-                    return null;
-                }
-            }
-            catch(Exception ex){
-                service=null;
-                
-                if(debuglog!=null){
-                    ex.printStackTrace(debuglog);
-                    debuglog.flush();
-                }else{
-                    ex.printStackTrace();
-                }
-                
-                return null;
-            }
-        }
-        
+//
+//        boolean resolvedKvService = false;
+//        WorkstatistikIteratorHolder iter = new WorkstatistikIteratorHolder();
+//        
+//        if(service==null){
+//            if(!resolveKvService()){
+//                System.out.println("getKvWorkstatistik: Cant connect to kvService!");
+//                return null;
+//            }else
+//                resolvedKvService=true;
+//        }
+//        
+//        for ( int i = 0; i < 2 && service != null; i++ ) { 
+//            try {
+//                if ( ! service.getRejectdecode( decodeInfo, rejectedIterator ) ) {
+//                    System.out.println("getKvRejectDecode: kvService cant deliver the Rejectdecode iterator");
+//                    return null;
+//                } 
+//                else
+//                    return rejectedIterator.value;
+//            }
+//            catch( org.omg.CORBA.COMM_FAILURE e ) {
+//                if ( ! resolvedKvService ) {
+//                    if ( ! resolveKvService() ) {
+//                        service = null;
+//                        System.out.println("getKvRejectDecode: Cant connect to kvService!");
+//                        return null;
+//                    }
+//                    else
+//                        resolvedKvService = true;
+//                }
+//                else {
+//                    service = null;
+//                    System.out.println("getKvRejectDecode: Cant connect to kvService!");
+//                    return null;
+//                }
+//            }
+//            catch( Exception ex ){
+//                service = null;
+//                ex.printStackTrace();
+//                return null;
+//            }
+//        }
         return null;
     }
+
+    
+    
     
     /**
      * sendDataToKv, sends data to kvalobs, kvDataInputd. ObsType is used
