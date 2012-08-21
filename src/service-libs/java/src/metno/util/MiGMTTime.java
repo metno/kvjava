@@ -54,6 +54,11 @@ public class MiGMTTime extends MiTime{
         set(miTime);
     };
     
+    public MiGMTTime(java.sql.Timestamp ts ){
+        super(TimeZone.getTimeZone("GMT"));
+        set( ts.getTime() );
+    };
+    
     public MiGMTTime(Calendar c){
         super(c);
         cal.setTimeZone(TimeZone.getTimeZone("GMT"));

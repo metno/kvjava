@@ -1,0 +1,59 @@
+#!/bin/sh
+# I would prefer it this way, but there does not seem to be a way to
+# find out the HOME of the JDK ...
+# : ${JAVA_HOME:="@@@JAVA_HOME@@@"}
+# ... If there is no JDK, simply set the following ...
+# : ${JRE_HOME:="$JAVA_HOME/jre"}
+
+# ... but we have to refer to the JRE only!
+
+if  which kvconfig > /dev/null 2>&1; then
+    KVCONFIG=kvconfig
+fi
+
+if [ "z$KVJAVA" = "z" ]; then
+	if [ "z$KVCONFIG" != "z" ]; then
+   		KVJAVA="$(kvconfig --datadir)/kvalobs/java"
+
+		if [ ! -x "$KVJAVA/bin/jaco" ]; then
+      		KVJAVA=""
+        fi
+	fi
+fi
+
+if [ "z$KVJAVA" = "z" ]; then
+    KVJAVA=$HOME/share/kvalobs/java
+fi
+
+MY_JAVA=""
+
+if [ -n "$JAVA_HOME" ]; then
+    MY_JAVA=$JAVA_HOME
+elif [ -n "$JRE_HOME" ]; then
+    MY_JAVA=$JRE_HOME
+elif which java > /dev/null 2>&1 ; then
+    MY_JAVA=$(dirname $(dirname $(which java)))
+fi
+
+if [ -z "$MY_JAVA" ]; then
+    echo "No java found, try to set JAVA_HOME."
+    exit 1
+fi
+
+JAVA_HOME=$MY_JAVA
+
+if [ ! -x "$JAVA_HOME/bin/java" ]; then
+    echo "No java found, try to set JAVA_HOME."
+    exit 1
+fi
+
+
+: ${JVM_FLAGS:=""}
+
+echo "java: ${JAVA_HOME}/bin/java"
+echo "KVJAVA: $KVJAVA"
+
+# call java interpreter
+exec ${JAVA_HOME}/bin/java ${JVM_FLAGS} \
+    -classpath ${JACORB_HOME}/jacorb.jar:${JACORB_HOME}/logkit-1.2.jar:{CLASSPATH} \
+    "$@"

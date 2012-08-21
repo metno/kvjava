@@ -1,0 +1,5 @@
+Main-Class: metno.kvalobs.kl2kvDbCopy.kl2kvDbCopy
+Class-Path: log4j-1.2.13.jar
+            ojdbc6.jar
+            kvalobsclt.jar
+            postgresql-8.3-603.jdbc3.jar

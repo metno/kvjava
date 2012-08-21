@@ -33,7 +33,6 @@ package metno.kvalobs.kv2klgetdata;
 import java.util.LinkedList;
 import java.util.List;
 import java.lang.Integer;
-import java.util.ListIterator;
 import java.util.TimeZone;
 import metno.kvalobs.kl.KlApp;
 import metno.kvalobs.kl.Range;
@@ -154,8 +153,8 @@ public class Main {
     	String typeid=null;
         List<String> list=null;
         //LinkedList<Integer> stationList=null;
-        LinkedList typelist=null;
-        WhichData[] whichData=null;
+        LinkedList<Integer> typelist=null;
+        CKvalObs.CService.WhichData[] whichData=null;
         int        nObservations=0;
         int        nObsMsg=0;
         int        nIterations=0;

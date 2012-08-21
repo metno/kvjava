@@ -30,15 +30,12 @@
 */
 package metno.kvalobs.kl;
 
-import metno.util.MiGMTTime;
 import metno.dbutil.*;
 import metno.util.PropertiesHelper;
-import kvalobs.*;
+import kvalobs.KvApp;
 import java.sql.*;
 import java.io.*;
-import java.util.*;
 import org.apache.log4j.Logger;
-import org.apache.log4j.NDC;
 
 public class KlApp extends KvApp
 {

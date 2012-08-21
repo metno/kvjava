@@ -1,0 +1,12 @@
+#Use this server as the klima server 
+#to receive data from.
+klima.db.connect=jdbc:oracle:thin:@euros:1521:dvh
+klima.db.driver=oracle.jdbc.driver.OracleDriver
+klima.db.user=kvalobs
+klima.db.passwd=obs2005
+
+#Insert the data into this database.
+kvalobs.db.connect=jdbc:postgresql://localhost:5432/kvalobs
+kvalobs.db.driver=org.postgresql.Driver
+kvalobs.db.user=kvalobs
+kvalobs.db.passwd=kvalobs12

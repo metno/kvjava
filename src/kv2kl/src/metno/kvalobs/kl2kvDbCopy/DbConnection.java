@@ -32,23 +32,73 @@ package metno.kvalobs.kl2kvDbCopy;
 
 import metno.util.MiGMTTime;
 import java.sql.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DbConnection{
     Connection conn = null;
-    Statement statement = null;
-
-    MiGMTTime lastAccess=null;
-    boolean   inuse=false;
+    HashMap<String, PreparedStatement> statements=new HashMap<String, PreparedStatement>();
+    MiGMTTime timeCreated=null;
 
     String    dbdriver;
 
-    public  DbConnection(Connection conn_, 
-			 Statement statement_,
-			 String dbdriver_
-			 ){
-        dbdriver=dbdriver_;
-        conn=conn_;
-        statement=statement_;
+    public  DbConnection( Connection conn_,
+    					  String dbdriver_ ) {
+    	dbdriver = dbdriver_;
+    	conn = conn_; 
     }
-
+    
+    public void  addStatement( String id, PreparedStatement statement ){
+    	 PreparedStatement s=statements.put( id, statement );
+    	 
+    	 if( s != null ) {
+    		 try {
+				s.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+    	 }
+    }
+    
+    public void close() {
+    	for( String key : statements.keySet() )	{
+    		PreparedStatement stmt = statements.get( key ); 
+    		if( stmt != null ) {
+    			try {
+    				stmt.close();
+    			} catch (SQLException e) {
+    				e.printStackTrace();
+    			}
+    		}
+    	}
+    	statements.clear();
+    	if( conn != null ) {
+    		try {
+				conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+    	}
+    }
+    
+    public PreparedStatement getStatement( String id ){
+    	return statements.get( id );
+    }
+    
+    public PreparedStatement createStatement( String id, String preparedStatement )  throws SQLException{
+    	if( conn == null ) {
+    		throw new SQLException("No connection");
+    	}
+    	
+    	PreparedStatement stmt = statements.get( id );
+    	
+    	if( stmt != null )
+    		return stmt;
+    	
+    	stmt = conn.prepareStatement( preparedStatement );
+    	
+    	statements.put( id, stmt );
+    	
+    	return stmt;
+    }
 }

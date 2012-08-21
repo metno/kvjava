@@ -44,7 +44,10 @@ public class MiTime{
 
     /**yyyy-MM-dd HH:mm:ss z*/
     public static final String FMT_ISO_z="yyyy-MM-dd HH:mm:ss z";
-    
+   
+    /**yyyy-MM-dd HH:mm:ss.SSS*/
+    public static final String FMT_ISO_WITH_MILLIS="yyyy-MM-dd HH:mm:ss.SSS";
+   
     /**yyyyMMddHHmmss
     public static final String FMT_COMPACT_TIMESTAMP="yyyyMMddHHmmss";
     /**yyyyMMddHHmm*/
@@ -155,13 +158,18 @@ public class MiTime{
     }
     
     public void set(int year, int month, int day){
-        cal.set(year, month-1, day, 0, 0, 0);
+        set(year, month-1, day, 0, 0, 0, 0);
     }
     
     public void set(int year, int month, int day, int hour, int min, int sec){
-        cal.set(year, month-1, day, hour, min, sec);
+        set(year, month-1, day, hour, min, sec, 0);
     }
     
+    public void set(int year, int month, int day, 
+    		        int hour, int min, int sec, int msec){
+        cal.set(year, month-1, day, hour, min, sec);
+        cal.set( Calendar.MILLISECOND, msec );
+    }
     public void set(MiGMTTime gmtTime){
         TimeZone zone=cal.getTimeZone();
         cal=(Calendar)gmtTime.cal.clone();
@@ -175,7 +183,11 @@ public class MiTime{
     public void set(Date d){
         cal.setTime(d);
     }
-    
+
+    public void set(long timeInMillis ){
+        cal.setTimeInMillis( timeInMillis );
+    }
+
     public void set(Calendar c){
         cal=(Calendar)c.clone();
     }

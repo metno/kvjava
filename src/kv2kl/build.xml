@@ -16,6 +16,7 @@
 			<include name="*.jar"/>
 			<exclude name="idl.jar"/>
 		</fileset>
+		<pathelement path="${libdir}/ojdbc6.jar"/>
 		<pathelement path="${libdir}/kvalobsclt.jar"/>
 		<pathelement path="${libdir}/log4j-1.2.13.jar"/>
 		<pathelement path="${builddir}"/>
@@ -30,6 +31,20 @@
 	<target name="main" depends="clean, compile">
 	</target>
 	
+	<target name="kvalobs-is-set">
+		<condition property="has-kvalobs" else="false">
+		  <and>
+			 <length string="${env.KVALOBS}" trim="true" when="gt" length="0"/>
+		    <not> 		
+		      <equals arg1="${env.KVALOBS}" arg2="$${env.KVALOBS}" trim="true"/>
+		    </not>
+		  </and>
+		</condition>
+		<echo>
+			KVALOBS environment variable '${env.KVALOBS}'. has-kvalobs: ${has-kvalobs} 
+		</echo>
+	</target>
+	
 	<target name="init">
 		<mkdir dir="${builddir}"/>
 		<mkdir dir="${testresult}"/>
@@ -41,7 +56,7 @@
 		<javac destdir="${builddir}" srcdir="${src}" classpathref="build.classpath" debug="true"> 
      	<compilerarg value="-Xlint:unchecked"/> 
 			<include name="**/*.java"/>	
-		<!--	<exclude name="**/SqlHelper/*.java"/> -->
+		<!--	<exclude name="**/kl2kvDbCopy/*.java"/> --> 
 		</javac>
 	</target>
 	
@@ -92,6 +107,21 @@
 		<copy todir="${libdir}" file="kl2kvnew.jar"/>
 	</target>
 
+	<target name="-kl2kvdbcopy-install" if="${has-kvalobs}" >
+		<copy todir="${env.KVALOBS}/share/kvalobs/java/lib" file="kl2kvdbcopy.jar"/>
+	</target>
+	<target name="-kl2kvdbcopy" depends="init, compile">
+	    <jar destfile="kl2kvdbcopy.jar" manifest="kl2kvdbcopy.manifest" >
+	    	<fileset dir="${builddir}">
+	            <include name="**/kl/**/*.class"/>
+	            <include name="**/kl2kvDbCopy/**/*.class"/>
+	            <exclude name="**/*Test.class"/>
+	        </fileset>
+	    </jar>
+	    <copy todir="${libdir}" file="kl2kvdbcopy.jar"/>
+     </target>
+	<target name="kl2kvdbcopy" depends="-kl2kvdbcopy,kvalobs-is-set,-kl2kvdbcopy-install"/>
+	
 	<target name="kv2klgetdata" depends="init, compile">
 		<jar destfile="kv2klgetdata.jar" manifest="kv2klgetdata.manifest" >
 			<fileset dir="${builddir}">
@@ -105,7 +135,7 @@
 
 
 	
-	<target name="dist" depends="main, kv2kl, kl2kv, kl2kvnew, kv2klgetdata">
+	<target name="dist" depends="main, kv2kl, kl2kv, kl2kvnew, kv2klgetdata, kl2kvdbcopy">
 		<delete dir="${distdir}"/>
 		<mkdir dir="${distdir}/share/kvalobs/java/bin"/>
 		<mkdir dir="${distdir}/share/kvalobs/java/etc"/>
@@ -141,6 +171,10 @@
 
 		<exec executable="cp" dir="." failonerror="true">
 			<arg line="src/bin/kl2kvnew ${distdir}/bin"/>
+		</exec>
+		
+		<exec executable="cp" dir="." failonerror="true">
+		    <arg line="src/bin/kl2kvdbcopy ${distdir}/bin"/>
 		</exec>
 
 		<exec executable="cp" dir="." failonerror="true">

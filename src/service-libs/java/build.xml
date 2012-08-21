@@ -41,9 +41,30 @@
 	 -->
 	<taskdef name="jacidl" classpathref="idl.classpath" classname="org.jacorb.idl.JacIDL" />
 		
-	<target name="main" depends="clean, idl2java, compile, jar, jar2libdir, sqlhelper, kvdatalistener">
+	
+	<target name="-main-install" if="${has-kvalobs}" >
+	   <copy todir="${env.KVALOBS}/share/kvalobs/java/lib" file="kvalobsclt.jar"/>
+	   <copy todir="${env.KVALOBS}/share/kvalobs/java/lib" file="KvDataListener.jar"/>
+	   <copy todir="${env.KVALOBS}/share/kvalobs/java/lib" file="SqlHelper.jar"/>
 	</target>
 	
+	
+	<target name="main" depends="clean, idl2java, compile, jar, jar2libdir, sqlhelper, kvdatalistener,kvalobs-is-set,-main-install">
+	</target>
+	
+	<target name="kvalobs-is-set">
+	   <condition property="has-kvalobs" else="false">
+	      <and>
+	         <length string="${env.KVALOBS}" trim="true" when="gt" length="0"/>
+	         <not>       
+	            <equals arg1="${env.KVALOBS}" arg2="$${env.KVALOBS}" trim="true"/>
+	         </not>
+	      </and>
+	   </condition>
+	   <echo>
+	      KVALOBS environment variable '${env.KVALOBS}'. has-kvalobs: ${has-kvalobs} 
+	   </echo>
+	</target>
 	<target name="init">
 		<mkdir dir="${builddir}"/>
 		<mkdir dir="${testresult}"/>
