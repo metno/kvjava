@@ -34,7 +34,7 @@ public class DbConnectionFactory {
 			return	"Driver:  " + dbdriver +"\n" +
 				  "Connect: " + dbconnect+"\n" +
 				  "User:    " + dbuser +"\n" +
-				  "Passwd:  " + dbpasswd+"\n";
+				  "Passwd:  ******"; // + dbpasswd;
 		}
 	}
 	HashMap<String, DbParams> dbconf;
@@ -94,6 +94,7 @@ public class DbConnectionFactory {
 		}
 		
 		try{
+			System.out.println("--- Create connection ("  + database +") -----");
 			System.out.println( db.print() );
 			//OracleDataSource ds = new OracleDataSource();
 			
@@ -105,6 +106,11 @@ public class DbConnectionFactory {
 			
 			
 			Connection conn = DriverManager.getConnection(db.dbconnect, db.dbuser, db.dbpasswd );
+			
+			if( conn != null )
+				System.out.println("OK - Database connection created to '"+database+ "'!");
+			else
+				System.out.println("ERROR -  Cant create a database connection to '"+database +"'!");
 			
 			return new DbConnection( conn, db.dbdriver );
 		}

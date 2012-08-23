@@ -15,6 +15,7 @@ public class KlCopyQueryWorker extends QueryWorker {
 	
 	public KlCopyQueryWorker( KlDbConnection con, 
 			MiGMTTime from, MiGMTTime to ) {
+		this.con = con;
 		this.from = from;
 		this.to = to;
 	}
@@ -23,22 +24,19 @@ public class KlCopyQueryWorker extends QueryWorker {
 	
 	@Override
 	public ResultSet init() throws SQLException {
-		if( con == null )
+		if( con == null ) {
 			throw new java.sql.SQLException( "No db connection.");
-		
-		return con.select( from, to );
+		}
+
+		return con.selectKlData( from, to );
 	}
 
 	@Override
 	public boolean next(ResultSet res, Status status) throws SQLException {
-		int stationid;
-		int typeid;
-		MiGMTTime obstime;
-
 		if( res.next() ) {
-			stationid = res.getInt( 1 );
-			obstime = new  MiGMTTime( res.getTimestamp( 2 ) );
-			typeid = res.getInt( 3 );
+			int stationid = res.getInt( 1 );
+			MiGMTTime obstime = new  MiGMTTime( res.getTimestamp( 2 ) );
+			int typeid = res.getInt( 3 );
 
 			if( curStationid == stationid && 
 				curTypeid == typeid &&
@@ -47,8 +45,8 @@ public class KlCopyQueryWorker extends QueryWorker {
     			status.setFirst( false );
     			status.setLast( false );
     			return true;
-			} else if( curStationid != Integer.MIN_VALUE &&
-				       curTypeid != Integer.MIN_VALUE ) {
+			} else if( curStationid == Integer.MIN_VALUE &&
+				       curTypeid == Integer.MIN_VALUE ) {
 				status.setFirst( true );
 				status.setLast( false );
 			} else {
@@ -60,8 +58,6 @@ public class KlCopyQueryWorker extends QueryWorker {
 			curObstime = obstime;
 			curTypeid = typeid;
 			curStationid = stationid;
-			System.out.println( curStationid +", " + curTypeid + ", " +
-					curObstime.toString() + " : " + count ); 
 
 			return true;
 		}

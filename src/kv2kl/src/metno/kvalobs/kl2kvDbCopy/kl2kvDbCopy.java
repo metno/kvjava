@@ -102,61 +102,18 @@ public class kl2kvDbCopy {
     	DbConnectionFactory conFactory=new DbConnectionFactory( propConf );
     
     	KlDbConnection kldb = new KlDbConnection( conFactory.createConnection("klima") );
+    	KlDbConnection kvdb = new KlDbConnection( conFactory.createConnection("kvalobs") );
+
+    	if( kldb == null )
+    		System.out.println("kldb==null GRRRRRRRRRRRR");
     	
-    	System.out.println("From: " + (new MiGMTTime(2012, 7, 19, 6, 0, 0)).getTimestamp().toString() );
-    	ResultSet klres=kldb.select( new MiGMTTime(2012, 7, 19, 6, 0, 0),
-    								 new MiGMTTime(2012, 7, 19, 7, 0, 0) );
-    	try{
-    		String val;
-    		int stationid;
-    		int typeid;
-    		MiGMTTime obstime;
-    		java.sql.Timestamp ts;
-    		int curStationid=Integer.MIN_VALUE;
-    		int curTypeid=Integer.MIN_VALUE;
-    		MiGMTTime curObstime=null;
-    		int count=1;
-    		
-    		while( klres.next() ) {
-    			stationid = klres.getInt( 1 );
-    			ts = klres.getTimestamp( 2 );
-    			obstime = new  MiGMTTime( klres.getTimestamp( 2 ) );
-    			typeid = klres.getInt( 3 );
-    			
-    			if( curStationid == stationid && 
-    			    curTypeid == typeid &&
-    			    curObstime != null && curObstime.compareTo( obstime )==0 ) {
-    				count++;
-    				continue;
-    			} 
-    			
-    			if( curStationid != Integer.MIN_VALUE &&
-    					curTypeid != Integer.MIN_VALUE ) {
-    				System.out.println( curStationid +", " + curTypeid + ", " +
-    						curObstime.toString() + " : " + count ); 
-    			}
-    		    
-    			count=1;
-    			curObstime = obstime;
-    			curTypeid = typeid;
-    			curStationid = stationid;
-    			
-//    			
-//    			for( int i=1; i<=12; ++i ) {
-//    				if( i>1 ) {
-//    					System.out.print(",");
-//    				}
-//    				val = klres.getString( i );
-//    				if( klres.wasNull() )
-//    					val="";
-//    				System.out.print( val );
-//    			}
-//				System.out.println();
-    		}
-    	} catch (SQLException e) {
-    		logger.error("HHHHH: " + e.getMessage() );
-    	}
-    	System.out.println("From: " + (new MiGMTTime(2012, 7, 19, 6, 0, 0)).getTimestamp().toString() );
+    	if( kldb == null )
+    		System.out.println("kvdb==null GRRRRRRRRRRRR");
+    	
+    	IProcessQuery klCopyQuery=new KlCopyQuery( kvdb );
+    	KlCopyQueryWorker klCopyWorker=new KlCopyQueryWorker(kldb, new MiGMTTime(2012, 7, 19, 6, 0, 0), new MiGMTTime(2012, 7, 19, 7, 0, 0));
+    	
+    	klCopyWorker.run(klCopyQuery);
     }
 	
     
