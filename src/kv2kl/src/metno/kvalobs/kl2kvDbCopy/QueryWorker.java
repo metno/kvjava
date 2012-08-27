@@ -67,6 +67,7 @@ public class QueryWorker {
 			if( status.getLast() )
 				process.atLast();
 			
+			
 		}
 		catch( java.sql.SQLException ex ) {
 			try {
