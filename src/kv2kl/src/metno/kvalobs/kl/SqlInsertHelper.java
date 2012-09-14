@@ -55,6 +55,8 @@ public class SqlInsertHelper {
 	DbConnectionMgr conMgr=null;
 	String dataTableName=null;
 	String textDataTableName=null;
+	String foreignDataTableName=null;
+	String foreignTextDataTableName=null;
 	boolean    enableFilter;
 	
 	
@@ -118,6 +120,14 @@ public class SqlInsertHelper {
 
 	 public void setTextDataTableName( String textDataTable ) {
 		 textDataTableName = textDataTable;
+	 }
+	 
+	 public void setForeignDataTable( String foreignData ) {
+		 foreignDataTableName = foreignData;
+	 }
+
+	 public void setForeignTextDataTable( String foreignTextData ) {
+		 foreignDataTableName = foreignTextData;
 	 }
 	
 	protected boolean usetypeid(int  typeid, LinkedList typelist){
@@ -224,7 +234,9 @@ public class SqlInsertHelper {
    				return true;
    			}
    			
-   			DataHelper dh = new DataHelper( dbconn.getDbdriver(), dataTableName, textDataTableName );
+   			DataHelper dh = new DataHelper( dbconn.getDbdriver(), 
+   											dataTableName, textDataTableName,
+   											foreignDataTableName, foreignTextDataTableName );
    			
    			for(int i=0; i<obsData.length; i++){
    				msg.setValue(null);

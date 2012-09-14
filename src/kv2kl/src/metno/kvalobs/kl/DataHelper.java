@@ -6,14 +6,35 @@ public class DataHelper {
 	char ctlinfo[] = new char[16];
 	CKvalObs.CService.DataElem[] dataElem=null;
 	CKvalObs.CService.TextDataElem[] textDataElem=null;
+	String foreignDataTable=null;
+	String foreignTextDataTable=null;
 	int index=-1;
 	
 
 	public DataHelper( String dbdriver ){
-		this( dbdriver, null, null );
+		this( dbdriver, null, null, null, null );
 	}
 	
-	public DataHelper( String dbdriver, String dataTableName, String textDataTableName ){
+	public DataHelper( String dbdriver, 
+			   		   String dataTableName, 
+					   String textDataTableName ) {
+		this( dbdriver, dataTableName, textDataTableName, null, null );
+	}
+	
+	public DataHelper( String dbdriver, 
+					   String dataTableName, 
+					   String textDataTableName,
+					   String foreignDataTable,
+					   String foreignTextDataTable){
+		this.foreignDataTable = foreignDataTable;
+		this.foreignTextDataTable = foreignTextDataTable;
+		
+		if( this.foreignDataTable=="" )
+			this.foreignDataTable = null;
+		
+		if( this.foreignTextDataTable=="" )
+			this.foreignTextDataTable = null;
+		
 		query = QueryFactory.createQuery( dbdriver, dataTableName, textDataTableName );
 	}
 	
@@ -31,24 +52,82 @@ public class DataHelper {
 		index = -1;
 	}
 	
+	/**
+	 * For foreign stations, ie stations with stationid>100000,
+	 * we insert the data in the foreign table if it exist. If it do
+	 * not exist we ignore the data.
+	 * 
+	 * @return the insert query.
+	 */
 	public String createInsertQuery(){
-		if( dataElem != null)
-			return query.createDataInsertQuery( dataElem[index] );
+		String retQ = null;
+		String oldtable=null;
+		boolean isForeign=false;
 		
-		if( textDataElem != null)
-			return query.createTextDataInsertQuery( textDataElem[index] );
+		if( dataElem != null) {
+			if( dataElem[index].stationID > 100000 ) {
+				if( foreignDataTable != null ) {
+					isForeign = true;
+					oldtable = query.setDataTableName( foreignDataTable );
+				}
+			}
+			
+			retQ = query.createDataInsertQuery( dataElem[index] );
 		
-		return null;
+			if( isForeign )
+				query.setDataTableName( oldtable );
+		} else if( textDataElem != null) {
+			if( textDataElem[index].stationID > 100000 ) {
+				if( foreignTextDataTable != null ) {
+					isForeign = true;
+					query.setTextDataTableName( foreignTextDataTable );
+				}
+			} 
+			
+			retQ = query.createTextDataInsertQuery( textDataElem[index] );
+			
+			if( isForeign )
+				query.setTextDataTableName( oldtable );
+		}
+		
+		
+		return retQ;
 	}
 
 	public String createUpdateQuery(){
-		if( dataElem != null)
-			return query.createDataUpdateQuery( dataElem[index] );
+		String retQ = null;
+		String oldtable=null;
+		boolean isForeign=false;
 		
-		if( textDataElem != null)
-			return query.createTextDataUpdateQuery( textDataElem[index] );
+		if( dataElem != null) {
+			if( dataElem[index].stationID > 100000 ) {
+				if( foreignDataTable != null ) {
+					oldtable = query.setDataTableName( foreignDataTable );
+					isForeign = true;
+				}
+			} 
 		
-		return null;
+			retQ = query.createDataUpdateQuery( dataElem[index] );
+			
+			if( isForeign )
+				query.setDataTableName( oldtable );
+			
+		} else if( textDataElem != null) {
+			if( textDataElem[index].stationID > 100000 ) {
+				if( foreignTextDataTable != null ) {
+					oldtable = query.setTextDataTableName( foreignTextDataTable);
+					isForeign = true;
+				}
+			} 
+			
+			retQ = query.createTextDataUpdateQuery( textDataElem[index] );
+			
+			if( isForeign )
+				query.setTextDataTableName( oldtable );
+				
+		}
+		
+		return retQ;
 	}
    	
 	

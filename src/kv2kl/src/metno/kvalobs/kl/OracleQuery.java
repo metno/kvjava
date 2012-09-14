@@ -14,6 +14,24 @@ public class OracleQuery implements IQuery {
 		textDataTable = "T_TEXT_DATA";
 	}
 	
+	public String setDataTableName( String tableName ) {
+		if( tableName != null )
+			return null;
+		
+		String old=dataTable;
+		dataTable = tableName;
+		return old;
+	}
+	
+	public String setTextDataTableName( String tableName ) {
+		if( tableName != null )
+			return null;
+		
+		String old=textDataTable;
+		textDataTable = tableName;
+		return old;
+	}
+	
 	public OracleQuery( String dataTableName, String textDataTableName ){
 		if( dataTableName != null )
 			dataTable = dataTableName;

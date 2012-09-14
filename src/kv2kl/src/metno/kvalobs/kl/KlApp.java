@@ -47,6 +47,8 @@ public class KlApp extends KvApp
     File             pidFile=null;
     String dataTableName=null;
     String textDataTableName=null;
+    String foreignDataTableName=null;
+    String foreignTextDataTableName=null;
     static String           kvpath=null;
     
     String getConfile(String conf){
@@ -100,6 +102,14 @@ public class KlApp extends KvApp
     	return textDataTableName;
     }
     
+    public String getForeignDataTableName() {
+    		return foreignDataTableName;
+    }
+    
+    public String getForeignTextDataTableName() {
+		return foreignTextDataTableName;
+    }
+
     /**
      * 
      * @param args
@@ -126,6 +136,8 @@ public class KlApp extends KvApp
         
         dataTableName = conf.getProperty("datatable", "kv2klima" );
         textDataTableName = conf.getProperty("textdatatable", "T_TEXT_DATA" );
+        foreignDataTableName = conf.getProperty( "foreign_datatable" );
+        foreignTextDataTableName = conf.getProperty( "foreign_textdatatable" );
         
         try {
             conMgr=new DbConnectionMgr(conf);

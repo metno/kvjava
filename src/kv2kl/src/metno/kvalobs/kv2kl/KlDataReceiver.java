@@ -49,6 +49,8 @@ public class KlDataReceiver implements KvDataEventListener {
     	insertstmt=new SqlInsertHelper(app.getConnectionMgr(), backupfile);
     	insertstmt.setDataTableName( app.getDataTableName() );
     	insertstmt.setTextDataTableName( app.getTextDataTableName() );
+    	insertstmt.setForeignDataTable( app.getForeignDataTableName() );
+    	insertstmt.setForeignTextDataTable( app.getForeignTextDataTableName() );
     }
  
     public KlDataReceiver(Kv2KlApp app, String backupfile, boolean enableFilter ){
@@ -56,6 +58,8 @@ public class KlDataReceiver implements KvDataEventListener {
     	insertstmt=new SqlInsertHelper(app.getConnectionMgr(), backupfile, enableFilter );
     	insertstmt.setDataTableName( app.getDataTableName() );
     	insertstmt.setTextDataTableName( app.getTextDataTableName() );
+    	insertstmt.setForeignDataTable( app.getForeignDataTableName() );
+    	insertstmt.setForeignTextDataTable( app.getForeignTextDataTableName() );
     }
     
     public void kvDataEvent(KvDataEvent event) {

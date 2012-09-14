@@ -12,6 +12,8 @@ dbpasswd=kvalobs12
 ##default er kv2klima (data) og T_TEXT_DATA (textdata).
 #datatable=kv2klima
 #textdatatable=T_TEXT_DATA
+#foreign_datatable=
+#foreign_textdatatable=
 
 kvserver=kvalobs
 
