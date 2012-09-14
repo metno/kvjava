@@ -10,13 +10,18 @@ dbpasswd=kvalobs12
 
 ##Hvilke data og textdata tabeller skal vi laste data inn i
 ##default er kv2klima (data) og T_TEXT_DATA (textdata).
+##
+##foreign_datatable og foreign_textdatatable angir tabellene
+##utenlandske stasjoner skal lastes inn i. Hvis de ikke er definert 
+##så ignores disse dataene. Default er å ignorer. Utenlandske stasjoner
+##er definert som alle stasjonene med en stationid>100000.
 #datatable=kv2klima
 #textdatatable=T_TEXT_DATA
-#foreign_datatable=
+#foreign_datatable=kv2klima_utland
 #foreign_textdatatable=
 
 kvserver=kvalobs
 
-#Hvilken navn skal overv�kings grensesnitt registreres under
+#Hvilken navn skal overvåkings grensesnitt registreres under
 #i CORBA navnetjeneren.
 admin=kv2kl-kvtest 
