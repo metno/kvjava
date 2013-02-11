@@ -43,7 +43,7 @@ public class MiTime{
     public static final String FMT_ISO="yyyy-MM-dd HH:mm:ss";
 
     /**yyyy-MM-dd HH:mm:ss z*/
-    public static final String FMT_ISO_z="yyyy-MM-dd HH:mm:ss z";
+    public static final String FMT_ISO_z="yyyy-MM-dd HH:mm:ssZ";
    
     /**yyyy-MM-dd HH:mm:ss.SSS*/
     public static final String FMT_ISO_WITH_MILLIS="yyyy-MM-dd HH:mm:ss.SSS";
@@ -208,8 +208,9 @@ public class MiTime{
         return format.format(cal.getTime());
     }
     
+    @Override
     public String toString(){
-        return toString(FMT_ISO_z);
+        return toString( FMT_ISO );
     }
 
     /**
