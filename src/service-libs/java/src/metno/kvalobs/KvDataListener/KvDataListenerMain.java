@@ -35,6 +35,8 @@ import CKvalObs.CService.*;
 import java.util.*;
 import java.text.*;
 import java.io.*;
+
+import metno.kvalobs.KvDataListener.KvHintListener;
 import metno.util.MiGMTTime;
 import metno.util.PropertiesHelper;
 import org.apache.log4j.Logger;
@@ -120,7 +122,7 @@ public class KvDataListenerMain {
     	KvDataReceiver dataReceiver=new KvDataReceiver(app);
     	String subscriberid=app.getSubscriberid();
     	MiGMTTime now=new MiGMTTime();
-    	
+    	KvHintListener hint  = new KvHintListener();
     	logger.info("Starting: " +now);
     	
     	if(subscriberid==null){
@@ -139,8 +141,12 @@ public class KvDataListenerMain {
       		app.exit();
       	}
     	
+      	String hintid = app.subscribeKvHintListener( hint );
+      	
     	logger.info("Subscribe on <KvData>, subscriberid <" 
-    			           + subscriberid+"> Ctrl+c for aa avslutte!");
+    			           + subscriberid+">!");
+    	logger.info("Subscribe on <KvHint>, hintid <" 
+		           + hintid+"> Ctrl+c for aa avslutte!");
     	app.run();
 
     	logger.info("Prorgram terminate!");
