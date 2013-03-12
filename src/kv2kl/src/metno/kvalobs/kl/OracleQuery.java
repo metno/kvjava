@@ -53,7 +53,8 @@ public class OracleQuery implements IQuery {
 	}
 	
 	public String createDataUpdateQuery( CKvalObs.CService.DataElem elem ){
-		logger.debug("Update a Oracle database!");
+		logger.debug("Update a Oracle database!sid: "+elem.stationID+" tid: " + 
+	             elem.typeID_ + " pid: " + elem.paramID+ " obstime: '"+elem.obstime+"' tbtime: "+elem.tbtime);
 	   	String query="UPDATE "+ getDataTableName() +
 	   				 " SET " +
 	   				 "  original="+elem.original + "," +
@@ -73,7 +74,8 @@ public class OracleQuery implements IQuery {
 	}
 	
 	public String createDataInsertQuery( CKvalObs.CService.DataElem elem){
-		logger.debug("Insert data into a Oracle database!");
+		logger.debug("Insert data into a Oracle database! sid: "+elem.stationID+" tid: " + 
+	             elem.typeID_ + " pid: " + elem.paramID+ " obstime: '"+elem.obstime+"' tbtime: "+elem.tbtime);
 	   	String query="insert into " + getDataTableName() + "(stnr,dato,original,kvstamp,paramid,typeid,xlevel,sensor,useinfo,corrected,controlinfo,cfailed) values ("
 	   				 +elem.stationID+",to_date('"
 	   				 +elem.obstime+"','yyyy-mm-dd hh24:mi:ss'),"
@@ -91,7 +93,8 @@ public class OracleQuery implements IQuery {
 	}
 	
 	public String createTextDataUpdateQuery( CKvalObs.CService.TextDataElem elem ){
-		logger.debug("Update textData in a Oracle database!");
+		logger.debug("Update textData in a Oracle database! sid: "+elem.stationID+" tid: " + 
+	             elem.typeID_ + " pid: " + elem.paramID+ " obstime: '"+elem.obstime+"' tbtime: "+elem.tbtime);
 	   	String query="UPDATE "+ getTextDataTableName() +
 	   				 " SET " +
 	   				 "  original='"+elem.original + "'," +
@@ -105,7 +108,8 @@ public class OracleQuery implements IQuery {
 	}
 	
 	public String createTextDataInsertQuery(CKvalObs.CService.TextDataElem elem){
-		logger.debug("Insert textData into a Oracle database!");
+		logger.debug("Insert textData into a Oracle database! sid: "+elem.stationID+" tid: " + 
+	             elem.typeID_ + " pid: " + elem.paramID+ " obstime: '"+elem.obstime+"' tbtime: "+elem.tbtime);
 	   	String query="insert into " + getTextDataTableName() + "(stationid,obstime,original,paramid,tbtime,typeid) values ("
 	   				 +elem.stationID+",to_date('"
 	   				 +elem.obstime+"','yyyy-mm-dd hh24:mi:ss'),'"
@@ -118,6 +122,8 @@ public class OracleQuery implements IQuery {
 	}
 	
 	public String dateString( MiTime time ) {
-		return "to_date('" + time.toString(MiTime.FMT_ISO) + "','yyyy-mm-dd hh24:mi:ss')";
+		String out = "to_date('" + time.toString(MiTime.FMT_ISO) + "','yyyy-mm-dd hh24:mi:ss')";
+		logger.debug("Oracle  time string! in '" + time +" out: '"+out+"'.");
+		return out;
 	}
 }
