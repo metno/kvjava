@@ -1,8 +1,8 @@
-package kvalobs;
+package no.met.kvclient;
 
 import java.util.EventListener;
 
-import kvalobs.service.ObsDataList;
+import no.met.kvclient.service.ObsDataList;
 
 public interface KvEventListener extends EventListener {
 	default void callListener(Object source, ObsDataList dataList) {

@@ -28,11 +28,10 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package kvalobs;
-
+package no.met.kvclient;
 public interface KvDataEventListener extends KvEventListener {
 	@Override
-	default public void callListener(Object source, kvalobs.service.ObsDataList dataList) {
+	default public void callListener(Object source, no.met.kvclient.service.ObsDataList dataList) {
 		kvDataEvent(new KvDataEvent(source, dataList));
 	};
 

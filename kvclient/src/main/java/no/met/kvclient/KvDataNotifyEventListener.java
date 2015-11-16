@@ -28,16 +28,16 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package kvalobs;
+package no.met.kvclient;
 
-import kvalobs.service.DataElem;
-import kvalobs.service.ObsData;
-import kvalobs.service.kvDataNotifySubscriber.What;
-import kvalobs.service.kvDataNotifySubscriber.WhatList;
+import no.met.kvclient.service.DataElem;
+import no.met.kvclient.service.ObsData;
+import no.met.kvclient.service.kvDataNotifySubscriber.What;
+import no.met.kvclient.service.kvDataNotifySubscriber.WhatList;
 
 public interface KvDataNotifyEventListener extends KvEventListener {
 	@Override
-	default public void callListener(Object source, kvalobs.service.ObsDataList dataList) {
+	default public void callListener(Object source, no.met.kvclient.service.ObsDataList dataList) {
 		WhatList wl = new WhatList();
 		for (ObsData od : dataList) {
 			boolean onlyMissing = true;

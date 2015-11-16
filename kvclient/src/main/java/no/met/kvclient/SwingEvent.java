@@ -28,9 +28,9 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package kvalobs;
+package no.met.kvclient;
 
-import kvalobs.priv.Event;
+import no.met.kvclient.priv.Event;
 
 public class SwingEvent implements Runnable {
 	private KvApp app;

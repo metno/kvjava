@@ -1,4 +1,4 @@
-package kvalobs.service;
+package no.met.kvclient.service;
 
 public class QcIdList extends java.util.LinkedList<QcId> {
 	private static final long serialVersionUID = 28776296348250018L;

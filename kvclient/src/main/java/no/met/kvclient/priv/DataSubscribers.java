@@ -1,13 +1,13 @@
-package kvalobs.priv;
+package no.met.kvclient.priv;
 
 import java.util.LinkedList;
 
-import kvalobs.KvEventListener;
-import kvalobs.service.DataElem;
-import kvalobs.service.DataSubscribeInfo;
-import kvalobs.service.ObsData;
-import kvalobs.service.ObsDataList;
-import kvalobs.service.SubscribeId;
+import no.met.kvclient.KvEventListener;
+import no.met.kvclient.service.DataElem;
+import no.met.kvclient.service.DataSubscribeInfo;
+import no.met.kvclient.service.ObsData;
+import no.met.kvclient.service.ObsDataList;
+import no.met.kvclient.service.SubscribeId;
 
 public class DataSubscribers<Listener extends KvEventListener>
 		extends LinkedList<DataSubscribers<Listener>.SubscriberElem> {
@@ -35,7 +35,7 @@ public class DataSubscribers<Listener extends KvEventListener>
 	ObsDataList filter(ObsDataList data, DataSubscribeInfo info) {
 		ObsDataList dataToSend = new ObsDataList();
 
-		for (kvalobs.service.ObsData de : data) {
+		for (no.met.kvclient.service.ObsData de : data) {
 			ObsData obsData = new ObsData(de.stationid, de.typeID, de.obstime, de.textDataList);
 
 			for (DataElem elem : de.dataList) {

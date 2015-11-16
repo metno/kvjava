@@ -28,9 +28,9 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package kvalobs.priv;
+package no.met.kvclient.priv;
 
-import kvalobs.*;
+import no.met.kvclient.*;
 import java.util.*;
 
 public class ShutdownHook extends Thread

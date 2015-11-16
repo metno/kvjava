@@ -1,4 +1,4 @@
-package kvalobs.service;
+package no.met.kvclient.service;
 
 public class Reference_station {
 	public long stationID;

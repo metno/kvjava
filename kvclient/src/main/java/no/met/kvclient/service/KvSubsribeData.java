@@ -1,4 +1,4 @@
-package kvalobs.service;
+package no.met.kvclient.service;
 
 public interface KvSubsribeData {
 	SubscribeId subscribeDataNotify(DataSubscribeInfo info, kvDataNotifySubscriber sub);

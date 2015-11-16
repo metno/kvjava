@@ -1,4 +1,4 @@
-package kvalobs.service;
+package no.met.kvclient.service;
 
 public class RejectDecodeInfo {
 	public java.util.LinkedList<String> decodeList = null;

@@ -28,9 +28,9 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package kvalobs;
+package no.met.kvclient;
 
-import kvalobs.service.ObsDataList;
+import no.met.kvclient.service.ObsDataList;
 
 public class KvGetDataEvent extends KvDataEvent {
 	private static final long serialVersionUID = 5358533752972212712L;

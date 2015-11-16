@@ -1,4 +1,4 @@
-package kvalobs.service;
+package no.met.kvclient.service;
 
 public class TextDataElemList extends java.util.LinkedList<TextDataElem> {
 	private static final long serialVersionUID = -8492848189771106644L;

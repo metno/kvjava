@@ -28,9 +28,9 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package kvalobs;
+package no.met.kvclient;
 
-import kvalobs.service.kvDataNotifySubscriber.WhatList;
+import no.met.kvclient.service.kvDataNotifySubscriber.WhatList;
 
 public class KvDataNotifyEvent extends KvEvent {
 	private static final long serialVersionUID = 1771127947051664937L;

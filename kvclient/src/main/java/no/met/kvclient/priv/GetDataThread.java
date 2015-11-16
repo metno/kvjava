@@ -28,10 +28,10 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package kvalobs.priv;
+package no.met.kvclient.priv;
 
-import kvalobs.KvApp;
-import kvalobs.KvDataEventListener;
+import no.met.kvclient.KvApp;
+import no.met.kvclient.KvDataEventListener;
 
 public class GetDataThread extends Thread {
 	private boolean doExit = false;
@@ -39,11 +39,11 @@ public class GetDataThread extends Thread {
 	private KvApp app = null;
 	private KvDataEventListener listener;
 	private boolean running = true;
-	kvalobs.service.WhichDataList whichData;
+	no.met.kvclient.service.WhichDataList whichData;
 
 	// TODO: We need connection information to the database.
 	public GetDataThread(KvEventQue eventQue_, KvApp app_, KvDataEventListener listener_,
-			kvalobs.service.WhichDataList whichData) {
+			no.met.kvclient.service.WhichDataList whichData) {
 		doExit = false;
 		eventQue = eventQue_;
 		app = app_;

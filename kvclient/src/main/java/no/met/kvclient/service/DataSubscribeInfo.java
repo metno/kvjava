@@ -1,4 +1,4 @@
-package kvalobs.service;
+package no.met.kvclient.service;
 
 public class DataSubscribeInfo {
 	public StationIDList ids; // Send info for all stations if the list is
@@ -24,7 +24,7 @@ public class DataSubscribeInfo {
 		status = StatusId.All;
 	}
 
-	public void setStatusId(kvalobs.service.StatusId statusid) {
+	public void setStatusId(StatusId statusid) {
 		this.status = statusid;
 	}
 
@@ -32,7 +32,7 @@ public class DataSubscribeInfo {
 		ids.addLast(new Long(stationid));
 	}
 
-	public void addQcId(kvalobs.service.QcId qcId) {
+	public void addQcId(QcId qcId) {
 		qc.addLast(qcId);
 	}
 

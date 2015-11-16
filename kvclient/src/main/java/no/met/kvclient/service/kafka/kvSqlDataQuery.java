@@ -1,21 +1,21 @@
-package kvalobs.service.impl;
+package no.met.kvclient.service.kafka;
 
 import java.util.Optional;
 
-import kvalobs.service.DataIterator;
-import kvalobs.service.ModelDataIterator;
-import kvalobs.service.Obs_pgmList;
-import kvalobs.service.OperatorList;
-import kvalobs.service.ParamList;
-import kvalobs.service.Reference_stationList;
-import kvalobs.service.RejectDecodeInfo;
-import kvalobs.service.RejectedIterator;
-import kvalobs.service.StationIDList;
-import kvalobs.service.StationList;
-import kvalobs.service.Station_paramList;
-import kvalobs.service.TypeList;
-import kvalobs.service.WhichDataList;
-import kvalobs.service.KvDataQuery;
+import no.met.kvclient.service.DataIterator;
+import no.met.kvclient.service.ModelDataIterator;
+import no.met.kvclient.service.Obs_pgmList;
+import no.met.kvclient.service.OperatorList;
+import no.met.kvclient.service.ParamList;
+import no.met.kvclient.service.Reference_stationList;
+import no.met.kvclient.service.RejectDecodeInfo;
+import no.met.kvclient.service.RejectedIterator;
+import no.met.kvclient.service.StationIDList;
+import no.met.kvclient.service.StationList;
+import no.met.kvclient.service.Station_paramList;
+import no.met.kvclient.service.TypeList;
+import no.met.kvclient.service.WhichDataList;
+import no.met.kvclient.service.KvDataQuery;
 
 public class kvSqlDataQuery implements KvDataQuery {
 

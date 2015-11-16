@@ -1,4 +1,4 @@
-package kvalobs.service;
+package no.met.kvclient.service;
 
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;

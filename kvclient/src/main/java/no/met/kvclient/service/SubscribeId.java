@@ -1,4 +1,4 @@
-package kvalobs.service;
+package no.met.kvclient.service;
 
 public class SubscribeId implements Comparable<SubscribeId> {
 	public String id = null;

@@ -1,7 +1,7 @@
-package kvalobs.priv;
+package no.met.kvclient.priv;
 
-import kvalobs.KvDataEventListener;
-import kvalobs.service.ObsDataList;
+import no.met.kvclient.KvDataEventListener;
+import no.met.kvclient.service.ObsDataList;
 
 public class Event {
 	public enum Hint {

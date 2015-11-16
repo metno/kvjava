@@ -28,11 +28,11 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package kvalobs;
+package no.met.kvclient;
 
 //TODO: Should this bee removed?
 //import java.util.*;
-import kvalobs.service.kvDataNotifySubscriber.What;
+import no.met.kvclient.service.kvDataNotifySubscriber.What;
 
 public class KvDataNotifyExtEvent extends KvEvent
 {

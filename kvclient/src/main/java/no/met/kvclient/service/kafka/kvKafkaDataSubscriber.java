@@ -1,11 +1,11 @@
-package kvalobs.service.impl;
+package no.met.kvclient.service.kafka;
 
-import kvalobs.service.DataSubscribeInfo;
-import kvalobs.service.SubscribeId;
-import kvalobs.service.kvDataNotifySubscriber;
-import kvalobs.service.kvDataSubscriber;
-import kvalobs.service.kvHintSubscriber;
-import kvalobs.service.KvSubsribeData;
+import no.met.kvclient.service.DataSubscribeInfo;
+import no.met.kvclient.service.SubscribeId;
+import no.met.kvclient.service.kvDataNotifySubscriber;
+import no.met.kvclient.service.kvDataSubscriber;
+import no.met.kvclient.service.kvHintSubscriber;
+import no.met.kvclient.service.KvSubsribeData;
 
 public class kvKafkaDataSubscriber implements KvSubsribeData {
 

@@ -28,27 +28,13 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package kvalobs;
-
+package no.met.kvclient;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.LinkedList;
-
-import kvalobs.priv.DataSubscribers;
-import kvalobs.priv.Event;
-import kvalobs.priv.GetDataThread;
-import kvalobs.priv.GetDataThreadManager;
-import kvalobs.priv.HintSubscribers;
-import kvalobs.priv.KvEventQue;
-import kvalobs.priv.ShutdownHook;
-import kvalobs.service.Admin;
-import kvalobs.service.DataSubscribeInfo;
-import kvalobs.service.ObsDataList;
-import kvalobs.service.RejectDecodeInfo;
-import kvalobs.service.RejectedIterator;
-import kvalobs.service.SubscribeId;
-import kvalobs.service.kvService;;
+import no.met.kvclient.priv.*;
+import no.met.kvclient.service.*;
 
 public class KvApp {
 	final private int nGetDataThreads = 10;
@@ -59,7 +45,7 @@ public class KvApp {
 	private HintSubscribers hintList = new HintSubscribers();
 	private LinkedList<Admin> adminList = new LinkedList<Admin>();
 	private kvService service = null;
-	private kvalobs.datasource.Data dataInput = null;
+	private no.met.kvclient.datasource.Data dataInput = null;
 	private String kvServer = null;
 	private KvEventQue eventQue = null;
 	private ShutdownHook hook = null;
@@ -237,7 +223,7 @@ public class KvApp {
 	}
 
 	// TODO: We need to filter data to see whom is to receive data.
-	synchronized public void postKvEvent(kvalobs.priv.Event event) {
+	synchronized public void postKvEvent(no.met.kvclient.priv.Event event) {
 		switch (event.getEventType()) {
 		case DataEvent: {
 			dataList.callListeners(event.getSource(), event.getObsData());
@@ -261,15 +247,15 @@ public class KvApp {
 		}
 	}
 
-	public kvalobs.service.Station[] getKvStations() {
+	public no.met.kvclient.service.Station[] getKvStations() {
 		return null;
 	}
 
-	public kvalobs.service.Param[] getKvParams() {
+	public no.met.kvclient.service.Param[] getKvParams() {
 		return null;
 	}
 
-	public kvalobs.service.Types[] getKvTypes() {
+	public no.met.kvclient.service.Types[] getKvTypes() {
 		return null;
 	}
 
@@ -286,7 +272,7 @@ public class KvApp {
 	 *
 	 * @return An array containing the specified station parameters.
 	 */
-	public kvalobs.service.Station_param[] getKvStationParam(int stationid, int paramid, int day) {
+	public no.met.kvclient.service.Station_param[] getKvStationParam(int stationid, int paramid, int day) {
 		return null;
 	}
 
@@ -294,7 +280,7 @@ public class KvApp {
 		return null;
 	}
 
-	public kvalobs.service.Obs_pgm[] getKvObsPgm(int[] stationIDList, boolean aUnion) {
+	public no.met.kvclient.service.Obs_pgm[] getKvObsPgm(int[] stationIDList, boolean aUnion) {
 		return null;
 	}
 
@@ -313,7 +299,7 @@ public class KvApp {
 	 * @return true on success and false otherwise.
 	 */
 
-	synchronized public boolean getKvData(kvalobs.service.WhichDataList whichData, KvDataEventListener listener) {
+	synchronized public boolean getKvData(no.met.kvclient.service.WhichDataList whichData, KvDataEventListener listener) {
 		return false;
 	}
 
@@ -330,7 +316,7 @@ public class KvApp {
 	 *            the stations and period we want data for.
 	 * @return KvDataIterator to pull the data from kvalobs or null if failed.
 	 */
-	public KvDataIterator getKvData(kvalobs.service.WhichDataList whichData) {
+	public KvDataIterator getKvData(no.met.kvclient.service.WhichDataList whichData) {
 		return null;
 	}
 
@@ -372,7 +358,7 @@ public class KvApp {
 	 *         the CORBA nameserver may be down.
 	 */
 
-	public kvalobs.datasource.Result sendDataToKv(String data, String obsType) {
+	public no.met.kvclient.datasource.Result sendDataToKv(String data, String obsType) {
 		return null;
 	}
 
@@ -430,7 +416,7 @@ public class KvApp {
 	 *         the CORBA nameserver may be down.
 	 */
 
-	public kvalobs.datasource.Result sendKlDataToKv(String data, long nationalid, long typeid) {
+	public no.met.kvclient.datasource.Result sendKlDataToKv(String data, long nationalid, long typeid) {
 		String obsType = "kldata/nationalnr=" + Long.toString(nationalid) + "/type=" + Long.toString(typeid);
 
 		return sendDataToKv(data, obsType);

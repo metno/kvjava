@@ -1,18 +1,18 @@
-package kvalobs.priv;
+package no.met.kvclient.priv;
 
 import java.util.LinkedList;
 
-import kvalobs.service.SubscribeId;
-import metno.kvalobs.KvDataListener.KvHintListener;
+import no.met.kvclient.service.SubscribeId;
+import no.met.kvclient.KvHintEventListener;
 
 public class HintSubscribers extends LinkedList<HintSubscribers.SubscriberElem> {
 	private static final long serialVersionUID = 445868070046645018L;
 
 	public class SubscriberElem {
 		SubscribeId id;
-		KvHintListener listener;
+		KvHintEventListener listener;
 
-		public SubscriberElem(SubscribeId id, KvHintListener listener) {
+		public SubscriberElem(SubscribeId id, KvHintEventListener listener) {
 			this.id = id;
 			this.listener = listener;
 		}
@@ -21,7 +21,7 @@ public class HintSubscribers extends LinkedList<HintSubscribers.SubscriberElem> 
 	public HintSubscribers() {
 	}
 
-	public void addSubscriber(SubscribeId id, KvHintListener listener) {
+	public void addSubscriber(SubscribeId id, KvHintEventListener listener) {
 		add(new SubscriberElem(id, listener));
 	}
 

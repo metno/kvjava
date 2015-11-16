@@ -1,4 +1,4 @@
-package kvalobs.service;
+package no.met.kvclient.service;
 
 public class ModelDataList extends java.util.LinkedList<ModelData> {
 	private static final long serialVersionUID = 2043405686284949114L;
