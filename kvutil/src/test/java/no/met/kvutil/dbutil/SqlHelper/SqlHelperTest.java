@@ -28,9 +28,9 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package metno.SqlHelper;
+package no.met.kvutil.dbutil.SqlHelper;
 
-import metno.util.*;
+import no.met.kvutil.*;
 import junit.framework.TestCase;
 
 public class SqlHelperTest extends TestCase {

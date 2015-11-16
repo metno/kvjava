@@ -28,12 +28,9 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package metno.util;
+package no.met.kvutil;
 
 import java.util.*;
-
-import com.sun.org.apache.xalan.internal.xsltc.cmdline.getopt.GetOptsException;
-
 import junit.framework.*;
 
 /** Some test cases for GetOpt.
@@ -49,7 +46,7 @@ public class GetOptTest extends TestCase {
 	private String goodLongArgs[]  = {
 			"-help", "-output-file", "outfile", "infile"
 	};
-	private char[] goodArgsExpectChars = { 'h', 'o' };
+	//private char[] goodArgsExpectChars = { 'h', 'o' };
 
 	private 	String badArgChars = "f1o";
 	private String badArgs[]  = {

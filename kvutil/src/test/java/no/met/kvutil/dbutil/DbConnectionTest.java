@@ -28,15 +28,13 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package metno.dbutil; 
+package no.met.kvutil.dbutil; 
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-
 import junit.framework.*;
-import metno.dbutil.*;
 
 public class DbConnectionTest extends TestCase{
     static final String dbdriver="org.hsqldb.jdbcDriver";
