@@ -33,9 +33,9 @@ package no.met.kvutil;
 import junit.framework.*;
 
 public class FileUtilTest extends TestCase{
-    static final String inFile="tmp/inFile.txt";
-    static final String outFile="tmp/outFile.txt";
-    static final String readTstFile="test/metno/util/readtest.txt";
+    static final String inFile="target/inFile.txt";
+    static final String outFile="target/outFile.txt";
+    static final String readTstFile="src/test/java/no/met/kvutil/readtest.txt";
 
     
     //filecontent must be equal to the content in the file test/metno/util/readtest.txt.
