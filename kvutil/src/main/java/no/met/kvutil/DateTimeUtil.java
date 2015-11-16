@@ -28,7 +28,7 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package metno.util;
+package no.met.kvutil;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -127,7 +127,6 @@ public class DateTimeUtil {
 	 * @see java.text.SimpleDateFormat for an description of fmt.
 	 */
 	public static OffsetDateTime parse(String timestamp) {
-		DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ssx");
 		String ts = timestamp.replace('T', ' ');
 		ts = ts.replace("z", "+00");
 		ts = ts.replace("Z", "+00");

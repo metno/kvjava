@@ -1,7 +1,7 @@
 /*
   Kvalobs - Free Quality Control Software for Meteorological Observations 
 
-  $Id: StringHolder.java,v 1.1.2.3 2007/09/27 09:02:43 paule Exp $                                                       
+  $Id: IntHolder.java,v 1.1.2.2 2007/09/27 09:02:43 paule Exp $                                                       
 
   Copyright (C) 2007 met.no
 
@@ -28,20 +28,17 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package metno.util;
+package no.met.kvutil;
+public class IntHolder{
+    int value;
 
-public class StringHolder {
-	String value;
-	
-	public StringHolder(){
-		value=null;
-	}
-	
-	public StringHolder(String value){
-		this.value=value;
-	}
-	
-	public String getValue(){ return value;}
-	public void   setValue(String value){ this.value=value;}
+    public IntHolder(){
+    }
+
+    public IntHolder(int i){
+        value=i;
+    }
+    
+    public int getValue(){ return value;}
+    public void setValue(int value){ this.value=value;}
 }
-

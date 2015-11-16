@@ -1,7 +1,7 @@
 /*
   Kvalobs - Free Quality Control Software for Meteorological Observations 
 
-  $Id: IntHolder.java,v 1.1.2.2 2007/09/27 09:02:43 paule Exp $                                                       
+  $Id: SelectInfo.java,v 1.1.2.2 2007/09/27 09:02:42 paule Exp $                                                       
 
   Copyright (C) 2007 met.no
 
@@ -28,18 +28,16 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package metno.util;
+package no.met.kvutil.dbutil.SqlHelper;
 
-public class IntHolder{
-    int value;
 
-    public IntHolder(){
-    }
+public class SelectInfo {
 
-    public IntHolder(int i){
-        value=i;
-    }
+    String filename;
+    String select;
     
-    public int getValue(){ return value;}
-    public void setValue(int value){ this.value=value;}
+    SelectInfo(String select, String filename){
+            this.filename=filename;
+            this.select=select;
+    }
 }

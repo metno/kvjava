@@ -28,14 +28,13 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package metno.SqlHelper;
-
-import metno.util.*;
+package no.met.kvutil.dbutil.SqlHelper;
+import no.met.kvutil.*;
 import java.util.*;
 
 public class SelectInfoParser {
     PropertiesHelper prop;
-    Enumeration      keys;
+    Enumeration<?>   keys;
     StringHolder     sh;
     
     SelectInfoParser(PropertiesHelper prop){

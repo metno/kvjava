@@ -28,9 +28,8 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package metno.dbutil;
-
-import metno.util.MiGMTTime;
+package no.met.kvutil.dbutil;
+import no.met.kvutil.MiGMTTime;
 import java.sql.*;
 import java.util.*;
 

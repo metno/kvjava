@@ -28,13 +28,12 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package metno.dbutil;
-
+package no.met.kvutil.dbutil;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import metno.util.MiGMTTime;
+import no.met.kvutil.MiGMTTime;
 
 public class DbConnection {
 	Connection connection;

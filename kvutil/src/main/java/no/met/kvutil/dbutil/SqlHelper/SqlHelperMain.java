@@ -28,13 +28,9 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package metno.SqlHelper;
-
-import java.util.*;
-import java.text.*;
-import java.sql.*;
+package no.met.kvutil.dbutil.SqlHelper;
 import java.io.*;
-import metno.util.*;
+import no.met.kvutil.*;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;

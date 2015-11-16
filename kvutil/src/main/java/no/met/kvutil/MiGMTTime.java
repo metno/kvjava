@@ -28,14 +28,9 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package metno.util;
-
+package no.met.kvutil;
 
 import java.util.*;
-import java.text.*;
-import java.sql.Timestamp;
-
-import metno.util.MiTime;
 
 public class MiGMTTime extends MiTime{
     
