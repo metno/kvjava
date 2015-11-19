@@ -1,14 +1,16 @@
 package no.met.kvclient.service;
 
+import java.time.Instant;
+
 public class TextDataElem {
 	public long stationID;
-	public String obstime;
+	public Instant obstime;
 	public String original;
-	public short paramID;
-	public String tbtime;
-	public short typeID_;
+	public int paramID;
+	public Instant tbtime;
+	public long typeID_;
 
-	public TextDataElem(long stationID, String obstime, String original, short paramID, String tbtime, short typeID) {
+	public TextDataElem(long stationID, Instant obstime, String original, int paramID, Instant tbtime, long typeID) {
 		this.stationID = stationID;
 		this.obstime = obstime;
 		this.original = original;

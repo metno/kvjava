@@ -123,11 +123,12 @@ public class DateTimeUtil {
 	 *            The format of the string.
 	 * @return True if the timestamp could be parsed as a timestamp in
 	 *         accordance with fmt. False otherwise.
-	 * 
+	 * @throws DateTimeParseException
 	 * @see java.text.SimpleDateFormat for an description of fmt.
 	 */
 	public static OffsetDateTime parse(String timestamp) {
-		String ts = timestamp.replace('T', ' ');
+		String ts=timestamp.trim();
+		ts = timestamp.replace('T', ' ');
 		ts = ts.replace("z", "+00");
 		ts = ts.replace("Z", "+00");
 

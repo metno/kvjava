@@ -52,14 +52,20 @@
       <artifactId>hsqldb</artifactId>
       <version>2.3.3</version>
       <scope>test</scope>
-   </dependency>
+    </dependency>
     
+    <dependency>
+      <groupId>org.apache.kafka</groupId>
+      <artifactId>kafka-clients</artifactId>
+      <version>0.8.2.2</version>
+    </dependency>
+
     <dependency>
       <groupId>org.apache.kafka</groupId>
       <artifactId>kafka_2.11</artifactId>
       <version>0.8.2.2</version>
-   </dependency>
-    
+    </dependency>
+
     <dependency>
       <groupId>no.met.kvalobs</groupId>
       <artifactId>kvutil</artifactId>

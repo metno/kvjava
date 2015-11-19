@@ -210,8 +210,9 @@ public class KvApp {
 	 */
 
 	synchronized public SubscribeId subscribeKvHintListener(KvHintEventListener listener) {
-
-		return new SubscribeId();
+		SubscribeId subid = getSubscriberId("hint_subscriber_");
+		hintList.addSubscriber(subid, listener);
+		return subid;
 	}
 
 	synchronized public boolean unsubscribeKv(SubscribeId subscriberid) {
@@ -222,7 +223,6 @@ public class KvApp {
 		return false;
 	}
 
-	// TODO: We need to filter data to see whom is to receive data.
 	synchronized public void postKvEvent(no.met.kvclient.priv.Event event) {
 		switch (event.getEventType()) {
 		case DataEvent: {
