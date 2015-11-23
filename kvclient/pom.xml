@@ -16,34 +16,7 @@
     <version>1.0-SNAPSHOT</version>
   </parent>
 
-  <repositories>
-    <repository>
-      <id>public</id>
-      <name>All public repositories</name>
-      <url>http://maven.met.no/content/groups/public</url>
-      <releases>
-        <enabled>true</enabled>
-        <updatePolicy>allways</updatePolicy>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-        <updatePolicy>allways</updatePolicy>
-      </snapshots>
-    </repository>
-   
-    <repository>
-      <id>Apache repository</id>
-      <url>https://repository.apache.org/content/repositories</url>
-      <releases>
-        <updatePolicy>always</updatePolicy>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
- 
-  </repositories>
-
+  
   <dependencies>
     <dependency>
       <groupId>junit</groupId>

@@ -11,7 +11,8 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
-  <repositories>
+
+   <repositories>
     <repository>
       <id>public</id>
       <name>All public repositories</name>
@@ -27,7 +28,7 @@
     </repository>
    
     <repository>
-          <id>Apache repository</id>
+      <id>Apache repository</id>
       <url>https://repository.apache.org/content/repositories</url>
       <releases>
         <updatePolicy>always</updatePolicy>
@@ -38,6 +39,7 @@
     </repository>
  
   </repositories>
+
 
 
   <modules>
