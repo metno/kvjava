@@ -1,9 +1,12 @@
 package no.met.kvclient.service;
 
-public interface KvSubsribeData {
-	SubscribeId subscribeDataNotify(DataSubscribeInfo info, kvDataNotifySubscriber sub);
+import no.met.kvclient.KvDataEventListener;
+import no.met.kvclient.KvDataNotifyEventListener;
 
-	SubscribeId subscribeData(DataSubscribeInfo info, kvDataSubscriber sub);
+public interface KvSubsribeData {
+	SubscribeId subscribeDataNotify(DataSubscribeInfo info, KvDataNotifyEventListener listener);
+
+	SubscribeId subscribeData(DataSubscribeInfo info, KvDataEventListener listener);
 
 	SubscribeId subscribeKvHint(kvHintSubscriber sub);
 

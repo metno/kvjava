@@ -3,6 +3,8 @@ package no.met.kvclient.priv;
 import java.util.LinkedList;
 
 import no.met.kvclient.KvEventListener;
+import no.met.kvclient.ListenerEvent;
+import no.met.kvclient.ListenerEventQue;
 import no.met.kvclient.service.DataElem;
 import no.met.kvclient.service.DataSubscribeInfo;
 import no.met.kvclient.service.ObsData;
@@ -12,23 +14,45 @@ import no.met.kvclient.service.SubscribeId;
 public class DataSubscribers<Listener extends KvEventListener>
 		extends LinkedList<DataSubscribers<Listener>.SubscriberElem> {
 	private static final long serialVersionUID = 1L;
-
+	ListenerEventQue defaultQue;
+	
 	public class SubscriberElem {
 		SubscribeId id;
 		DataSubscribeInfo info;
 		Listener listener;
-
+		
 		public SubscriberElem(SubscribeId id, DataSubscribeInfo info, Listener listener) {
 			this.id = id;
 			this.info = info;
 			this.listener = listener;
 		}
+		public String getId(){
+			return id.toString();
+		}
 	}
 
-	public DataSubscribers() {
+	public void remove(SubscribeId subid){
+		String id=subid.toString();
+		int index=0;
+		for(DataSubscribers<Listener>.SubscriberElem e : this  ){
+			if(e.getId().compareTo(id) == 0 ){
+				remove(index);
+				break;
+			}
+			index++;
+		}
+	}
+	
+	public DataSubscribers(ListenerEventQue defaultQue) {
+		if( defaultQue==null)
+			throw new IllegalArgumentException("defaultQue cant be null.");
+		this.defaultQue = defaultQue;
 	}
 
 	public void addSubscriber(SubscribeId id, DataSubscribeInfo info, Listener listener) {
+		if( info.que == null )
+			info.que = defaultQue;
+		
 		add(new SubscriberElem(id, info, listener));
 	}
 
@@ -51,11 +75,15 @@ public class DataSubscribers<Listener extends KvEventListener>
 	}
 
 	public void callListeners(Object source, ObsDataList data) {
-		ObsDataList dataToSend;
 		for (SubscriberElem elem : this) {
-			dataToSend = filter(data, elem.info);
+			ObsDataList dataToSend = filter(data, elem.info);
 			if (!dataToSend.isEmpty()) {
-				elem.listener.callListener(source, dataToSend);
+				elem.info.que.putEvent( new ListenerEvent() {
+					@Override
+					public void run() {
+						elem.listener.callListener(source, dataToSend);
+					}
+				});
 			}
 		}
 	}

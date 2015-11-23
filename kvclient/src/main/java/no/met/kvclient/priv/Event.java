@@ -32,7 +32,7 @@ public class Event {
 
 	public Event(Object source, ObsDataList data, KvDataEventListener listener) {
 		this.source = source;
-		eventType = Type.HintEvent;
+		eventType = Type.GetDataEvent;
 		this.hint = Hint.Down;
 		this.data = null;
 	}

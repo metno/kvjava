@@ -32,6 +32,7 @@ package no.met.kvclient;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.EventListener;
 import java.util.LinkedList;
 import no.met.kvclient.priv.*;
 import no.met.kvclient.service.*;
@@ -40,16 +41,18 @@ public class KvApp {
 	final private int nGetDataThreads = 10;
 	private long nextSubscriberId = 0;
 	// private KvEventThread kvEventThread;
-	private DataSubscribers<KvDataNotifyEventListener> dataNotifyList = new DataSubscribers<>();
-	private DataSubscribers<KvDataEventListener> dataList = new DataSubscribers<>();
+	private ListenerEventQue eventQue=new ListenerEventQue();
+	private DataSubscribers<KvDataNotifyEventListener> dataNotifyList = new DataSubscribers<>(eventQue);
+	private DataSubscribers<KvDataEventListener> dataList = new DataSubscribers<>(eventQue);
 	private HintSubscribers hintList = new HintSubscribers();
 	private LinkedList<Admin> adminList = new LinkedList<Admin>();
 	private kvService service = null;
 	private no.met.kvclient.datasource.Data dataInput = null;
 	private String kvServer = null;
-	private KvEventQue eventQue = null;
+	//private KvEventQue eventQue = null;
 	private ShutdownHook hook = null;
 	private boolean isShutdown = false;
+	
 
 	// Must be called in by a synchronized method
 	private SubscribeId getSubscriberId(String prefix) {
@@ -123,7 +126,7 @@ public class KvApp {
 		getDataThreadManager.start();
 
 		if (!usingSwing) {
-			eventQue = new KvEventQue();
+			//eventQue = new KvEventQue();
 			// TODO: Must start a kafka thread
 			// corbaThread = new CorbaThread(args, eventQue, this, prop);
 		} else {
@@ -423,7 +426,7 @@ public class KvApp {
 	}
 
 	public void run() {
-		Event event = null;
+		ListenerEvent event = null;
 
 		if (eventQue == null) {
 			System.out.println("WARNING: We are using the event que to SWING!");
@@ -433,13 +436,13 @@ public class KvApp {
 		while (!isShutdown) {
 			try {
 				event = eventQue.getEvent(1000);
-
+				
 				if (event == null)
 					continue;
 
 				try {
 					System.out.println("KvApp: call postKvEvent!");
-					postKvEvent(event);
+					event.run();
 					System.out.println("KvApp: return postKvEvent!");
 				} catch (Exception ex) {
 					if (debuglog != null) {

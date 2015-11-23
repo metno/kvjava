@@ -1,4 +1,4 @@
-package no.met.kvclient.service.kafka;
+package no.met.kvclient.service.sql;
 
 import java.util.Optional;
 

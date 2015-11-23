@@ -1,15 +1,24 @@
 package no.met.kvclient.service;
 
+import no.met.kvclient.ListenerEventQue;
+
 public class DataSubscribeInfo {
 	public StationIDList ids; // Send info for all stations if the list is
 								// empty.
 	public StatusId status;
 	public QcIdList qc; // Send info for all QC's if the list is empty.
+	public ListenerEventQue que; // Run the listener in the thread that pulls
+									// data from this que
 
-	public DataSubscribeInfo(StationIDList ids, StatusId status, QcIdList qc) {
+	public DataSubscribeInfo(StationIDList ids, StatusId status, QcIdList qc, ListenerEventQue que) {
 		this.ids = ids;
 		this.status = status;
 		this.qc = qc;
+		this.que = que;
+	}
+
+	public DataSubscribeInfo(StationIDList ids, StatusId status, QcIdList qc) {
+		this(ids, status, qc, null);
 	}
 
 	public DataSubscribeInfo(DataSubscribeInfo other) {

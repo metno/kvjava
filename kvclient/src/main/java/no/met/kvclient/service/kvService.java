@@ -2,6 +2,9 @@ package no.met.kvclient.service;
 
 import java.util.Optional;
 
+import no.met.kvclient.KvDataEventListener;
+import no.met.kvclient.KvDataNotifyEventListener;
+
 public class kvService implements KvSubsribeData, KvDataQuery {
 	KvSubsribeData subscribe;
 	KvDataQuery query;
@@ -62,15 +65,18 @@ public class kvService implements KvSubsribeData, KvDataQuery {
 	}
 
 	@Override
-	public SubscribeId subscribeDataNotify(DataSubscribeInfo info, kvDataNotifySubscriber sub) {
-		return subscribe.subscribeDataNotify(info, sub);
+	public SubscribeId subscribeDataNotify(DataSubscribeInfo info, KvDataNotifyEventListener listener){
+		return subscribe.subscribeDataNotify(info, listener);
 	}
-
+	
 	@Override
-	public SubscribeId subscribeData(DataSubscribeInfo info, kvDataSubscriber sub) {
-		return subscribe.subscribeData(info, sub);
+	public SubscribeId subscribeData(DataSubscribeInfo info, KvDataEventListener listener)
+	{
+		return subscribe.subscribeData(info, listener);
 	}
 
+	
+	
 	@Override
 	public SubscribeId subscribeKvHint(kvHintSubscriber sub) {
 		return subscribe.subscribeKvHint(sub);
