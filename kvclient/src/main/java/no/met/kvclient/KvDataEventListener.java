@@ -29,10 +29,14 @@
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 package no.met.kvclient;
+
+import no.met.kvclient.service.SubscribeId;
+import no.met.kvclient.service.ObsDataList;
+
 public interface KvDataEventListener extends KvEventListener {
 	@Override
-	default public void callListener(Object source, no.met.kvclient.service.ObsDataList dataList) {
-		kvDataEvent(new KvDataEvent(source, dataList));
+	default public void callListener(Object source, SubscribeId id, ObsDataList dataList) {
+		kvDataEvent(new KvDataEvent(source, id, dataList));
 	};
 
 	public void kvDataEvent(KvDataEvent event);

@@ -38,10 +38,11 @@ public class KvGetDataEvent extends KvDataEvent {
 	private KvDataEventListener listener;
 
 	public KvGetDataEvent(Object source, ObsDataList obsData, KvDataEventListener listener) {
-		super(source, obsData);
+		super(source, null, obsData);
 		this.listener = listener;
 	}
 
+	@Override
 	public String toString() {
 		return "KvGetDataEvent@" + Integer.toHexString(hashCode());
 	}

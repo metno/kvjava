@@ -2,8 +2,12 @@ package no.met.kvclient.service;
 
 import java.util.Optional;
 
+import no.met.kvclient.KvDataEventListener;
+
 public interface KvDataQuery {
 	Optional<DataIterator> getData(WhichDataList whichData);
+	
+	boolean getKvData(WhichDataList whichData, KvDataEventListener listener);
 
 	Optional<StationList> getStations();
 

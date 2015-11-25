@@ -20,6 +20,11 @@ public class kvService implements KvSubsribeData, KvDataQuery {
 	}
 
 	@Override
+	public boolean getKvData(WhichDataList whichData, KvDataEventListener listener){
+		return query.getKvData(whichData, listener);
+	}
+	
+	@Override
 	public Optional<StationList> getStations() {
 		return query.getStations();
 	}

@@ -41,7 +41,7 @@ public class KvApp {
 	final private int nGetDataThreads = 10;
 	private long nextSubscriberId = 0;
 	// private KvEventThread kvEventThread;
-	private ListenerEventQue eventQue=new ListenerEventQue();
+	private ListenerEventQue eventQue=new ListenerEventQue(100);
 	private DataSubscribers<KvDataNotifyEventListener> dataNotifyList = new DataSubscribers<>(eventQue);
 	private DataSubscribers<KvDataEventListener> dataList = new DataSubscribers<>(eventQue);
 	private HintSubscribers hintList = new HintSubscribers();
@@ -226,29 +226,29 @@ public class KvApp {
 		return false;
 	}
 
-	synchronized public void postKvEvent(no.met.kvclient.priv.Event event) {
-		switch (event.getEventType()) {
-		case DataEvent: {
-			dataList.callListeners(event.getSource(), event.getObsData());
-			dataNotifyList.callListeners(event.getSource(), event.getObsData());
-		}
-			break;
-		case HintEvent:
-			hintList.callListeners(event.getSource(), event.getHint());
-			break;
-		case GetDataEvent: {
-			KvDataEventListener listener = event.getGetDataEventListener();
-			ObsDataList obsData = event.getObsData();
-
-			if (listener != null) {
-				listener.kvDataEvent(new KvDataEvent(event.getSource(), obsData));
-			}
-		}
-			break;
-		default:
-			System.out.println("PostKvEvent: Unknown KvEvent (" + event.getEventType() + ")!");
-		}
-	}
+//	synchronized public void postKvEvent(no.met.kvclient.priv.Event event) {
+//		switch (event.getEventType()) {
+//		case DataEvent: {
+//			dataList.callListeners(event.getSource(), event.getObsData());
+//			dataNotifyList.callListeners(event.getSource(), event.getObsData());
+//		}
+//			break;
+//		case HintEvent:
+//			hintList.callListeners(event.getSource(), event.getHint());
+//			break;
+//		case GetDataEvent: {
+//			KvDataEventListener listener = event.getGetDataEventListener();
+//			ObsDataList obsData = event.getObsData();
+//
+//			if (listener != null) {
+//				listener.kvDataEvent(new KvDataEvent(event.getSource(), obsData));
+//			}
+//		}
+//			break;
+//		default:
+//			System.out.println("PostKvEvent: Unknown KvEvent (" + event.getEventType() + ")!");
+//		}
+//	}
 
 	public no.met.kvclient.service.Station[] getKvStations() {
 		return null;
@@ -435,7 +435,7 @@ public class KvApp {
 
 		while (!isShutdown) {
 			try {
-				event = eventQue.getEvent(1000);
+				event = eventQue.getObject(1000);
 				
 				if (event == null)
 					continue;

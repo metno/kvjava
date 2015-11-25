@@ -116,7 +116,7 @@ public class KafkaDataSubscriber implements KvSubsribeData {
 		shutdown();
 	}
 
-	synchronized void callListeners(Object source, ObsDataList data) {
+	synchronized void callListeners(Object source, ObsDataList data) throws InterruptedException {
 		if(! dataList.isEmpty())
 			dataList.callListeners(source, data);
 		if( !dataNotifyList.isEmpty())

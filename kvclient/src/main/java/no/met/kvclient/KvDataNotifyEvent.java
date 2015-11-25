@@ -31,19 +31,16 @@
 package no.met.kvclient;
 
 import no.met.kvclient.service.kvDataNotifySubscriber.WhatList;
+import no.met.kvclient.service.SubscribeId;
 
 public class KvDataNotifyEvent extends KvEvent {
 	private static final long serialVersionUID = 1771127947051664937L;
 
 	private WhatList what;
 
-	public KvDataNotifyEvent(Object source, WhatList what) {
-		super(source);
+	public KvDataNotifyEvent(Object source, SubscribeId id, WhatList what) {
+		super(source, id, "KvDataNotifyEvent");
 		this.what = what;
-	}
-
-	public String toString() {
-		return "KvDataNotifyEvent@" + Integer.toHexString(hashCode());
 	}
 
 	public WhatList getWhatList() {

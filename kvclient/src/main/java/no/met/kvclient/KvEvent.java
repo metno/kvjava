@@ -32,16 +32,26 @@ package no.met.kvclient;
 
 import java.util.*;
 
+import no.met.kvclient.service.SubscribeId;
+
 public class KvEvent extends EventObject
 {
 	private static final long serialVersionUID = 9190398844527040865L;
-
-	public KvEvent(Object source){
+	protected SubscribeId id;
+	private String eventName;
+	
+	public KvEvent(Object source, SubscribeId id, String eventName){
         super(source);
+        this.id = id;
+        this.eventName=eventName;
     }
     
+	public SubscribeId getSubscriberId(){
+		return id;
+	}
+	
 	@Override
     public String toString(){
-        return "KvEvent";
+        return eventName+"@"+(id==null?"UNKNOWN":id);
     }
 }

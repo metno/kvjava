@@ -31,22 +31,18 @@
 package no.met.kvclient;
 
 import no.met.kvclient.service.ObsDataList;
+import no.met.kvclient.service.SubscribeId;
 
 public class KvDataEvent extends KvEvent {
 	private static final long serialVersionUID = 1933931251836823879L;
-	private ObsDataList obsData_;
+	private ObsDataList obsData;
 
-	public KvDataEvent(Object source, ObsDataList obsData) {
-		super(source);
-		obsData_ = obsData;
-	}
-
-	@Override
-	public String toString() {
-		return "KvDataEvent@" + Integer.toHexString(hashCode());
+	public KvDataEvent(Object source, SubscribeId id, ObsDataList obsData) {
+		super(source, id, "KvDataEvent");
+		this.obsData = obsData;
 	}
 
 	public ObsDataList getObsData() {
-		return obsData_;
+		return obsData;
 	}
 }

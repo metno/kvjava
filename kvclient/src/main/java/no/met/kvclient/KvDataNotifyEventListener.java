@@ -31,13 +31,15 @@
 package no.met.kvclient;
 
 import no.met.kvclient.service.DataElem;
+import no.met.kvclient.service.ObsDataList;
 import no.met.kvclient.service.ObsData;
+import no.met.kvclient.service.SubscribeId;
 import no.met.kvclient.service.kvDataNotifySubscriber.What;
 import no.met.kvclient.service.kvDataNotifySubscriber.WhatList;
 
 public interface KvDataNotifyEventListener extends KvEventListener {
 	@Override
-	default public void callListener(Object source, no.met.kvclient.service.ObsDataList dataList) {
+	default public void callListener(Object source, SubscribeId id, ObsDataList dataList) {
 		WhatList wl = new WhatList();
 		for (ObsData od : dataList) {
 			boolean onlyMissing = true;
@@ -57,7 +59,7 @@ public interface KvDataNotifyEventListener extends KvEventListener {
 				wl.add(new What(od.stationid, od.typeID, od.obstime, false));
 		}
 		if (!wl.isEmpty()) {
-			kvDataNotifyEvent(new KvDataNotifyEvent(source, wl));
+			kvDataNotifyEvent(new KvDataNotifyEvent(source, id, wl));
 		}
 	};
 

@@ -30,21 +30,23 @@
 */
 package no.met.kvclient;
 
+import no.met.kvclient.service.SubscribeId;
+
 public class KvHintEvent extends KvEvent {
 
 	private static final long serialVersionUID = -4705096077287940118L;
 	private boolean commingUp_;
 
-	public KvHintEvent(Object source, boolean commingUp) {
-		super(source);
+	public KvHintEvent(Object source, SubscribeId id, boolean commingUp) {
+		super(source, id, "KvHintEvent");
 		commingUp_ = commingUp;
 	}
 
-	public String toString() {
-		return "KvHintEvent@" + Integer.toHexString(hashCode());
-	}
-
-	public boolean getCommingUp() {
+	public boolean isCommingUp() {
 		return commingUp_;
+	}
+	
+	public boolean isGoingDown() {
+		return !commingUp_;
 	}
 }

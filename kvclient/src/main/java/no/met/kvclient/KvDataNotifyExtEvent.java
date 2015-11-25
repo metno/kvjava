@@ -30,6 +30,7 @@
 */
 package no.met.kvclient;
 
+import no.met.kvclient.service.SubscribeId;
 //TODO: Should this bee removed?
 //import java.util.*;
 import no.met.kvclient.service.kvDataNotifySubscriber.What;
@@ -40,14 +41,11 @@ public class KvDataNotifyExtEvent extends KvEvent
 
 	private What whatList[]; 
     
-    public KvDataNotifyExtEvent(Object source, What[] whatList){
-        super(source);
+    public KvDataNotifyExtEvent(Object source, SubscribeId id, What[] whatList){
+        super(source,id,"KvDataNotifyExtEvent");
         this.whatList=whatList;
     }
     
-    public String toString(){
-        return "KvDataNotifyExtEvent@"+Integer.toHexString(hashCode());
-    }
     
     public What[] getWhatList(){
         return whatList;

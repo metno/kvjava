@@ -32,27 +32,11 @@ package no.met.kvclient;
 
 import no.met.kvclient.priv.MtQue;
 
-public class ListenerEventQue {
-	MtQue que = null;
+public class ListenerEventQue extends MtQue<ListenerEvent> {
 
-	public ListenerEventQue() {
-		que = new MtQue();
-	}
+	private static final long serialVersionUID = 1890731196027249719L;
 
-	public ListenerEvent getEvent(int waitInMillisecond) {
-		Object obj = que.getObject(waitInMillisecond);
-
-		if (obj == null)
-			return null;
-
-		return (ListenerEvent) obj;
-	}
-
-	public void putEvent(ListenerEvent event) {
-		que.putObject(event);
-	}
-
-	public int size() {
-		return que.size();
+	public ListenerEventQue(int capacity) {
+		super(capacity);
 	}
 }

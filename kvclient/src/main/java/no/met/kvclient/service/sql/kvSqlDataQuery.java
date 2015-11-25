@@ -2,6 +2,7 @@ package no.met.kvclient.service.sql;
 
 import java.util.Optional;
 
+import no.met.kvclient.KvDataEventListener;
 import no.met.kvclient.service.DataIterator;
 import no.met.kvclient.service.ModelDataIterator;
 import no.met.kvclient.service.Obs_pgmList;
@@ -25,6 +26,12 @@ public class kvSqlDataQuery implements KvDataQuery {
 		return null;
 	}
 
+	@Override
+	public boolean getKvData(WhichDataList whichData, KvDataEventListener listener) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
 	@Override
 	public Optional<StationList> getStations() {
 		// TODO Auto-generated method stub
@@ -78,5 +85,7 @@ public class kvSqlDataQuery implements KvDataQuery {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	
 
 }

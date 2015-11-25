@@ -30,97 +30,34 @@
 */
 package no.met.kvclient.priv;
 
-import java.util.*;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 
-public class MtQue
+public class MtQue<E> extends  LinkedBlockingQueue<E>
 {
-    private List que;
-    
-    public MtQue()
-    {
-        que=new LinkedList();
+	private static final long serialVersionUID = 5244379526689354367L;
+
+	public MtQue()  {
+    	super(100);
     }
     
-    public Object getObject(int waitInMillisecond)
-    {
-        synchronized(que){
-            if(!que.isEmpty()){
-                System.out.println("MtQue::getObject: que.size="+que.size());
-            }
-            
-            if(que.isEmpty()){
-                try{
-                    que.wait(waitInMillisecond);
-                }
-                catch(IllegalArgumentException e){
-                    System.out.println("MtQue::getObject: invalid timeout value. (" +
-                            waitInMillisecond +")");
-                }
-                catch(IllegalMonitorStateException e){
-                    System.out.println("MtQue::getObject: Not owner of the monitor (Mutex)");
-                }
-                catch(InterruptedException e){
-                    System.out.println("MtQue::getObject: Interupted");
-                }
-                catch(Exception ex){
-                    System.out.println("MtQue::getObject: Unexpected exception!");
-                }
-                
-                if(que.isEmpty())
-                    return null;
-            }
-            
-            try{
-                return que.remove(0);
-            }
-            catch(Exception ex){
-                System.out.println("MtQue::getObject: No objects in que.!!!");
-                return null;
-            }
-        }
+    public MtQue(int capacity)  {
+    	super(capacity);
     }
     
-    public void putObject(Object obj)
+    public E getObject(int waitInMillisecond) throws InterruptedException 
     {
-        if(obj==null){
-            System.out.println("MtQue::putObject: obj==null" );
+    	return poll(waitInMillisecond,TimeUnit.MILLISECONDS);
+    }
+    
+    public void putObject(E element) throws InterruptedException
+    {
+        if(element==null){
+            System.out.println("MtQue::putObject: element==null" );
             return;
         }
-        
-        synchronized(que){
-            if(!que.isEmpty()){
-                System.out.println("MtQue::putObject: que.size="+que.size());
-            }
-            
-            
-            try{
-                que.add(obj);
-                que.notifyAll();
-            }
-            catch(IllegalMonitorStateException ex){
-                System.out.println("MtQue::putObject: IllegalMonitorStateException");
-            }
-            catch(UnsupportedOperationException ex){
-                System.out.println("MtQue::putObject: UnsupportedOperationException");
-            }
-            catch(ClassCastException ex){
-                System.out.println("MtQue::putObject: ClassCastException");
-                
-            }
-            catch(NullPointerException ex){
-                System.out.println("MtQue::putObject: NullPointerException");
-            }
-            catch(IllegalArgumentException ex){
-                System.out.println("MtQue::putObject: IllegalArgumentException");
-            }
-            catch(Exception e){
-                e.printStackTrace();
-            }
-        }
+        put(element);
     }
     
-    public synchronized int size() {
-			return que.size();
-	}
 }

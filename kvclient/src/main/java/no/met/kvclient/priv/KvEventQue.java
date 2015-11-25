@@ -30,28 +30,16 @@
 */
 package no.met.kvclient.priv;
 
-public class KvEventQue {
-	MtQue que = null;
+public class KvEventQue extends MtQue<Event>{
 
-	public KvEventQue() {
-		que = new MtQue();
+	private static final long serialVersionUID = 7925265947310739171L;
+
+	public Event getEvent(int waitInMillisecond) throws InterruptedException {
+		return getObject(waitInMillisecond);
 	}
 
-	public Event getEvent(int waitInMillisecond) {
-		Object obj = que.getObject(waitInMillisecond);
-
-		if (obj == null)
-			return null;
-
-		return (Event) obj;
-	}
-
-	public void putEvent(Event event) {
-		que.putObject(event);
-	}
-
-	public int size() {
-		return que.size();
+	public void putEvent(Event event) throws InterruptedException {
+		putObject(event);
 	}
 
 }

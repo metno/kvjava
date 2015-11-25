@@ -32,6 +32,7 @@ package no.met.kvclient;
 
 import no.met.kvclient.priv.Event;
 
+//TODO: What to do with this.
 public class SwingEvent implements Runnable {
 	private KvApp app;
 	private Event event;
@@ -42,6 +43,6 @@ public class SwingEvent implements Runnable {
 	}
 
 	public void run() {
-		app.postKvEvent(event);
+	//	app.postKvEvent(event);
 	}
 }

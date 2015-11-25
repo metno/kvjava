@@ -32,6 +32,7 @@ package no.met.kvclient.priv;
 
 import no.met.kvclient.KvApp;
 
+//TODO: What do we do with this, is it completely replaced by ListenerEventRunner. 
 public class KvEventThread extends Thread {
 	private KvEventQue que;
 	private KvApp app;
@@ -48,12 +49,18 @@ public class KvEventThread extends Thread {
 		Event event = null;
 
 		while (!doExit) {
-			event = que.getEvent(1000);
+			try {
+				event = que.getEvent(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				event=null;
+			}
 
 			if (event == null)
 				continue;
 
-			app.postKvEvent(event);
+			//app.postKvEvent(event);
 		}
 	}
 
