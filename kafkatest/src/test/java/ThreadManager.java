@@ -1,6 +1,5 @@
-package no.met.kvutil.concurrent;
-
 import java.time.Instant;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ThreadManager {
@@ -8,12 +7,12 @@ public class ThreadManager {
 	ThreadGroup thrGroup;
 	AtomicInteger numberOfThreads;
 	AtomicInteger threadId;
-	boolean shutDown;
+	AtomicBoolean shutDown;
 	
 	ThreadManager(String name){
 		thrGroup = new ThreadGroup(name);
 		numberOfThreads=new AtomicInteger(0);
-		shutDown=false;
+		shutDown=new AtomicBoolean(false);
 		threadId = new AtomicInteger(0);
 	}
 	
@@ -31,40 +30,42 @@ public class ThreadManager {
 		
 		@Override
 		public void run() {
+			System.err.println("Started thread: " + Thread.currentThread().getName());
 			manager.numberOfThreads.incrementAndGet();
+			
 			try {
 				toRun.run();
-			}
-			catch(Exception ex ){
+			}catch(Exception ex ){
 				System.err.println("Ucaught exception: "+manager.thrGroup.getName());
 			}
 			manager.numberOfThreads.decrementAndGet();
+			System.err.println("Terminating thread: " + Thread.currentThread().getName());
 		}
 		
-	}
-	
-	
-	synchronized public void shutdown( long waitInMillisTo){
-		if( !shutDown ) {
-			thrGroup.interrupt();
-			shutDown=true;
-		}
 	}
 	
 	/**
 	 * 
 	 * @param waitInMillis wait for this time to all 
-	 * threads has terminated. 0 to wait indefinitely.
+	 * therads has terminated. 0 to wait indefinitely.
 	 * 
 	 * @return Number of threads that has not stopped while waiting.
 	 */
-	public int join(long waitInMillisTo) throws InterruptedException {
+	public int shutdown( long waitInMillisTo){
+		if( ! shutDown.compareAndSet(false, true) )//Returns false if the actual value is true.
+			return numberOfThreads.get();
+		
+		thrGroup.interrupt();
 		Instant now=Instant.now();
 		Instant stop=waitInMillisTo>0?now.plusMillis(waitInMillisTo):Instant.MAX;
 		
-		while( numberOfThreads.get()>0 && now.compareTo(stop)<=0 ) {
-			Thread.sleep(100);
-			now=Instant.now();
+		try {
+			while( numberOfThreads.get()>0 && now.compareTo(stop)<=0 ) {
+				Thread.sleep(100);
+				now=Instant.now();
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 		
 		return numberOfThreads.get();
@@ -74,10 +75,7 @@ public class ThreadManager {
 		start(runable, "");
 	}
 	
-	synchronized public void start( Runnable runable, String name){
-		if( shutDown )
-			throw new IllegalStateException("The thread manager '" + thrGroup.getName()+"' is shutdown.");
-		
+	public void start( Runnable runable, String name){
 		String theName= thrGroup.getName()+":"+name+":"+threadId.getAndIncrement();
 		new Runner(this, runable, theName);
 	}
@@ -85,5 +83,3 @@ public class ThreadManager {
 	public int size(){ return numberOfThreads.get();}
 	
 }
-
-
