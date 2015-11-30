@@ -92,4 +92,10 @@ public class kvService implements KvSubsribeData, KvDataQuery {
 		subscribe.unsubscribe(subid);
 	}
 
+	@Override
+	public void close() {
+		subscribe.close();
+		query.close();
+	}
+
 }

@@ -11,4 +11,6 @@ public interface KvSubsribeData {
 	SubscribeId subscribeKvHint(kvHintSubscriber sub);
 
 	void unsubscribe(SubscribeId subid);
+	
+	void close();
 }

@@ -10,7 +10,7 @@ public class ThreadManager {
 	AtomicInteger threadId;
 	boolean shutDown;
 	
-	ThreadManager(String name){
+	public ThreadManager(String name){
 		thrGroup = new ThreadGroup(name);
 		numberOfThreads=new AtomicInteger(0);
 		shutDown=false;
@@ -44,7 +44,7 @@ public class ThreadManager {
 	}
 	
 	
-	synchronized public void shutdown( long waitInMillisTo){
+	synchronized public void shutdown(){
 		if( !shutDown ) {
 			thrGroup.interrupt();
 			shutDown=true;

@@ -74,4 +74,5 @@ public interface KvDataQuery {
 	Optional<OperatorList> getOperator();
 
 	Optional<Station_paramList> getStationParam(long stationid, long paramid, long day);
+	void close();
 }

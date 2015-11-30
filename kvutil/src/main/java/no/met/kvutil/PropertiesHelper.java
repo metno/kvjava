@@ -34,10 +34,15 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Properties;
 
 public class PropertiesHelper extends Properties {
 
+	private static final long serialVersionUID = 7979045326117714279L;
 	String filename;
 
 	public PropertiesHelper() {
@@ -124,6 +129,29 @@ public class PropertiesHelper extends Properties {
 		return key.trim();
 	}
 
+	static public PropertiesHelper loadFile(Path path ){
+		PropertiesHelper prop=new PropertiesHelper();
+		if( ! Files.isRegularFile(path) ){
+			System.err.println("File do not exist, or is not readable '" + path +"'.");
+			return null;
+		}
+		
+		try {
+			InputStream s = Files.newInputStream(path);
+			prop.load(s);
+			return prop;
+		}
+		catch(IOException ex ){
+			System.err.println("Error reading configuration file '"+path +"'. Reason: " + ex.getMessage());
+			return null;
+		}
+	}
+	
+	 static public PropertiesHelper loadFile(String conf) {
+			Path path = FileSystems.getDefault().getPath(conf);
+			return loadFile(path);
+		}
+	
 	public Properties loadFromFile(String filename) throws FileNotFoundException, IOException {
 
 		File f = new File(filename);

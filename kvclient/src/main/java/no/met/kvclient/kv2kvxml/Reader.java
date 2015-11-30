@@ -179,7 +179,7 @@ class Reader {
 
 	
 	void decodeKvData() throws XMLStreamException, FormatException{
-		System.err.println("decodeKvData: start");
+		//System.err.println("decodeKvData: start");
 		int paramid=getAttributeAsInt("paramid");
 		String element = getElement("tbtime","original","corrected","controlinfo","useinfo","cfailed","kvdata");
 		double original=Double.MAX_VALUE;
@@ -214,7 +214,7 @@ class Reader {
 			element = getElement("tbtime","original","corrected","controlinfo","useinfo","cfailed","kvdata");
 		}
 		
-		System.err.println("decodeKvData: "+getElementName() + " "+(isEndElement(null)?"endElement":"startElement"));
+		//System.err.println("decodeKvData: "+getElementName() + " "+(isEndElement(null)?"endElement":"startElement"));
 		if( isEndElement("kvdata") ){
 			if( corrected == Double.MAX_VALUE)
 				corrected=original;
@@ -225,11 +225,11 @@ class Reader {
 				currentObsData.addData(paramid, currentSensor, currentLevel, tbtime, original, corrected, controlinfo, useinfo, cfailed);
 		}
 		getElement(null);
-		System.err.println("decodeKvData: start, element: "+getElementName()+" "+(isEndElement(null)?"endElement":"startElement"));
+		//System.err.println("decodeKvData: start, element: "+getElementName()+" "+(isEndElement(null)?"endElement":"startElement"));
 	}
 	
 	void decodeKvTextData() throws XMLStreamException, FormatException{
-		System.err.println("decodeKvTextData: start");
+		//System.err.println("decodeKvTextData: start");
 		int paramid=getAttributeAsInt("paramid");
 		String element = getElement("original","tbtime", "kvtextdata");
 		String original=null;
@@ -248,7 +248,7 @@ class Reader {
 			element = getElement("tbtime", "original", "kvtextdata");
 		}
 		
-		System.err.println("decodeKvTextData: "+getElementName() + " "+(isEndElement(null)?"endElement":"startElement"));
+		//System.err.println("decodeKvTextData: "+getElementName() + " "+(isEndElement(null)?"endElement":"startElement"));
 		if( isEndElement("kvtextdata") ){
 			if( tbtime == null)
 				tbtime=startTime;
@@ -256,7 +256,7 @@ class Reader {
 				currentObsData.addTextData(paramid, tbtime, original);
 		}
 		getElement(null);
-		System.err.println("decodeKvTextData: start, element: "+getElementName()+" "+(isEndElement(null)?"endElement":"startElement"));
+		//System.err.println("decodeKvTextData: start, element: "+getElementName()+" "+(isEndElement(null)?"endElement":"startElement"));
 	}
 
 
@@ -310,7 +310,6 @@ class Reader {
 				decodeKvData();
 				break;
 			case "kvtextdata":
-				System.err.println();
 				decodeKvTextData();
 				break;
 			case "sensor":
@@ -322,7 +321,7 @@ class Reader {
 			default:
 				return;
 			}
-			System.out.println("decodeData: "+getElementName()+" endElement: "+(isEndElement(null)?"true":"false"));
+			//System.out.println("decodeData: "+getElementName()+" endElement: "+(isEndElement(null)?"true":"false"));
 		}
 	}
 
@@ -336,7 +335,7 @@ class Reader {
 		getElement("obstime", "typeid");
 
 		while (isStartElement("obstime")) {
-			System.out.println("obstime: Start");
+			//System.out.println("obstime: Start");
 			currentObstime = getAttributeAsInstant("val");
 			currentObsData = new ObsData(currentStationId, currentTypeId, currentObstime);
 			decodeData();
@@ -354,22 +353,22 @@ class Reader {
 	void decodeTypeid() throws XMLStreamException, FormatException {
 		getElement("typeid", "station");
 		while (isStartElement("typeid")) {
-			System.out.println("typeid: Start");
+			//System.out.println("typeid: Start");
 			currentTypeId = getAttributeAsLong("val");
 			currentSensor = 0;
 			currentLevel = 0;
 			decodeObstime();
-			System.out.println("decodeTypeid: "+getElementName()+" endElement: "+(isEndElement(null)?"true":"false"));
+			//System.out.println("decodeTypeid: "+getElementName()+" endElement: "+(isEndElement(null)?"true":"false"));
 		}
 		currentTypeId = Long.MAX_VALUE;
 		getElement(null);
-		System.out.println("@@@@@decodeTypeid: "+getElementName()+" endElement: "+(isEndElement(null)?"true":"false"));
+		//System.out.println("@@@@@decodeTypeid: "+getElementName()+" endElement: "+(isEndElement(null)?"true":"false"));
 	}
 
 	void decodeStation() throws XMLStreamException, FormatException {
 		getElement("station", "kvalobsdata");
 		while (isStartElement("station")) {
-			System.out.println("station: Start");
+			//System.out.println("station: Start");
 			currentStationId = getAttributeAsLong("val");
 			currentTypeId = Long.MAX_VALUE;
 			currentSensor = 0;
@@ -386,7 +385,7 @@ class Reader {
 
 		try {
 			getStartElement("kvalobsdata");
-			System.out.println("KvalobsData: Start");
+			//System.out.println("KvalobsData: Start");
 			decodeStation();
 		} catch (Exception ex) {
 			throw new FormatException("Not in 'KvalobData' xml-format. " + ex.getMessage());

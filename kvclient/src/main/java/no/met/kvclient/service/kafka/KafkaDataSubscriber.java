@@ -4,25 +4,17 @@ import java.util.Properties;
 import kafka.consumer.ConsumerConfig;
 import kafka.consumer.KafkaStream;
 import kafka.javaapi.consumer.ConsumerConnector;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
 import no.met.kvclient.KvDataEventListener;
 import no.met.kvclient.KvDataNotifyEventListener;
-import no.met.kvclient.KvDataSubscribeInfo;
-import no.met.kvclient.KvEvent;
 import no.met.kvclient.ListenerEventQue;
 import no.met.kvclient.priv.DataSubscribers;
-import no.met.kvclient.priv.KvEventQue;
 import no.met.kvclient.service.DataSubscribeInfo;
 import no.met.kvclient.service.SubscribeId;
-import no.met.kvclient.service.kvDataNotifySubscriber;
-import no.met.kvclient.service.kvDataSubscriber;
 import no.met.kvclient.service.kvHintSubscriber;
 import no.met.kvclient.service.KvSubsribeData;
 import no.met.kvclient.service.ObsDataList;
@@ -40,16 +32,20 @@ public class KafkaDataSubscriber implements KvSubsribeData {
 	
 	ConsumerConfig createConfig(Properties conf) {
 		Properties props = new Properties();
+		
+		if(conf==null)
+			conf =  new Properties();
+		
 		topic = conf.getProperty("topic", "kvalobs.data");
 		groupId = conf.getProperty("group.id");
 
 		if (topic == null) {
 			System.out.println("No topic");
-			throw new IllegalArgumentException("No topic");
+			throw new IllegalArgumentException("Kafka: No topic");
 		}
 		if (groupId == null) {
 			System.out.println("No topic");
-			throw new IllegalArgumentException("No group.id");
+			throw new IllegalArgumentException("Kafka: No group.id");
 		}
 
 		props.put("zookeeper.connect", conf.getOrDefault("zookeeper.connect", "10.99.2.228:2181"));
@@ -70,7 +66,7 @@ public class KafkaDataSubscriber implements KvSubsribeData {
 
 	// Must be called in by a synchronized method
 	private SubscribeId getSubscriberId(String prefix) {
-		String id = prefix + nextSubscriberId;
+		String id = prefix + "-"+ nextSubscriberId;
 		++nextSubscriberId;
 		return new SubscribeId(id);
 	}
@@ -78,7 +74,7 @@ public class KafkaDataSubscriber implements KvSubsribeData {
 	@Override
 	synchronized public SubscribeId subscribeDataNotify(DataSubscribeInfo subscribeInfo,
 			KvDataNotifyEventListener listener) {
-		SubscribeId subid = getSubscriberId("data_notify_subscriber_");
+		SubscribeId subid = getSubscriberId("data_notify_subscriber");
 		dataNotifyList.addSubscriber(subid, subscribeInfo, listener);
 
 		if( !isStarted )
@@ -89,7 +85,7 @@ public class KafkaDataSubscriber implements KvSubsribeData {
 
 	@Override
 	synchronized public SubscribeId subscribeData(DataSubscribeInfo subscribeInfo, KvDataEventListener listener) {
-		SubscribeId subid = getSubscriberId("data_subscriber_");
+		SubscribeId subid = getSubscriberId("data_subscriber");
 		dataList.addSubscriber(subid, subscribeInfo, listener);
 
 		if( !isStarted )
@@ -99,7 +95,7 @@ public class KafkaDataSubscriber implements KvSubsribeData {
 	}
 
 	@Override
-	public SubscribeId subscribeKvHint(kvHintSubscriber sub) {
+	synchronized public SubscribeId subscribeKvHint(kvHintSubscriber sub) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -108,12 +104,13 @@ public class KafkaDataSubscriber implements KvSubsribeData {
 	synchronized public void unsubscribe(SubscribeId subid) {
 		String id = subid.toString();
 
-		if (id.startsWith("data_notify_subscriber_")) {
+		if (id.startsWith("data_notify_subscriber-")) {
 			dataNotifyList.remove(subid);
-		} else if (id.startsWith("data_subscriber_")) {
+		} else if (id.startsWith("data_subscriber-")) {
 			dataList.remove(subid);
 		}
-		shutdown();
+		if( dataList.isEmpty() && dataNotifyList.isEmpty() )
+			stop();
 	}
 
 	synchronized void callListeners(Object source, ObsDataList data) throws InterruptedException {
@@ -123,7 +120,7 @@ public class KafkaDataSubscriber implements KvSubsribeData {
 			dataNotifyList.callListeners(source, data);
 	}
 
-	public void start(boolean delayUntilItHasSubscribers) {
+	synchronized public void start(boolean delayUntilItHasSubscribers) {
 		if (delayUntilItHasSubscribers) {
 			if (!dataNotifyList.isEmpty() || !dataList.isEmpty())
 				start();
@@ -132,7 +129,7 @@ public class KafkaDataSubscriber implements KvSubsribeData {
 		}
 	}
 
-	public void start() {	
+	synchronized public void start() {	
 		if (isStarted)
 			return;
 		
@@ -153,11 +150,18 @@ public class KafkaDataSubscriber implements KvSubsribeData {
 		isStarted=true;
 	}
 	
-	public void shutdown(){
+	synchronized public void stop(){
 		if( consumer != null )
 			consumer.shutdown();
 		if(executor!=null)
 			executor.shutdown();
 		isStarted=false;
 	}
+
+	@Override
+	public void close() {
+		stop();
+	}
+	
+	
 }

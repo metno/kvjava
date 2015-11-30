@@ -7,11 +7,12 @@ import no.met.kvclient.ListenerEventRunner;
 import no.met.kvclient.service.ObsDataList;
 
 import java.time.Instant;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DataSubscriber extends ListenerEventRunner implements KvDataEventListener {
 	
 
-	DataSubscriber(Boolean shutdown, ListenerEventQue que ){
+	DataSubscriber(AtomicBoolean shutdown, ListenerEventQue que ){
 		super( shutdown, que);
 	}
 	
@@ -19,6 +20,7 @@ public class DataSubscriber extends ListenerEventRunner implements KvDataEventLi
 		Instant now = Instant.now();
 		System.out.println("================ " + now + " [BEGIN] ================");
 		ObsDataList data=event.getObsData();
+		System.out.println(data);
 		System.out.println("====================  [END]  ===========================");
 	}
 }
