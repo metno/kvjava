@@ -31,6 +31,7 @@ public class DataSubscribeInfo {
 		ids = new StationIDList();
 		qc = new QcIdList();
 		status = StatusId.All;
+		que = null;
 	}
 
 	public void setStatusId(StatusId statusid) {
