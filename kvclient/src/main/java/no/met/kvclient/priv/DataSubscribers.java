@@ -10,7 +10,6 @@ import no.met.kvclient.service.DataSubscribeInfo;
 import no.met.kvclient.service.ObsData;
 import no.met.kvclient.service.ObsDataList;
 import no.met.kvclient.service.SubscribeId;
-import scala.concurrent.duration.Duration.Infinite;
 
 public class DataSubscribers<Listener extends KvEventListener>
 		extends LinkedList<DataSubscribers<Listener>.SubscriberElem> {
@@ -53,7 +52,10 @@ public class DataSubscribers<Listener extends KvEventListener>
 	}
 
 	public void addSubscriber(SubscribeId id, DataSubscribeInfo info, Listener listener) {
-		if (info.que == null)
+		if( info == null )
+			info = new DataSubscribeInfo();
+		
+		if(info.que == null)
 			info.que = defaultQue;
 
 		add(new SubscriberElem(id, info, listener));
