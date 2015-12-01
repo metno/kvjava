@@ -3,8 +3,9 @@ package no.met.kvclient.service;
 import java.util.Optional;
 
 import no.met.kvclient.KvDataEventListener;
+import no.met.kvutil.LifeCycle;
 
-public interface KvDataQuery {
+public interface KvDataQuery extends LifeCycle{
 	Optional<DataIterator> getData(WhichDataList whichData);
 	
 	boolean getKvData(WhichDataList whichData, KvDataEventListener listener);
@@ -74,5 +75,6 @@ public interface KvDataQuery {
 	Optional<OperatorList> getOperator();
 
 	Optional<Station_paramList> getStationParam(long stationid, long paramid, long day);
-	void close();
+	void stop();
+	void start();
 }

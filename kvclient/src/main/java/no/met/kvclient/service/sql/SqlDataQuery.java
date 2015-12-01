@@ -97,7 +97,13 @@ public class SqlDataQuery implements KvDataQuery {
 	}
 
 	@Override
-	public void close() {
+	public void stop() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void start() {
 		// TODO Auto-generated method stub
 		
 	}

@@ -93,9 +93,15 @@ public class kvService implements KvSubsribeData, KvDataQuery {
 	}
 
 	@Override
-	public void close() {
-		subscribe.close();
-		query.close();
+	public void stop() {
+		subscribe.stop();
+		query.stop();
+	}
+
+	@Override
+	public void start() {
+		subscribe.start();
+		query.start();
 	}
 
 }

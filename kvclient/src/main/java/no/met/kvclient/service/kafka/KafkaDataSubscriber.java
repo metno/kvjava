@@ -76,9 +76,7 @@ public class KafkaDataSubscriber implements KvSubsribeData {
 			KvDataNotifyEventListener listener) {
 		SubscribeId subid = getSubscriberId("data_notify_subscriber");
 		dataNotifyList.addSubscriber(subid, subscribeInfo, listener);
-
-		if( !isStarted )
-			start();
+		tryStart();
 		
 		return subid;
 	}
@@ -87,9 +85,7 @@ public class KafkaDataSubscriber implements KvSubsribeData {
 	synchronized public SubscribeId subscribeData(DataSubscribeInfo subscribeInfo, KvDataEventListener listener) {
 		SubscribeId subid = getSubscriberId("data_subscriber");
 		dataList.addSubscriber(subid, subscribeInfo, listener);
-
-		if( !isStarted )
-			start();
+		tryStart();
 		
 		return subid;
 	}
@@ -123,13 +119,14 @@ public class KafkaDataSubscriber implements KvSubsribeData {
 	synchronized public void start(boolean delayUntilItHasSubscribers) {
 		if (delayUntilItHasSubscribers) {
 			if (!dataNotifyList.isEmpty() || !dataList.isEmpty())
-				start();
+				tryStart();
 		} else {
-			start();
+			tryStart();
 		}
 	}
 
-	synchronized public void start() {	
+	
+	synchronized void tryStart() {	
 		if (isStarted)
 			return;
 		
@@ -150,6 +147,12 @@ public class KafkaDataSubscriber implements KvSubsribeData {
 		isStarted=true;
 	}
 	
+	@Override
+	public void start(){
+		start( true );
+	}
+
+	@Override
 	synchronized public void stop(){
 		if( consumer != null )
 			consumer.shutdown();
@@ -158,10 +161,6 @@ public class KafkaDataSubscriber implements KvSubsribeData {
 		isStarted=false;
 	}
 
-	@Override
-	public void close() {
-		stop();
-	}
-	
+
 	
 }

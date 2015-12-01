@@ -13,7 +13,7 @@ import no.met.kvclient.service.sql.SqlDataQuery;
 import no.met.kvutil.PropertiesHelper;
 import no.met.kvutil.concurrent.ThreadManager;
 
-class KafkaApp extends kvService {
+public class KafkaApp extends kvService {
 	Properties prop;
 	ListenerEventQue que;
 	AtomicBoolean shutdown;
@@ -41,7 +41,7 @@ class KafkaApp extends kvService {
 	
 	
 	static public KafkaApp factory(Properties prop) {
-		ListenerEventQue que = new ListenerEventQue(Integer.parseInt(prop.getProperty("que.size", "10")));
+		ListenerEventQue que = new ListenerEventQue(Math.abs(Integer.parseInt(prop.getProperty("que.size", "10"))));
 		KafkaDataSubscriber sub = null;
 		SqlDataQuery query=null;
 		
@@ -54,10 +54,10 @@ class KafkaApp extends kvService {
 			System.err.println("Configuration error: " + ex.getMessage());
 			
 			if( sub != null )
-				sub.close();
+				sub.stop();
 			
 			if(query !=  null )
-				query.close();
+				query.stop();
 			
 			return null;
 		}
@@ -83,8 +83,11 @@ class KafkaApp extends kvService {
 		super(subscribers, query);
 		this.que=que;
 		this.prop=prop;
+		shutdown = new AtomicBoolean(false);
 		workers=new ThreadManager("Subscribers");
 		subscriberWorkers = Math.abs(Integer.parseInt(prop.getProperty("kvalobs.subscribe.workers", "1")));
+		
+		Runtime.getRuntime().addShutdownHook(new Hook(this));
 		
 		for( int i=0; i<subscriberWorkers; ++i){
 			workers.start(new ListenerEventRunner(shutdown, que));
@@ -108,7 +111,7 @@ class KafkaApp extends kvService {
 	
 	public void shutdown()throws InterruptedException {
 		if(shutdown.compareAndSet(false, true)){
-			super.close();
+			stop();
 			workers.shutdown();
 			workers.join(10000);
 		}
@@ -116,6 +119,7 @@ class KafkaApp extends kvService {
 	
 	public void run() throws InterruptedException {
 		System.err.println("Starting main thread, workers " + workers.size()+".");
+		start();
 		while(!shutdown.get() && ! isInterupted){
 			try {
 				Thread.sleep(500);
@@ -125,7 +129,7 @@ class KafkaApp extends kvService {
 			}
 		}
 		
-		System.err.println("Terminating main thread, workers stil alive " + workers.size() + " (interupted: " + (isInterupted?"true":"false")+").");
+		System.err.println("Terminating main thread, workers still alive " + workers.size() + " (interupted: " + (isInterupted?"true":"false")+").");
 	}
 	
 }

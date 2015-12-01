@@ -1,13 +1,11 @@
 package no.met.kvalobs.kafkatest;
 
 import no.met.kvutil.concurrent.ThreadManager;
-
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import no.met.kvclient.ListenerEventQue;
 import no.met.kvclient.service.SubscribeId;
-import no.met.kvclient.service.kafka.KafkaDataSubscriber;;
+import no.met.kvclient.service.kafka.KafkaDataSubscriber;
+import no.met.kvclient.kafka.KafkaApp;
 public class KafkaAppTest {
 	
 	static class Hook extends Thread {
@@ -38,33 +36,29 @@ public class KafkaAppTest {
 		}
 	}
 	
+	@SuppressWarnings("unused")
 	public static void main(String[] args) {
 		Properties prop=new Properties();
 		prop.setProperty("group.id", "kvclient-borge-ea29af5c-1699-4299-a4dd-8cc272319436");
-		AtomicBoolean shutdown=new AtomicBoolean(false);
-		ListenerEventQue defaultQue=new ListenerEventQue(10);
-		ThreadManager mgrManager = new ThreadManager("KafkListeners");
-		KafkaDataSubscriber kafka=new KafkaDataSubscriber(prop, defaultQue);
-		DataSubscriber dataSub=new DataSubscriber(shutdown, defaultQue);
+		prop.setProperty("kvalobs.subscribe.workers", "3");
+		KafkaApp app = KafkaApp.factory( prop );
+		DataSubscriber dataSub=new DataSubscriber();
 		
-		SubscribeId subid = kafka.subscribeData(null, dataSub );
-		System.err.println("Subscriberid: " + subid);
+		SubscribeId subid = app.subscribeData(null, dataSub );
 		
-		mgrManager.start(dataSub, subid.toString());
-		
-		
-		kafka.start();
-		
-		Runtime.getRuntime().addShutdownHook(new Hook(mgrManager,shutdown, kafka));
-		
-		try {
-			while( true ) {
-				Thread.sleep(Long.MAX_VALUE);
-			}
-		} catch (InterruptedException e) {
-			System.out.println("Terminating............ remaining threads: " + mgrManager.size());
+		if( app == null ) {
+			System.err.println("Fatal: Could not create app");
+			System.exit(1);
 		}
 		
+		System.err.println("Subscriberid: " + subid);
+		
+		try{
+			app.run();
+		}
+		catch (InterruptedException ex){
+			System.err.println("Main app interupted.");
+		}
 		
 	}
 
