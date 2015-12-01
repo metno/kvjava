@@ -28,21 +28,18 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package metno.kvalobs.kl;
+package no.met.kvalobs.kl;
 
 import java.util.TimeZone;
-import java.io.File;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import CKvalObs.CService.DataElem;
-import metno.dbutil.DbConnectionMgr;
-import metno.dbutil.DbConnection;
-import metno.util.StringHolder;
-import static metno.DbTestUtil.*;
+import no.met.kvutil.dbutil.DbConnectionMgr;
+import no.met.kvutil.dbutil.DbConnection;
+import no.met.kvclient.service.DataElem;
+import no.met.kvutil.DateTimeUtil;
+import no.met.kvutil.StringHolder;
+import static no.met.DbTestUtil.*;
 import org.junit.*;
 import static org.junit.Assert.*;
 import junit.framework.JUnit4TestAdapter;
-import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 public class klfilterTest {
@@ -172,35 +169,35 @@ public class klfilterTest {
     }
     
     DataElem 
-        fillWithStationData(int sid, int tid, String obstime){
+        fillWithStationData(long sid, long tid, String obstime){
         
         return new DataElem(
-                            sid, obstime, 1.2, (short)211,
-                            "2006-03-09 18:00:00", 
-                            (short)tid, "0", (short)0, 1.2, 
+                            sid, DateTimeUtil.parse(obstime).toInstant(), 1.2, 211,
+                            DateTimeUtil.parse("2006-03-09 18:00:00").toInstant(), 
+                            tid, 0, 0, 1.2, 
                             "0123456789012345", "0123456789012345",
                             ""); 
     }
     
 
     DataElem 
-        fillWithStationData(int sid, int tid, int pid,String obstime){
+        fillWithStationData(long sid, long tid, int pid,String obstime){
         
         return new DataElem(
-                            sid, obstime, 1.2, (short)pid,
-                            "2006-03-09 18:00:00", 
-                            (short)tid, "0", (short)0, 1.2, 
+                            sid, DateTimeUtil.parse(obstime).toInstant(), 1.2, pid,
+                            DateTimeUtil.parse("2006-03-09 18:00:00").toInstant(), 
+                            tid, 0, 0, 1.2, 
                             "0123456789012345", "0123456789012345",
                             ""); 
     }
 
-    DataElem getDataElem(int sid, int tid, String obstime, 
+    DataElem getDataElem(long sid, long tid, String obstime, 
     					 int paramid, int sensor, int level){
 
     	return new DataElem(
-            sid, obstime, 1.2, (short)paramid,
-            "2006-03-09 18:00:00", 
-            (short)tid, Integer.toString(sensor), (short)level, 1.2, 
+            sid, DateTimeUtil.parse(obstime).toInstant(), 1.2, paramid,
+            DateTimeUtil.parse("2006-03-09 18:00:00").toInstant(), 
+            tid, sensor, level, 1.2, 
             "0123456789012345", "0123456789012345",
             ""); 
     }

@@ -28,14 +28,14 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package metno;
+package no.met;
 
 import java.io.File;
 import java.sql.ResultSet;
 
-import metno.dbutil.DbConnection;
-import metno.dbutil.DbConnectionMgr;
-import metno.util.FileUtil;
+import no.met.kvutil.dbutil.DbConnection;
+import no.met.kvutil.dbutil.DbConnectionMgr;
+import no.met.kvutil.FileUtil;
 
 public class DbTestUtil {
 
