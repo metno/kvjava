@@ -30,8 +30,10 @@
 */
 package no.met.kvutil;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.regex.Matcher;
@@ -106,6 +108,10 @@ public class DateTimeUtil {
 		return dt.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
 	}
 
+	static public String toString(Instant dt, DateTimeFormatter fmt) {
+		return OffsetDateTime.from(dt).format(fmt);
+	}
+
 	static public OffsetDateTime parse(String dt, String format) {
 		DateTimeFormatter fmt = DateTimeFormatter.ofPattern(format);
 		return OffsetDateTime.parse(dt, fmt);
@@ -138,13 +144,8 @@ public class DateTimeUtil {
 		return OffsetDateTime.parse(ts, FMT_PARSE);
 	}
 
-	static MiTime parseOptHms(String time, MiTime miTime, StringBuilder remaining) {
+	static public Instant parseOptHms(String time, StringBuilder remaining) {
 		int year, month, day, hour, min, second;
-
-		if (miTime == null) {
-			System.out.println("No MiTime template (miTime==null)!");
-			return null;
-		}
 
 		if (time == null) {
 			System.out.println("No time string (time==null)!");
@@ -217,23 +218,9 @@ public class DateTimeUtil {
 			return null;
 		}
 
-		miTime.set(year, month, day, hour, min, second);
-
-		return miTime;
+		return Instant.from(OffsetDateTime.of(year, month, day,hour,min,second,0, ZoneOffset.UTC));
 	}
 
-	/**
-	 * Parse time format with optional hour, min and second. Missing hour, min
-	 * and second is set to 0.
-	 * 
-	 * 
-	 * @param time
-	 * @return
-	 */
-	public static MiTime parseOptHms(String time, StringBuilder remaining) {
-		MiTime miTime = new MiTime();
-
-		return parseOptHms(time, miTime, remaining);
-	}
-
+	
+		
 }
