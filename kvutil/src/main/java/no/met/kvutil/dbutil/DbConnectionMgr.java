@@ -227,7 +227,6 @@ public class DbConnectionMgr
                  con.setAutoCommit(true);
                           
              statement=con.createStatement();
-                          
          }
          catch(SQLException ex){
              if(con!=null){

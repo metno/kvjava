@@ -5,4 +5,9 @@ auto.commit.interval.ms=1000
 group.id=kvclient-borge-ea29af5c-1699-4299-a4dd-8cc272319436
 topic=kvalobs.data
 que.size=10
+log.dir=
+log.level=
+log.kafka.level=
+log.kvalobs.level=
 kvalobs.subscribe.workers=1
+

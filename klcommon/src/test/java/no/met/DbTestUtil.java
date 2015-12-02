@@ -30,7 +30,13 @@
 */
 package no.met;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.sql.ResultSet;
 
 import no.met.kvutil.dbutil.DbConnection;
@@ -45,7 +51,7 @@ public class DbTestUtil {
         try{
             con=mgr.newDbConnection();
             
-            ResultSet rs=con.execQuery("Select * FROM "+tablename);
+            ResultSet rs=con.execQuery("SELECT * FROM "+tablename);
             int c=rs.getMetaData().getColumnCount();
             int n=0;
             
@@ -116,27 +122,8 @@ public class DbTestUtil {
     	if(buf==null)
     		return false;
     	
-    	DbConnection con=null;
-        
-        try{
-            con=mgr.newDbConnection();
-            con.exec(buf);
-            mgr.releaseDbConnection(con);
-            
-            return true;
-        }catch(Exception e){
-        	e.printStackTrace(); 
-        	if(con!=null){
-        		try{
-        			mgr.releaseDbConnection(con);
-                }
-                catch (Exception ex) {
-                }
-            }
-                
-            return false;
-        }
-    }
+    	return runSqlFromString(mgr, buf);
+	}
 	
 	
 	static public boolean runSqlFromString(DbConnectionMgr mgr, String sqlstmt){
@@ -163,26 +150,38 @@ public class DbTestUtil {
         }
     }
     
-	static public void deleteDb(String path){
-    	File dbdir=new File(path);
+	static public void deleteDir(String path){
+    	Path dbdir=FileSystems.getDefault().getPath(path);
         
-        if(dbdir.exists()){
-            if(dbdir.isDirectory()){
-                String[] files=dbdir.list();
-                int dirs=0;
-                
-                for(int i=0; i<files.length; i++){
-                    File f=new File(path+"/"+files[i]);
-                    if(f.isFile()){
-                        f.delete();
-                    }else{
-                        dirs++;
-                    }
-                }
-                
-                if(dirs==0)
-                    dbdir.delete();
+        if(Files.exists(dbdir)){
+            if(Files.isDirectory(dbdir)){
+            	  try {
+					Files.walkFileTree(dbdir, new SimpleFileVisitor<Path>() {
+					         @Override
+					         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
+					             throws IOException
+					         {
+					             Files.delete(file);
+					             return FileVisitResult.CONTINUE;
+					         }
+					         @Override
+					         public FileVisitResult postVisitDirectory(Path dir, IOException e)
+					             throws IOException
+					         {
+					             if (e == null) {
+					                 Files.delete(dir);
+					                 return FileVisitResult.CONTINUE;
+					             } else {
+					                 // directory iteration failed
+					                 throw e;
+					             }
+					         }
+					     });
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
             }
         }
-    }
+	}
 }

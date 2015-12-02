@@ -34,6 +34,7 @@ import static no.met.DbTestUtil.*;
 import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.LinkedList;
+
 import no.met.kvutil.dbutil.DbConnectionMgr;
 import no.met.kvutil.dbutil.DbConnection;
 import no.met.kvalobs.kl.ParamFilter;
@@ -46,21 +47,28 @@ import junit.framework.JUnit4TestAdapter;
 import org.apache.log4j.PropertyConfigurator;
 
 public class ParamFilterTest {
+	static final String paramlogconf="src/test/java/no/met/ParamFilterTest_log.conf";
+	static final String insertParamSql="src/test/java/no/met/insert_into_typeid_param_filter.sql";
     static final String dbdriver="org.hsqldb.jdbcDriver";
-    static final String dbconnect="jdbc:hsqldb:tmp/db/db";
+    static final String dbconnect="jdbc:hsqldb:file:target/hsqldb/paramfiltertest/db";
+    //static final String dbconnect="jdbc:hsqldb:mem:testdb";
     static final String dbpasswd="";
     static final String dbuser="sa"; //Default user in a HSQLDB.
-    static final String createKv2KlFilter="src/sql/create_kv2kl_filter_tables.sql";
+    static final String createKv2KlFilter="../etc/sql/create_kv2kl_filter_tables.sql";
 	static DbConnectionMgr mgr=null;
     
     @BeforeClass
     public static void setUpAndLoadTheDb(){
     	
-    	PropertyConfigurator.configure("test/metno/kvalobs/kl/ParamFilterTest_log.conf");
+    	PropertyConfigurator.configure(paramlogconf);
     	
-        deleteDb("tmp/db");
+        deleteDir("target/hsqldb/paramfiltertest");
         
         try {
+        	if( mgr != null ){
+        		System.err.println(" @@@@@@@@@@@@@@ A mngr exist");
+        	}
+        	
             mgr=new DbConnectionMgr(dbdriver, dbuser, dbpasswd, dbconnect, 10);
             
             if(!runSqlFromFile(mgr, createKv2KlFilter)){
@@ -70,11 +78,11 @@ public class ParamFilterTest {
             }
             
             //Load the database with test data from a file.
-        	assertTrue("Cant load: test/metno/kvalobs/kl/insert_into_typeid_param_filter.sql", 
-        			runSqlFromFile(mgr, "test/metno/kvalobs/kl/insert_into_typeid_param_filter.sql"));
+        	assertTrue("Cant load: "+insertParamSql, 
+        			runSqlFromFile(mgr, insertParamSql));
         	
-        	listKlimaTypeidParamFilter(mgr);
-        	listKlimaParamFilter(mgr);
+        	//listKlimaTypeidParamFilter(mgr);
+        	//listKlimaParamFilter(mgr);
         }catch(Exception ex) {
             if(mgr!=null)
                 try{
@@ -161,7 +169,7 @@ public class ParamFilterTest {
     		assertTrue(paramList.size()==0);
     		assertEquals(pf.types.size(), 3);
     		
-    		LinkedList<ParamElem> list=pf.types.get(312);
+    		LinkedList<ParamElem> list=pf.types.get(new Long(312));
     		
     		assertNotNull(list);
     		assertTrue(list.size()==0);
@@ -186,7 +194,6 @@ public class ParamFilterTest {
         boolean         ret;
         
         assertNotNull(mgr);
-        //assertTrue(listKv2KlimaFilter(mgr));
         
         try{
            con=mgr.newDbConnection();
@@ -196,46 +203,46 @@ public class ParamFilterTest {
            ParamFilter pf=new ParamFilter(18700, con);
     
            ret=doFilter(pf, getDataElem(18700,302,"2006-06-14 12:00:00", 108, 0,0));
-   		   System.out.println("filter 1\n"+pf.types+"\n\n");
+   		   //System.out.println("filter 1\n"+pf.types+"\n\n");
            assertTrue(ret);
        
            ret=doFilter(pf, getDataElem(18700,302,"2006-06-14 12:00:00", 112,0,0));
-   		   System.out.println("filter 2\n"+pf.types+"\n\n");
+   		   //System.out.println("filter 2\n"+pf.types+"\n\n");
            assertFalse(ret);
            
            ret=doFilter(pf, getDataElem(18700,330,"2006-06-14 12:00:00", 104,1,0));
-   		   System.out.println("filter 3\n"+pf.types+"\n\n");
+   		   //System.out.println("filter 3\n"+pf.types+"\n\n");
            assertFalse(ret);
            
            ret=doFilter(pf, getDataElem(18700,312,"2006-06-14 12:00:00", 104,1,0));
-   		   System.out.println("filter 4\n"+pf.types+"\n\n");
+   		   //System.out.println("filter 4\n"+pf.types+"\n\n");
            assertTrue(ret);
            
            ret=doFilter(pf, getDataElem(18700,308, "2006-06-14 12:00:00", 22,0,0));
-   		   System.out.println("filter 5\n"+pf.types+"\n\n");
+   		   //System.out.println("filter 5\n"+pf.types+"\n\n");
            assertTrue(ret);
            
            ret=doFilter(pf, getDataElem(18700,308, "2006-06-14 12:00:00", 109, 0,0));
-   		   System.out.println("filter 6\n"+pf.types+"\n\n");
+   		   //System.out.println("filter 6\n"+pf.types+"\n\n");
            assertFalse(ret);
            
            ret=doFilter(pf, getDataElem(18700, 3,"2005-03-09 18:00:00", 104, 0, 0));
-   		   System.out.println("filter 7\n"+pf.types+"\n\n");
+   		   //System.out.println("filter 7\n"+pf.types+"\n\n");
            assertFalse(ret);
      	
        	   ret=doFilter(pf, getDataElem(18700, 3,"2006-03-09 18:00:00", 104, 0, 0));
-   		   System.out.println("filter 8\n"+pf.types+"\n\n");
+   		   //System.out.println("filter 8\n"+pf.types+"\n\n");
        	   assertFalse(ret);
 
        	   
            ret=doFilter(pf, getDataElem(18700, 3,"2005-03-09 18:00:00", 110, 0, 0));
-  		   System.out.println("filter 9\n"+pf.types+"\n\n");
+  		   //System.out.println("filter 9\n"+pf.types+"\n\n");
            assertTrue(ret);
            
            
            pf=new ParamFilter(87110, con);
            ret=doFilter(pf, getDataElem(87110, 1, "2006-09-08 06:00:00", 211, 0, 0));
- 		   System.out.println("filter 10\n"+pf.types+"\n\n");
+ 		   //System.out.println("filter 10\n"+pf.types+"\n\n");
            assertFalse(ret);
            
         }

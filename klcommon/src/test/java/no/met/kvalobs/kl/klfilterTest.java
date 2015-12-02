@@ -42,25 +42,22 @@ import static org.junit.Assert.*;
 import junit.framework.JUnit4TestAdapter;
 import org.apache.log4j.PropertyConfigurator;
 
+
 public class klfilterTest {
+	static final String logconf="src/test/java/no/met/klfilterTest_log.conf";
+	static final String insertParamFilterSql="src/test/java/no/met/insert_into_typeid_param_filter.sql";
     static final String dbdriver="org.hsqldb.jdbcDriver";
-    static final String dbconnect="jdbc:hsqldb:tmp/db/db";
+    static final String dbconnect="jdbc:hsqldb:file:target/hsqldb/klfiltertest/db";
     static final String dbpasswd="";
     static final String dbuser="sa"; //Default user in a HSQLDB.
-    static final String createFilterTables="src/sql/create_kv2kl_filter_tables.sql";
+    static final String createFilterTables="../etc/sql/create_kv2kl_filter_tables.sql";
     DbConnectionMgr mgr=null;
-    
-    
-    
     
     @BeforeClass
     public static void setUpAndLoadTheDb(){
     	TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
-    	PropertyConfigurator.configure("test/metno/kvalobs/kl/klfilterTest_log.conf");
+    	PropertyConfigurator.configure(logconf);
     }
-
-    
-    
     
     @Before
     public void setUp(){
@@ -69,7 +66,7 @@ public class klfilterTest {
   
     @After
     public void tearDown(){
-    	if(mgr!=null){
+    	if(mgr != null){
     		try{
         		mgr.closeDbDriver();
         	}
@@ -78,7 +75,7 @@ public class klfilterTest {
         	}
     	}
 
-		deleteDb("tmp/db");
+		deleteDir("target/hsqldb/klfiltertest");
     	mgr=null;
     }
     
@@ -98,9 +95,9 @@ public class klfilterTest {
     }
     
     DbConnectionMgr fillWithData(){
-        DbConnectionMgr mgr=null;
-        
-        
+    	if( mgr != null ) {
+    		mgr.closeDbDriver();
+    	}
         String insert="insert into t_kv2klima_filter VALUES("+
         			  "18700,'T',NULL,NULL,308,NULL);"+
         			  "insert into t_kv2klima_filter VALUES("+
@@ -126,7 +123,7 @@ public class klfilterTest {
         			  "insert into t_kv2klima_filter VALUES(" +
         			  "88000,'D','2008-01-01 00:00:00', NULL, 42, NULL);";
         
-        deleteDb("tmp/db");
+        deleteDir("target/hsqldb/klfiltertest");
         
         try {
             mgr=new DbConnectionMgr(dbdriver, dbuser, dbpasswd, dbconnect, 1);
@@ -149,7 +146,7 @@ public class klfilterTest {
         	ok=false;
         }
 
-        if(ok && !runSqlFromFile(mgr, "test/metno/kvalobs/kl/insert_into_typeid_param_filter.sql"))
+        if(ok && !runSqlFromFile(mgr, insertParamFilterSql))
         	ok=false;
         
     
@@ -202,16 +199,14 @@ public class klfilterTest {
             ""); 
     }
 
-    
     @Test
     public void missingTableEntryForType(){
         StringHolder msg=new StringHolder();
         DbConnection con=null;
         boolean         ret;
 
-        System.out.println("Test: missingTableEntryForType");
         assertNotNull(mgr);
-        assertTrue(listTestTables(mgr));
+        //assertTrue(listTestTables(mgr));
         
         try{
            con=mgr.newDbConnection();
@@ -250,52 +245,52 @@ public class klfilterTest {
         ret=filter.filter(fillWithStationData(18500, 10, "2006-01-01 03:00:00"), msg);
         assertTrue(ret);
 		        
-        ret=filter.filter(fillWithStationData(18500, 10, "2006-1-1 04:00:00"), msg);
+        ret=filter.filter(fillWithStationData(18500, 10, "2006-01-01 04:00:00"), msg);
         assertFalse(ret);
 
-        ret=filter.filter(fillWithStationData(18500, 10, "2006-2-1 02:00:00"), msg);
+        ret=filter.filter(fillWithStationData(18500, 10, "2006-02-01 02:00:00"), msg);
         assertFalse(ret);
         
-        ret=filter.filter(fillWithStationData(18500, 10, "2006-2-1 03:00:00"), msg);
+        ret=filter.filter(fillWithStationData(18500, 10, "2006-02-01 03:00:00"), msg);
         assertTrue(ret);
         
-        ret=filter.filter(fillWithStationData(18500, 10, "2006-2-18 02:00:00"), msg);
+        ret=filter.filter(fillWithStationData(18500, 10, "2006-02-18 02:00:00"), msg);
         assertTrue(ret);
 
-        ret=filter.filter(fillWithStationData(18500, 10, "2006-2-20 12:00:00"), msg);
+        ret=filter.filter(fillWithStationData(18500, 10, "2006-02-20 12:00:00"), msg);
         assertTrue(ret);
 
-        ret=filter.filter(fillWithStationData(18500, 10, "2006-2-20 13:00:00"), msg);
+        ret=filter.filter(fillWithStationData(18500, 10, "2006-02-20 13:00:00"), msg);
         assertFalse(ret);
         
-        ret=filter.filter(fillWithStationData(18500, 10, "2006-2-20 14:00:00"), msg);
+        ret=filter.filter(fillWithStationData(18500, 10, "2006-02-20 14:00:00"), msg);
         assertTrue(ret);
         
-        ret=filter.filter(fillWithStationData(18500, 10, "2006-2-20 11:00:00"), msg);
+        ret=filter.filter(fillWithStationData(18500, 10, "2006-02-20 11:00:00"), msg);
         assertTrue(ret);
         
-        ret=filter.filter(fillWithStationData(18500, 10, "2008-2-20 11:00:00"), msg);
-        assertTrue(ret);
-
-        ret=filter.filter(fillWithStationData(18600, 10, "2003-2-20 11:00:00"), msg);
-        assertTrue(ret);
-        
-        ret=filter.filter(fillWithStationData(18600, 10, "2006-1-1 3:00:00"), msg);
+        ret=filter.filter(fillWithStationData(18500, 10, "2008-02-20 11:00:00"), msg);
         assertTrue(ret);
 
-        ret=filter.filter(fillWithStationData(18600, 10, "2006-1-1 4:00:00"), msg);
+        ret=filter.filter(fillWithStationData(18600, 10, "2003-02-20 11:00:00"), msg);
+        assertTrue(ret);
+        
+        ret=filter.filter(fillWithStationData(18600, 10, "2006-01-01 03:00:00"), msg);
+        assertTrue(ret);
+
+        ret=filter.filter(fillWithStationData(18600, 10, "2006-01-01 04:00:00"), msg);
         assertFalse(ret);
         
-        ret=filter.filter(fillWithStationData(18600, 10, "2007-1-1 4:00:00"), msg);
+        ret=filter.filter(fillWithStationData(18600, 10, "2007-01-01 04:00:00"), msg);
         assertFalse(ret);
         
-        ret=filter.filter(fillWithStationData(18800, 10, "2006-1-1 2:00:00"), msg);
+        ret=filter.filter(fillWithStationData(18800, 10, "2006-01-01 02:00:00"), msg);
         assertFalse(ret);
                         
-        ret=filter.filter(fillWithStationData(18800, 10, "2006-1-1 3:00:00"), msg);
+        ret=filter.filter(fillWithStationData(18800, 10, "2006-01-01 03:00:00"), msg);
         assertTrue(ret);
 
-        ret=filter.filter(fillWithStationData(18800, 10, "2007-1-1 4:00:00"), msg);
+        ret=filter.filter(fillWithStationData(18800, 10, "2007-01-01 04:00:00"), msg);
         assertTrue(ret);
                 
         ret=filter.filter(fillWithStationData(4460, 342, "2007-11-01 07:00:00"), msg);
@@ -326,9 +321,8 @@ public class klfilterTest {
         DbConnection con=null;
     	boolean ret;
  
-        System.out.println("Test: paramFilter!");
     	assertNotNull(mgr);
-        assertTrue(listTestTables(mgr));
+       // assertTrue(listTestTables(mgr));
         
         try{
            con=mgr.newDbConnection();
@@ -381,7 +375,7 @@ public class klfilterTest {
 
     	assertFalse(ret);
     	
-    	ret=filter.filter(getDataElem(18700, 3,"2005-010-02 23:00:00", 104, 0, 0),
+    	ret=filter.filter(getDataElem(18700, 3,"2005-01-02 23:00:00", 104, 0, 0),
                 msg);
 
     	assertFalse(ret);
@@ -390,7 +384,6 @@ public class klfilterTest {
                 msg);
 
     	assertFalse(ret);
-    	
 
     	ret=filter.filter(getDataElem(18700, 3,"2006-01-01 01:00:00", 104, 0, 0),
                 msg);
@@ -453,9 +446,8 @@ public class klfilterTest {
         DbConnection con=null;
         boolean         ret;
         
-        System.out.println("Test: testStation");
         assertNotNull(mgr);
-        assertTrue(listTestTables(mgr));
+//        assertTrue(listTestTables(mgr));
         
         try{
            con=mgr.newDbConnection();
@@ -505,9 +497,8 @@ public class klfilterTest {
         DbConnection con=null;
         boolean         ret;
         
-        System.out.println("Test: testStation");
         assertNotNull(mgr);
-        assertTrue(listTestTables(mgr));
+        //assertTrue(listTestTables(mgr));
         
         try{
            con=mgr.newDbConnection();
@@ -559,9 +550,9 @@ public class klfilterTest {
         DbConnection con=null;
         boolean         ret;
         
-        System.out.println("Test: nyttStNr");
+    //    System.out.println("Test: nyttStNr");
         assertNotNull(mgr);
-        assertTrue(listTestTables(mgr));
+        //assertTrue(listTestTables(mgr));
         
         try{
            con=mgr.newDbConnection();
@@ -592,7 +583,6 @@ public class klfilterTest {
         catch(Exception e){
              fail("Unexpected exception!");
         }
-
     }
 
     public static junit.framework.Test suite() { 
