@@ -14,7 +14,7 @@ import no.met.kvutil.PropertiesHelper;
 import no.met.kvutil.concurrent.ThreadManager;
 
 public class KafkaApp extends kvService {
-	Properties prop;
+	PropertiesHelper prop;
 	ListenerEventQue que;
 	AtomicBoolean shutdown;
 	boolean isInterupted;
@@ -31,6 +31,7 @@ public class KafkaApp extends kvService {
 		public void run() {
 			System.err.println("Shutdown - start");
 			try{
+				app.onExit();
 				app.shutdown();
 			}
 			catch(InterruptedException ex){
@@ -64,7 +65,7 @@ public class KafkaApp extends kvService {
 	}
 	
 	static public KafkaApp factory(Path conf) {
-		Properties prop=PropertiesHelper.loadFile(conf);
+		PropertiesHelper prop=PropertiesHelper.loadFile(conf);
 		if( prop == null)
 			return null;
 		
@@ -79,10 +80,34 @@ public class KafkaApp extends kvService {
 		return factory(prop);
 	}
 	
-	public KafkaApp(Properties prop, ListenerEventQue que, KvDataQuery query, KvSubsribeData subscribers ){
-		super(subscribers, query);
+	
+	
+	public KafkaApp(Properties prop) {
+		this( prop, new ListenerEventQue(Math.abs(Integer.parseInt(prop.getProperty("que.size", "10")))));
+		KafkaDataSubscriber sub = null;
+		SqlDataQuery query=null;
+		
+		try {
+			sub = new KafkaDataSubscriber(prop, que);
+			query = new SqlDataQuery(prop,que);
+			this.init(sub, query);
+		}
+		catch( Exception ex){
+			System.err.println("Configuration error: " + ex.getMessage());
+			
+			if( sub != null )
+				sub.stop();
+			
+			if(query !=  null )
+				query.stop();
+			
+			throw new InternalError();
+		}
+	}
+	
+	KafkaApp(Properties prop, ListenerEventQue que) {
 		this.que=que;
-		this.prop=prop;
+		this.prop=new PropertiesHelper(prop);
 		shutdown = new AtomicBoolean(false);
 		workers=new ThreadManager("Subscribers");
 		subscriberWorkers = Math.abs(Integer.parseInt(prop.getProperty("kvalobs.subscribe.workers", "1")));
@@ -96,7 +121,12 @@ public class KafkaApp extends kvService {
 		isInterupted = false;
 	}
 	
-	public Properties getConf() { 
+	public KafkaApp(Properties prop, ListenerEventQue que, KvDataQuery query, KvSubsribeData subscribers ){
+		this(prop, que);
+		init(subscribers, query);
+	}
+	
+	public PropertiesHelper getConf() { 
 		return prop;
 	}
 	public AtomicBoolean getShutdown() {
@@ -117,8 +147,16 @@ public class KafkaApp extends kvService {
 		}
 	}
 	
+	protected void onExit(){
+		
+	}
+	
+	protected void onStartup(){
+		
+	}
 	public void run() throws InterruptedException {
 		System.err.println("Starting main thread, workers " + workers.size()+".");
+		onStartup();
 		start();
 		while(!shutdown.get() && ! isInterupted){
 			try {
@@ -128,7 +166,7 @@ public class KafkaApp extends kvService {
 				shutdown();
 			}
 		}
-		
+		onExit();
 		System.err.println("Terminating main thread, workers still alive " + workers.size() + " (interupted: " + (isInterupted?"true":"false")+").");
 	}
 	

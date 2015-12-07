@@ -4,16 +4,30 @@ import java.util.Optional;
 
 import no.met.kvclient.KvDataEventListener;
 import no.met.kvclient.KvDataNotifyEventListener;
+import no.met.kvclient.KvHintEventListener;
 
 public class kvService implements KvSubsribeData, KvDataQuery {
 	KvSubsribeData subscribe;
 	KvDataQuery query;
 
+
 	public kvService(KvSubsribeData subscribe, KvDataQuery query) {
 		this.subscribe = subscribe;
 		this.query = query;
 	}
+	
+	protected kvService() {
+		this.subscribe = null;
+		this.query = null;
+	}
 
+	protected void init(KvSubsribeData subscribe, KvDataQuery query) {
+		this.subscribe = subscribe;
+		this.query = query;
+	}
+	
+	
+	
 	@Override
 	public Optional<DataIterator> getData(WhichDataList whichData) {
 		return query.getData(whichData);
@@ -83,8 +97,8 @@ public class kvService implements KvSubsribeData, KvDataQuery {
 	
 	
 	@Override
-	public SubscribeId subscribeKvHint(kvHintSubscriber sub) {
-		return subscribe.subscribeKvHint(sub);
+	public SubscribeId subscribeKvHint(KvHintEventListener listener) {
+		return subscribe.subscribeKvHint(listener);
 	}
 
 	@Override

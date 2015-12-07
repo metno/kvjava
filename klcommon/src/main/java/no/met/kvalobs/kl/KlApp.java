@@ -34,19 +34,25 @@ import no.met.kvutil.PropertiesHelper;
 import no.met.kvutil.dbutil.DbConnection;
 import no.met.kvutil.dbutil.DbConnectionMgr;
 import no.met.kvclient.KvApp;
+import no.met.kvclient.kafka.KafkaApp;
+import no.met.kvclient.service.SendDataToKv;
+import no.met.kvclient.service.SendDataToKv.Result.EResult;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Properties;
+
 import org.apache.log4j.Logger;
 
-public class KlApp extends KvApp
+public class KlApp extends KafkaApp  implements SendDataToKv 
 {
+	
 	static Logger logger=Logger.getLogger(KlApp.class);
 
     DbConnectionMgr conMgr=null;
-    PropertiesHelper conf=null;
     //String           kvserver;
     File             pidFile=null;
     String dataTableName=null;
@@ -55,7 +61,7 @@ public class KlApp extends KvApp
     String foreignTextDataTableName=null;
     static String           kvpath=null;
     
-    String getConfile(String conf){
+    static PropertiesHelper getConfile(String conf){
     	if(conf==null){
     		logger.fatal("INTERNAL: No configuration file is given! (null)!");
     		System.exit(1);
@@ -91,8 +97,16 @@ public class KlApp extends KvApp
     		}
     	}
 
-    	return confFile;
+    	PropertiesHelper prop=PropertiesHelper.loadFile(confFile);
+    	
+    	if(prop==null){
+    		logger.fatal("Cant load configurationfile: "+confFile);
+			System.exit(1);
+    	}
+    	return prop;
     }
+    
+	
     
     public KlApp(String[] args, String conffile, boolean usingSwing){
     	this(args, conffile, null, usingSwing);
@@ -121,23 +135,8 @@ public class KlApp extends KvApp
      * @param usingSwing
      */
     public KlApp(String[] args, String conffile, String kvserver, boolean usingSwing){
-    	super(args, null, usingSwing, null);
-    	String confFile=getConfile(conffile);
-    	
-    	conf=new PropertiesHelper();
-
-    	try {
-            conf.loadFromFile(confFile);
-        } catch (FileNotFoundException e1) {
-            logger.fatal("Cant open configuration file: "+confFile);
-            logger.fatal("Reason: "+e1.getMessage());
-            System.exit(1);
-        } catch (IOException e1) {
-            logger.fatal("Error while reading configuration file: "+confFile);
-            logger.fatal("Reason: "+e1.getMessage());
-            System.exit(1);
-        }
-        
+    	super(getConfile(conffile));
+    	PropertiesHelper conf = getConf();
         dataTableName = conf.getProperty("datatable", "kv2klima" );
         textDataTableName = conf.getProperty("textdatatable", "T_TEXT_DATA" );
         foreignDataTableName = conf.getProperty( "foreign_datatable" );
@@ -147,9 +146,21 @@ public class KlApp extends KvApp
             conMgr=new DbConnectionMgr(conf);
         } catch (IllegalArgumentException e1) {
             logger.fatal("Missing properties in the configuration file: " + e1.getMessage());
+            try {
+				shutdown();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
             System.exit(1);
         } catch (ClassNotFoundException e1) {
             logger.fatal("Cant load databasedriver: "+e1.getMessage());
+            try {
+				shutdown();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
             System.exit(1);
         }
 
@@ -230,9 +241,6 @@ public class KlApp extends KvApp
     	return conMgr;
     }
     	
-    public PropertiesHelper getConf(){
-    	return conf;
-    }
     
 	synchronized public static String getKvpath(){
 
@@ -339,5 +347,13 @@ public class KlApp extends KvApp
 			System.out.println("SecurityException: Removing pidfile '" + pidFile.getName() + "!");	
 			//NOOP
 		}
+	}
+
+
+
+	@Override
+	public Result sendData(String data, String decoder) {
+		// TODO Implement the http rest interface to kvdatainputd.
+		return new Result(EResult.ERROR,"Not implemented");
 	}
 }

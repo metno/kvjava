@@ -59,7 +59,8 @@ public class DefaultQuery implements IQuery{
 	
 	
 	public String createDataUpdateQuery( DataElem elem ){
-		logger.debug("Update data in a SQL92 database!");
+		logger.debug("Update data in a SQL92 database ("+getDataTableName()+") sid: "+elem.stationID+" tid: " + 
+	             elem.typeID + " pid: " + elem.paramID+ " obstime: '"+elem.obstime+"' tbtime: "+elem.tbtime);
 		String query="UPDATE " +getDataTableName() +
 			 " SET " +
 			 "  original="+elem.original + "," +
@@ -79,7 +80,8 @@ public class DefaultQuery implements IQuery{
 	}
 	
 	public String createDataInsertQuery( DataElem elem ){
-		logger.debug("Insert into a SQL92 database!");
+		logger.debug("Insert into a SQL92 database("+getDataTableName()+") sid: "+elem.stationID+" tid: " + 
+	             elem.typeID + " pid: " + elem.paramID+ " obstime: '"+elem.obstime+"' tbtime: "+elem.tbtime);
 		String query="insert into " + getDataTableName() + "(stnr,dato,original,kvstamp,paramid,typeid,xlevel,sensor,useinfo,corrected,controlinfo,cfailed) values ("
 				 +elem.stationID+","
 				 +"'"+elem.obstime+"',"
@@ -97,7 +99,8 @@ public class DefaultQuery implements IQuery{
 	}
 	
 	public String createTextDataUpdateQuery( TextDataElem elem ){
-		logger.debug("Update textData in a SQL92 database!");
+		logger.debug("Update textData in a SQL92 database ("+getTextDataTableName()+") sid: "+elem.stationID+" tid: " + 
+	             elem.typeID_ + " pid: " + elem.paramID+ " obstime: '"+elem.obstime+"' tbtime: "+elem.tbtime);
 		String query="UPDATE " + getTextDataTableName() +
 			 " SET " +
 			 "  original='"+elem.original + "'," +
@@ -111,7 +114,8 @@ public class DefaultQuery implements IQuery{
 	}
 	
 	public String createTextDataInsertQuery( TextDataElem elem ) {
-		logger.debug("Insert textData into a SQL92 database!");
+		logger.debug("Insert textData into a SQL92 database ("+getTextDataTableName()+") sid: "+elem.stationID+" tid: " + 
+	             elem.typeID_ + " pid: " + elem.paramID+ " obstime: '"+elem.obstime+"' tbtime: "+elem.tbtime);
 		String query="INSERT INTO "+getTextDataTableName() + "(stationid,obstime,original,paramid,tbtime,typeid) "+
 		             "values ("
 				 	     +elem.stationID+","

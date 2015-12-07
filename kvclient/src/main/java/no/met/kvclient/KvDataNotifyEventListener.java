@@ -34,10 +34,11 @@ import no.met.kvclient.service.DataElem;
 import no.met.kvclient.service.ObsDataList;
 import no.met.kvclient.service.ObsData;
 import no.met.kvclient.service.SubscribeId;
-import no.met.kvclient.service.kvDataNotifySubscriber.What;
-import no.met.kvclient.service.kvDataNotifySubscriber.WhatList;
+import no.met.kvclient.KvDataNotifyEvent.What;
+import no.met.kvclient.KvDataNotifyEvent.WhatList;
 
 public interface KvDataNotifyEventListener extends KvEventListener {
+	
 	@Override
 	default public void callListener(Object source, SubscribeId id, ObsDataList dataList) {
 		WhatList wl = new WhatList();

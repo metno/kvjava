@@ -1,7 +1,7 @@
 /*
   Kvalobs - Free Quality Control Software for Meteorological Observations 
 
-  $Id: KvDataNotifyExtEvent.java,v 1.1.2.2 2007/09/27 09:02:41 paule Exp $                                                       
+  $Id: Admin.java,v 1.1.2.2 2007/09/27 09:02:19 paule Exp $                                                       
 
   Copyright (C) 2007 met.no
 
@@ -28,26 +28,20 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package no.met.kvclient;
+package no.met.kvalobs.kv2kl;
 
-import no.met.kvclient.service.SubscribeId;
-//TODO: Should this bee removed?
-//import java.util.*;
-import no.met.kvclient.service.kvDataNotifySubscriber.What;
+import no.met.kvclient.IAdmin;
 
-public class KvDataNotifyExtEvent extends KvEvent
-{
-	private static final long serialVersionUID = 2896365324320869316L;
+public class Admin implements IAdmin{
 
-	private What whatList[]; 
-    
-    public KvDataNotifyExtEvent(Object source, SubscribeId id, What[] whatList){
-        super(source,id,"KvDataNotifyExtEvent");
-        this.whatList=whatList;
-    }
-    
-    
-    public What[] getWhatList(){
-        return whatList;
-    }
+	Admin(){
+	}
+	
+	public String statusmessage(short details){
+		return "Admin.statusmessage: Not implemented!";
+	}
+	
+	public boolean shutdown(){
+		return false;
+	}
 }

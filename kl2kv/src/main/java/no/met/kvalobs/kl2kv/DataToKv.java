@@ -1,7 +1,7 @@
 /*
   Kvalobs - Free Quality Control Software for Meteorological Observations 
 
-  $Id: KvNoConnection.java,v 1.1.2.3 2007/09/27 09:02:41 paule Exp $                                                       
+  $Id: DataToKv.java,v 1.1.2.2 2007/09/27 09:02:19 paule Exp $                                                       
 
   Copyright (C) 2007 met.no
 
@@ -28,21 +28,9 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package no.met.kvclient;
 
+package no.met.kvalobs.kl2kv;
 
-public class KvNoConnection extends Exception
-{
-	private static final long serialVersionUID = -5537279012319555225L;
-
-	public KvNoConnection(String msg)
-    {
-        super(msg);
-    }
-    
-    public KvNoConnection()
-    {
-        super("No connection to kvalobs!!!");
-    }
-    
+public interface DataToKv {
+    public boolean sendData(String data, long stationid, long typeid);
 }

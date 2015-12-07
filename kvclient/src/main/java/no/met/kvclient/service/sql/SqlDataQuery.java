@@ -17,17 +17,19 @@ import no.met.kvclient.service.StationIDList;
 import no.met.kvclient.service.StationList;
 import no.met.kvclient.service.Station_paramList;
 import no.met.kvclient.service.TypeList;
+import no.met.kvclient.service.WhichData;
 import no.met.kvclient.service.WhichDataList;
 import no.met.kvclient.service.KvDataQuery;
 
 public class SqlDataQuery implements KvDataQuery {
 	ListenerEventQue que;
-	public SqlDataQuery(Properties prop){
-		que=new ListenerEventQue(Integer.parseInt(prop.getProperty("que.size", "10")));
+
+	public SqlDataQuery(Properties prop) {
+		que = new ListenerEventQue(Integer.parseInt(prop.getProperty("que.size", "10")));
 	}
 
-	public SqlDataQuery(Properties prop, ListenerEventQue que){
-		this.que=que;
+	public SqlDataQuery(Properties prop, ListenerEventQue que) {
+		this.que = que;
 	}
 
 	@Override
@@ -41,7 +43,7 @@ public class SqlDataQuery implements KvDataQuery {
 		// TODO Auto-generated method stub
 		return false;
 	}
-	
+
 	@Override
 	public Optional<StationList> getStations() {
 		// TODO Auto-generated method stub
@@ -56,8 +58,29 @@ public class SqlDataQuery implements KvDataQuery {
 
 	@Override
 	public Optional<ModelDataIterator> getModelData(WhichDataList whichData) {
-		// TODO Auto-generated method stub
-		return null;
+		StringBuilder q = new StringBuilder();
+		q.append("select * from model_data");
+
+		if (whichData != null && !whichData.isEmpty()) {
+			boolean first = true;
+			q.append(" where ");
+			for (WhichData e : whichData) {
+				if (!first)
+					q.append(" or ");
+				else
+					first = false;
+
+				q.append("(stationid=" + e.stationid + " and ");
+
+				if (e.fromTime.compareTo(e.toTime) == 0)
+					q.append("obstime='" + e.fromTime + "')");
+				else
+					q.append("obstime between '" + e.fromTime + "' and '" + e.toTime + "')");
+			}
+		}
+		String sql=q.toString();
+		//TODO: Do the database query.
+		return Optional.ofNullable(null);
 	}
 
 	@Override
@@ -99,15 +122,13 @@ public class SqlDataQuery implements KvDataQuery {
 	@Override
 	public void stop() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void start() {
 		// TODO Auto-generated method stub
-		
-	}
 
-	
+	}
 
 }

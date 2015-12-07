@@ -11,11 +11,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import no.met.kvclient.KvDataEventListener;
 import no.met.kvclient.KvDataNotifyEventListener;
+import no.met.kvclient.KvHintEventListener;
 import no.met.kvclient.ListenerEventQue;
 import no.met.kvclient.priv.DataSubscribers;
 import no.met.kvclient.service.DataSubscribeInfo;
 import no.met.kvclient.service.SubscribeId;
-import no.met.kvclient.service.kvHintSubscriber;
 import no.met.kvclient.service.KvSubsribeData;
 import no.met.kvclient.service.ObsDataList;
 
@@ -91,7 +91,7 @@ public class KafkaDataSubscriber implements KvSubsribeData {
 	}
 
 	@Override
-	synchronized public SubscribeId subscribeKvHint(kvHintSubscriber sub) {
+	synchronized public SubscribeId subscribeKvHint(KvHintEventListener sub) {
 		// TODO Auto-generated method stub
 		return null;
 	}

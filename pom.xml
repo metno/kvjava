@@ -45,7 +45,9 @@
   <modules>
    	<module>kvutil</module>
     <module>kvclient</module>
-    <module>kafkatest</module>
+    <module>klcommon</module>
+<!--    <module>kv2kl</module> -->
+    <!-- <module>kafkatest</module> -->
   </modules>
 
   <dependencies>

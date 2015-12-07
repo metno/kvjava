@@ -1,7 +1,7 @@
 /*
   Kvalobs - Free Quality Control Software for Meteorological Observations 
 
-  $Id: KvNoConnection.java,v 1.1.2.3 2007/09/27 09:02:41 paule Exp $                                                       
+  $Id: KvHintListener.java,v 1.1.2.2 2007/09/27 09:02:19 paule Exp $                                                       
 
   Copyright (C) 2007 met.no
 
@@ -28,21 +28,23 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package no.met.kvclient;
+package no.met.kvalobs.kv2kl;
 
+import no.met.kvclient.KvHintEventListener;
+public class KvHintListener implements KvHintEventListener {
+	
+	Kv2KlApp app;
 
-public class KvNoConnection extends Exception
-{
-	private static final long serialVersionUID = -5537279012319555225L;
+	public KvHintListener(Kv2KlApp app){
+		this.app=app;
+	}
+	
+	public void down() {
+		app.setKvIsUp(false);
+	}
 
-	public KvNoConnection(String msg)
-    {
-        super(msg);
-    }
-    
-    public KvNoConnection()
-    {
-        super("No connection to kvalobs!!!");
-    }
-    
+	public void up() {
+		app.setKvIsUp(true);
+	}
+
 }

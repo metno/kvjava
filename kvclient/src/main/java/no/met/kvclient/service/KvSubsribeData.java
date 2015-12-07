@@ -2,6 +2,7 @@ package no.met.kvclient.service;
 
 import no.met.kvclient.KvDataEventListener;
 import no.met.kvclient.KvDataNotifyEventListener;
+import no.met.kvclient.KvHintEventListener;
 import no.met.kvutil.LifeCycle;
 
 public interface KvSubsribeData extends LifeCycle{
@@ -9,7 +10,7 @@ public interface KvSubsribeData extends LifeCycle{
 
 	SubscribeId subscribeData(DataSubscribeInfo info, KvDataEventListener listener);
 
-	SubscribeId subscribeKvHint(kvHintSubscriber sub);
+	SubscribeId subscribeKvHint(KvHintEventListener sub);
 
 	void unsubscribe(SubscribeId subid);
 	
