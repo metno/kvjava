@@ -1,0 +1,32 @@
+#dbconnect=jdbc:oracle:thin:@euros:1521:dvh
+#dbdriver=oracle.jdbc.driver.OracleDriver
+#dbuser=kvalobs
+#dbpasswd=obs2005
+
+#dbconnect=jdbc:postgresql://dev-vm101:5433/kvalobs
+#dbdriver=org.postgresql.Driver
+#dbuser=kl2kv
+#dbpasswd=kl2kv12
+
+dbconnect=jdbc:oracle:thin:@buster.oslo.dnmi.no:1521:kd2
+dbdriver=oracle.jdbc.driver.OracleDriver
+dbuser=kvalobs
+dbpasswd=obs2005
+
+kvserver=kv-hist-test
+#kvserver=kvtest-dev-vm101 byttet 7.6.2010
+# byttet til 101 20.04.2010 Åse
+#kvserver=kv-hist
+
+
+
+#Hvilken tabell skal vi laste data fra og sende til kvalobs.
+#kl2kv_table=data
+#kl2kv_table=T_KL2KVALOBS_HIST
+
+
+#Stations er en kommaseparert liste med stasjonsnummer som
+#angir hvilke stasjoner vi skal sende data for. En tom liste angir
+#at vi skal sende data for alle stasjonene i tabellen.
+#eks. stations=60,290,1080,1650
+stations=

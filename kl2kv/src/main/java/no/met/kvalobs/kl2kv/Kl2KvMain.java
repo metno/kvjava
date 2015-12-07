@@ -30,6 +30,7 @@
 */
 package no.met.kvalobs.kl2kv;
 
+import java.nio.file.FileSystems;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -173,23 +174,9 @@ public class Kl2KvMain {
     		 System.exit(1);
     	 }
         
-    	 String logfile=configfile.substring(0, i);
-    	 i=logfile.lastIndexOf('/');
-    	 
-    	 if(i>-1){
-    		 if(i<logfile.length()){
-    			 logfile.substring(i+1);
-    		 }else{
-    			 System.out.println("FATAL: the name of the configuration file must on the form 'name.conf' <" + configfile +">");
-        		 System.exit(1);
-    		 }
-    	 }
-    	 
-    	 logfile+="_log.conf";
     	 
     	//    	Konfigurer loggesystemet, log4j.
-     	System.out.println("log4j conf: "+kvpath+"/etc/"+logfile);
-     	PropertyConfigurator.configure(kvpath+"/etc/"+logfile);
+     	PropertyConfigurator.configure(InitLogger.getLogProperties(configfile, FileSystems.getDefault().getPath(".")));
     	 
     	 List<String> stations=go.getFilenameList();
     	 
