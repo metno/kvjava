@@ -51,6 +51,8 @@ public class PidFileUtil {
 
 		try {
 			if (!pidFile.createNewFile()) {
+				System.err.println("FATAL: The pidfile '" + pidFilename + "' allready exist!"
+						+ "If an instance of the application is not running" + " remove the file and try again.");
 				logger.fatal("FATAL: The pidfile '" + pidFilename + "' allready exist!"
 						+ "If an instance of the application is not running" + " remove the file and try again.");
 				System.exit(1);
@@ -62,9 +64,11 @@ public class PidFileUtil {
 			System.out.println("Writing pidfile '" + pidFilename + "' with pid '" + pid + "'!");
 			logger.info("Writing pidfile '" + pidFilename + "' with pid '" + pid + "'!");
 		} catch (java.io.IOException ex) {
+			System.err.println("FATAL: PidFileUtil.createPidFile: " + ex.getMessage());
 			logger.fatal("FATAL: " + ex.getMessage());
 			System.exit(1);
 		} catch (java.lang.SecurityException ex) {
+			System.err.println("FATAL: PidFileUtil.createPidFile: " + ex.getMessage());
 			logger.fatal("FATAL: " + ex.getMessage());
 			System.exit(1);
 		}

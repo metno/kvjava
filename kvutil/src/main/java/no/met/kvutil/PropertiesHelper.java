@@ -38,7 +38,11 @@ import java.io.InputStream;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Properties;
+import java.util.Set;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 public class PropertiesHelper extends Properties {
 
@@ -57,31 +61,43 @@ public class PropertiesHelper extends Properties {
 		this.filename = filename;
 	}
 
-	public int countSubkeys(String key, StringHolder sh) {
-		int cnt = 1;
-		int i = 0;
-
+	static String cleanKey( String key ) {
 		key = key.trim();
 
-		while (key.length() > 0 && key.charAt(0) == '.')
+		//Compress all sequences of '.' to one '.'.
+		key.replaceAll("\\.{2,}",".");
+
+		//Remove '.' at start
+		if(key.startsWith("."))
 			key = key.substring(1);
 
-		while (key.length() > 0 && key.charAt(key.length() - 1) == '.')
+		//Remove '.' at end
+		if( key.endsWith("."))
 			key = key.substring(0, key.length() - 1);
 
+		return key;
+	}
+
+	static int count(String src, String what) {
+		int cnt = 0;
+		int i = -1;
+
+		do {
+			cnt++;
+			i = src.indexOf(what, i+1);
+		}while(i>=0);
+
+		return cnt;
+	}
+
+	public int countSubkeys(String key, StringHolder sh) {
+		key = cleanKey(key);
 		sh.setValue(key);
 
 		if (key.length() == 0)
 			return 0;
 
-		i = key.indexOf('.', 0);
-
-		while (i >= 0) {
-			cnt++;
-			i = key.indexOf('.', i + 1);
-		}
-
-		return cnt;
+		return count(key, ".");
 	}
 
 	/*-
@@ -89,7 +105,7 @@ public class PropertiesHelper extends Properties {
 	 * Sub elements of this key is: k1, k2 and k3. The sub element of index 1 is
 	 * k1, index 2 is k2, etc.
 	 * 
-	 * An index of 0 is returns the entire key, ie k1.k2.k3.
+	 * An index of 0 returns the entire key, ie k1.k2.k3.
 	 * 
 	 * @param key  A key on the form k1.k2.k3.k4 .....
 	 * @param index An index of n'te sub element of the key.
@@ -97,36 +113,17 @@ public class PropertiesHelper extends Properties {
 	 *         is returned.
 	 */
 	public String getSubkey(String key, int index) {
-		int cnt;
-		int i;
-		StringHolder sh = new StringHolder();
+		key = cleanKey(key);
 
-		cnt = countSubkeys(key, sh);
-
-		key = sh.getValue();
-
-		if (index == 0)
+		if (index <= 0)
 			return key;
 
-		if (index < 1 || index > cnt)
+		String subKeys[] = key.split("\\.");
+
+		if ( index > subKeys.length)
 			return null;
 
-		i = -1;
-
-		for (int ii = 0; ii < index - 1; ii++)
-			i = key.indexOf('.', i + 1);
-
-		if (i > -1)
-			key = key.substring(i + 1);
-
-		i = key.indexOf('.');
-
-		if (i < 0)
-			return key;
-
-		key = key.substring(0, i);
-
-		return key.trim();
+		return subKeys[index-1].trim();
 	}
 
 	static public PropertiesHelper loadFile(Path path ){
@@ -146,12 +143,13 @@ public class PropertiesHelper extends Properties {
 			return null;
 		}
 	}
-	
-	 static public PropertiesHelper loadFile(String conf) {
-			Path path = FileSystems.getDefault().getPath(conf);
-			return loadFile(path);
-		}
-	
+
+
+	static public PropertiesHelper loadFile(String conf) {
+		Path path = FileSystems.getDefault().getPath(conf);
+	    return loadFile(path);
+	}
+
 	public Properties loadFromFile(String filename) throws FileNotFoundException, IOException {
 
 		File f = new File(filename);
@@ -184,8 +182,7 @@ public class PropertiesHelper extends Properties {
 	 */
 
 	public String apply(String key) {
-		String val = getProperty(key);
-
+		String val = super.getProperty(key);
 		return apply(key, val);
 	}
 
@@ -255,7 +252,7 @@ public class PropertiesHelper extends Properties {
 					return null;
 				}
 			} else {
-				val2 = getProperty(k);
+				val2 = super.getProperty(k);
 
 				if (val2 == null) {
 					// Throw an form of property error.
@@ -269,6 +266,100 @@ public class PropertiesHelper extends Properties {
 
 		return value;
 	}
+
+	@Override  public String getProperty(String key) {
+		String val = super.getProperty(key);
+		return apply(key, val);
+
+	}
+
+	@Override public String getProperty(String key, String defaultVal) {
+		String val = super.getProperty(key);
+		val = apply(key, val);
+        if( val == null)
+            return defaultVal;
+        else
+            return val;
+	}
+
+	public String getPropertyApply(String key, String apply) {
+		String val = super.getProperty(key);
+		return apply(apply, val);
+	}
+
+	public String getPropertyApply(String key, String apply, String defaultVal) {
+		String val = super.getProperty(key);
+		val = apply(apply, val);
+		if( val == null)
+			return defaultVal;
+		else
+			return val;
+	}
+
+
+    /**
+     * Insert all properties that starts with  the prefix,
+     * but with the prefix removed into prop.
+     *
+     * Ex,
+     *   if we have the following properties.
+     *   kl.db.passwd=fjg
+     *   kl.db.user=hansen
+     *   kv.db.passwd=kjdfhg
+     *   kv.db.user=truls
+     *   kafka.connect=host
+     *
+     * @param prefix
+     * @return
+     */
+	public Properties removePrefix(String prefix, Properties prop) {
+        int from=prefix.length();
+        if( prefix.endsWith("*")) {
+            prefix=prefix.replaceAll("\\*+", "");
+            int i = prefix.lastIndexOf('.');
+            if(i<0)
+                from=0;
+            else
+                from=i+1;
+        } else if( ! prefix.endsWith(".")) {
+            prefix += ".";
+            from = prefix.length();
+        }
+
+        for( String key : stringPropertyNames()) {
+            if( key.startsWith(prefix))
+                prop.setProperty(key.substring(from),super.getProperty(key));
+        }
+        return prop;
+    }
+
+
+    public PropertiesHelper removePrefix(String prefix) {
+        PropertiesHelper prop=new PropertiesHelper();
+        return (PropertiesHelper) removePrefix(prefix, prop);
+    }
+
+	public List<String> getSortedStringKeys() {
+        return stringPropertyNames().stream().sorted().collect(Collectors.toList());
+	}
+
+    public String toString() {
+        return toString("Properties:");
+    }
+
+    public String toString(String heading) {
+        String res = heading +"\n";
+
+        for(String prop : getSortedStringKeys()) {
+			String val;
+            if(prop.matches(".*passw.*d.*"))
+		    	val="*********";  //Do not print passwords to the screen.
+			else
+				val = getProperty(prop);
+            res += "\n   " + prop + ": " + val;
+        }
+		return res;
+    }
 
 	public String apply(String key, Properties prop) {
 		return null;

@@ -59,10 +59,10 @@ public class SqlHelperTest extends TestCase {
       
         SelectInfo si=p.parse(S18700T3);
         
-        assertNotNull(si);
+        assertNotNull("Test1",si);
         
-        assertEquals("testresults/18700-3.dat", si.filename);
-        assertEquals("SELECT * FROM data WHERE stationid=18700 AND typeid=3 ORDER BY obstime, stationid, typeid, paramid, sensor, level;", si.select);
+        assertEquals("Test2","testresults/18700-3.dat", si.filename);
+        assertEquals("Test3","SELECT * FROM data WHERE stationid=18700 AND typeid=3 ORDER BY obstime, stationid, typeid, paramid, sensor, level;", si.select);
     }
     
     public void testSelectInfoParserNext(){
@@ -79,7 +79,7 @@ public class SqlHelperTest extends TestCase {
             si=p.next();
         }
         
-        assertTrue(cnt==2);
+        assertTrue("Test1",cnt==2);
         
         //assertEquals("testresults/18700-3.dat", si.filename);
         //lsassertEquals("SELECT * FROM data WHERE stationid=18700 AND typeid=3 ORDER BY obstime, stationid, typeid, paramid, sensor, level;", si.select);

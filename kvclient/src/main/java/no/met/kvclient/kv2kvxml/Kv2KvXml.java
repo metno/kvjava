@@ -16,6 +16,7 @@ public class Kv2KvXml {
 			Reader r = new Reader(xml);
 			return r.getObsData();
 		} catch (XMLStreamException ex) {
+			ex.printStackTrace();
 			throw new FormatException("Could not parse xml. " + ex.getMessage());
 		}
 	}
@@ -25,6 +26,7 @@ public class Kv2KvXml {
 			Reader r = new Reader(file);
 			return r.getObsData();
 		} catch (XMLStreamException ex) {
+			ex.printStackTrace();
 			throw new FormatException("Could not parse xml. " + ex.getMessage());
 		}
 	}

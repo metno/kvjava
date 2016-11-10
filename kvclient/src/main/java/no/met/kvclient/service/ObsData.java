@@ -13,7 +13,7 @@ public class ObsData {
 		this.stationid = stationid;
 		this.typeID = typeID;
 		this.obstime = obstime;
-		this.dataList = new DataElemList();
+				this.dataList = new DataElemList();
 		this.textDataList = new TextDataElemList();
 	}
 
@@ -47,7 +47,7 @@ public class ObsData {
 		dataList.add(e);
 	}
 	
-	public void addTextData(int paramID, Instant tbtime, String original) {
+	public void addTextData(int paramID, String original, Instant tbtime) {
 		TextDataElem e=new TextDataElem(stationid, obstime, original,paramID, tbtime,typeID);
 		textDataList.add(e);
 	}

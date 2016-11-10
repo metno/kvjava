@@ -30,23 +30,23 @@
 */
 package no.met.kvalobs.kl;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.ListIterator;
 import java.lang.Comparable;
-import no.met.kvutil.dbutil.DbConnection;
+
+import no.met.kvutil.dbutil.*;
 import no.met.kvclient.service.DataElem;
 import no.met.kvclient.service.TextDataElem;
+import no.met.kvutil.dbutil.IQuery;
 import org.apache.log4j.Logger;
 
 /**
  * The ParamFilter class is a helper class used to filter data on parameter.
- * 
+ *
  * It use two helper tables from the database it is connected to. These tables
  * are T_KV2KLIMA_TYPEID_PARAM_FILTER and T_KV2KLIMA_PARAM_FILTER. The first
  * table, T_KV2KLIMA_TYPEID_PARAM_FILTER, contains values that is common for all
@@ -58,32 +58,32 @@ import org.apache.log4j.Logger;
  * given for when the values is valid. The timespan is given with a from date
  * (fdato) and a to date (tdato). Note that for the add/remove to function as
  * specified the fdato and tdato must match exactly.
- * 
+ *
  * If a typeid in the filter table is negativ, ie less than 0 it only blocks
  * inncomming data with a negativ typeid. While a positiv typeid in the
  * filtertables blocks both data with nagativ and positiv typeids.
- * 
+ *
  * The fdato and tdato is valid for the timespan [fdato,tdato].
- * 
+ *
  * <b>Examle of filter setup</b><br/>
  * If you generally dont want data for params SA (112) and SD (18) for typeid
  * 302, but you want SD for station 18700. <br>
- * 
+ *
  * <pre>
-     insert into  T_KV2KLIMA_TYPEID_PARAM_FILTER VALUES(302, 112, 0, 0, NULL, NULL); 
+     insert into  T_KV2KLIMA_TYPEID_PARAM_FILTER VALUES(302, 112, 0, 0, NULL, NULL);
      insert into  T_KV2KLIMA_TYPEID_PARAM_FILTER VALUES(302,  18, 0, 0, NULL, NULL);
-   
+
      insert into  T_KV2KLIMA_PARAM_FILTER VALUES(18700, 302, -18, 0, 0, NULL, NULL);
  * </pre>
- * 
+ *
  * And if you want to block RR_X (117) from station 18700, you add this line to
  * the table T_KV2KLIMA_PARAM_FILTER VALUES.
- * 
+ *
  * <pre>
- *   
+ *
      insert into  T_KV2KLIMA_PARAM_FILTER VALUES(18700, 302, 117, 0, 0, NULL, NULL);
  * </pre>
- * 
+ *
  * @author borgem
  *
  */
@@ -93,7 +93,8 @@ public class ParamFilter {
 
 	long stationid;
 	HashMap<Long, LinkedList<ParamElem>> types;
-	DbConnection con;
+//	DbConnection con;
+	Matrics matrics;
 
 	static class ParamElem implements Comparable<Object> {
 		final static long MILIS_IN_YEAR = 31536000000L;
@@ -211,9 +212,9 @@ public class ParamFilter {
 	 * the element from the list if an element exist in the list. Elements that
 	 * is greater than zero is added to the list if it not allready exist in the
 	 * list.
-	 * 
+	 *
 	 * The paramid to the elemet is given with the absolute value of paramid.
-	 * 
+	 *
 	 * @param list
 	 *            The list toa add or remove an element from.
 	 * @param pe
@@ -245,7 +246,52 @@ public class ParamFilter {
 			list.add(pe);
 	}
 
-	LinkedList<ParamElem> loadFromDb(long type) {
+	no.met.kvutil.dbutil.IQuery createKv2KklimaTypeidParamFilterQuery( long typeid_) {
+		return new IQuery() {
+			final long typeid=typeid_;
+			@Override
+			public ResultSet exec(PreparedStatement s) throws SQLException {
+				s.setObject(1,typeid, Types.NUMERIC);
+				return s.executeQuery();
+			}
+
+			@Override
+			public String name() {
+				return "Kv2KklimaTypeidParamFilterQuery";
+			}
+
+			@Override
+			public String create() {
+				return "SELECT * FROM T_KV2KLIMA_TYPEID_PARAM_FILTER WHERE abs(typeid)=?";
+			}
+		};
+	}
+
+	IQuery createKv2KlimaParamFilterQuery(long stationid, long typeid) {
+		return new IQuery() {
+			final long sid=stationid;
+			final long tid=typeid;
+			@Override
+			public ResultSet exec(PreparedStatement s) throws SQLException {
+				s.setObject(1,tid,Types.NUMERIC);
+				s.setObject(2,sid,Types.NUMERIC);
+				return s.executeQuery();
+			}
+
+			@Override
+			public String name() {
+				return "Kv2KlimaParamFilterQuery";
+			}
+
+			@Override
+			public String create() {
+				return "SELECT * FROM T_KV2KLIMA_PARAM_FILTER WHERE abs(typeid)=? AND stnr=?";
+			}
+		};
+	}
+
+
+    LinkedList<ParamElem> loadFromDb(long type, DbConnection con) {
 		long typeid = Math.abs(type);
 		LinkedList<ParamElem> list = new LinkedList<ParamElem>();
 		boolean error = false;
@@ -253,9 +299,8 @@ public class ParamFilter {
 		if (types == null)
 			types = new HashMap<Long, LinkedList<ParamElem>>();
 
-		String stmt = "SELECT * FROM T_KV2KLIMA_TYPEID_PARAM_FILTER " + "  WHERE abs(typeid)=" + typeid;
-
-		logger.debug("TypeidParamFilter::loadFromDb: query: " + stmt);
+		IQuery stmt= createKv2KklimaTypeidParamFilterQuery(typeid);
+		logger.debug("TypeidParamFilter::loadFromDb: query: " + stmt.create());
 
 		ResultSet rs = null;
 
@@ -289,8 +334,7 @@ public class ParamFilter {
 		if (error)
 			return null;
 
-		stmt = "SELECT * FROM T_KV2KLIMA_PARAM_FILTER " + "  WHERE abs(typeid)=" + typeid + " AND stnr=" + stationid;
-
+		stmt = createKv2KlimaParamFilterQuery(stationid, typeid);
 		logger.debug("ParamFilter lookup: " + stmt);
 
 		rs = null;
@@ -328,38 +372,46 @@ public class ParamFilter {
 		return list;
 	}
 
-	public ParamFilter(long stationid, DbConnection con) {
-		this.stationid = stationid;
-		this.con = con;
-		types = null;
+    public ParamFilter(long stationid, Matrics matrics) {
+        this.stationid = stationid;
+        this.matrics = matrics;
+        types = null;
+    }
+
+	public boolean filter(DataElem data, Timestamp obstime, DbConnection con) {
+		return filter(data.paramID, data.typeID, data.level, data.sensor, true, obstime, con);
 	}
 
-	boolean filter(DataElem data, Timestamp obstime) {
-		return filter(data.paramID, data.typeID, data.level, data.sensor, true, obstime);
+	public boolean filter(TextDataElem data, Timestamp obstime, DbConnection con) {
+		return filter(data.paramID, data.typeID_, 0, 0, false, obstime, con);
 	}
 
-	boolean filter(TextDataElem data, Timestamp obstime) {
-		return filter(data.paramID, data.typeID_, 0, 0, false, obstime);
-	}
-
-	boolean filter(int paramid, long typeid, int level, int sensor, boolean useLevelAndSensor, Timestamp obstime) {
+    synchronized public boolean filter(int paramid, long typeid, int level, int sensor, boolean useLevelAndSensor, Timestamp obstime, DbConnection con) {
 		LinkedList<ParamElem> params = null;
+        boolean hitCounted=false;
 
 		if (types == null) {
-			params = loadFromDb(typeid);
+			params = loadFromDb(typeid, con);
 
 			if (params == null) {
 				System.out.println("ParamFilter: Unexpected null list!");
 				return true;
 			}
-		}
+		} else {
+            matrics.paramCount(true);
+            hitCounted=true;
+        }
 
 		LinkedList<ParamElem> obj = types.get(new Long(Math.abs(typeid)));
 
-		if (obj == null)
-			params = loadFromDb(typeid);
-		else
-			params = obj;
+		if (obj == null) {
+            matrics.paramCount(false);
+            params = loadFromDb(typeid, con);
+        }else {
+            if(!hitCounted)
+                matrics.paramCount(true);
+            params = obj;
+        }
 
 		if (params == null || params.size() == 0)
 			return true;

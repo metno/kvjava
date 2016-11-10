@@ -45,30 +45,21 @@ public class SelectInfoParser {
     
     SelectInfo parse(String key){
         int i=prop.countSubkeys(key, sh);
-        
-        System.out.println("Subkeys: "+i + " ("+key+")");
-        
+
         if(i<2)
            return null;
         
         if(!sh.getValue().startsWith("select."))
             return null;
         
-        System.out.println("key: "+sh.getValue());
-        
         String fkey=prop.getSubkey(key, i);
         
         if(fkey==null) //Should not happend
             return null;
-        
-        String fval=prop.getProperty(fkey);
-        
-        if(fval==null)
-            return null;
-        
-        String filename=prop.apply(key, fval);
-        String select=prop.apply(key);
-        
+
+        String filename=prop.getPropertyApply(fkey, key);
+        String select=prop.getProperty(key);
+
         if(filename==null || select==null)
             return null;
         

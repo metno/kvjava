@@ -30,6 +30,8 @@
 */
 package no.met.kvalobs.kl;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.*;
 import java.time.Instant;
 
@@ -45,9 +47,10 @@ import org.apache.log4j.Logger;
 public class Filter {
 
 	DbConnection con=null;
-	Kv2KlimaFilter dbKv2KlimaFilterElem=null;
-	ParamFilter    paramFilter=null;
+//	Kv2KlimaFilter dbKv2KlimaFilterElem=null;
+//	ParamFilter    paramFilter=null;
 	boolean       filterEnabled;
+	static FilterCache cache=new FilterCache(2000, getMatricsPath());
 	
 	static  Logger logger=Logger.getLogger(Filter.class);
 	
@@ -61,20 +64,24 @@ public class Filter {
 			sh.setValue(sh.getValue()+" "+s);
 		}
 	}
-	
+
+	static Path getMatricsPath() {
+		String appName = KlApp.getAppName();
+		Path path =  Paths.get(KlApp.getKvpath());
+		return path.resolve("var/log/kvalobs/"+appName+".matrics");
+	}
+
+
+
 	protected boolean paramFilter(long stationID, long typeID, int paramID, int level,
 			                      int sensor, boolean useLevelAndSensor, 
 							      Timestamp obstime,
                                   StringHolder msg){
-
-		if( paramFilter==null ||
-			paramFilter.stationid!=stationID ) {
-			paramFilter=new ParamFilter(stationID, con);
-		}
+		ParamFilter    paramFilter=cache.getParamFilter(stationID);
 
 		if(!paramFilter.filter(paramID, typeID, 
 				               level, sensor, useLevelAndSensor,
-				               obstime) ) {
+				               obstime, con) ) {
 			if( useLevelAndSensor )
 				addToString(msg, "[paramFilter] Blocked param: "+paramID+
 						         " sensor: "+sensor+
@@ -227,17 +234,7 @@ public class Filter {
 	public Kv2KlimaFilter loadFromDb( long stationID, long typeID_, 
 									  Timestamp obstime){
 		long typeid=Math.abs(typeID_);
-
-		if(dbKv2KlimaFilterElem!=null && 
-		   dbKv2KlimaFilterElem.getStnr()==stationID &&
-		   dbKv2KlimaFilterElem.getTypeid()==typeid ) { 
-
-			return dbKv2KlimaFilterElem;
-		}
-
-		dbKv2KlimaFilterElem = new Kv2KlimaFilter(stationID, typeid, con);
-
-		return dbKv2KlimaFilterElem;
+		return cache.getKv2KlimaFilter(stationID,typeid, con);
 	}
 	
 

@@ -10,13 +10,14 @@ import no.met.kvclient.service.KvSubsribeData;
 import no.met.kvclient.service.kvService;
 import no.met.kvclient.service.kafka.KafkaDataSubscriber;
 import no.met.kvclient.service.sql.SqlDataQuery;
+import no.met.kvutil.ProcUtil;
 import no.met.kvutil.PropertiesHelper;
 import no.met.kvutil.concurrent.ThreadManager;
 
 public class KafkaApp extends kvService {
 	PropertiesHelper prop;
 	ListenerEventQue que;
-	AtomicBoolean shutdown;
+	AtomicBoolean doShutdown;
 	boolean isInterupted;
 	int subscriberWorkers;
 	ThreadManager workers;
@@ -29,14 +30,18 @@ public class KafkaApp extends kvService {
 		}
 		@Override
 		public void run() {
-			System.err.println("Shutdown - start");
+			System.err.println("*** KafkaApp.Hook: Shutdown - start\n" +  ProcUtil.getStackTrace());
 			try{
 				app.onExit();
 				app.shutdown();
 			}
 			catch(InterruptedException ex){
 			}
-			System.err.println("Shutdown - completed");
+			catch( Exception ex ){
+				System.err.println(" ------ Exception in KafkaApp.Hook: " + ex.getMessage());
+				ex.printStackTrace();
+			}
+			System.err.println("*** KafkaApp.Hook: Shutdown - completed");
 		}
 	}
 	
@@ -108,14 +113,12 @@ public class KafkaApp extends kvService {
 	KafkaApp(Properties prop, ListenerEventQue que) {
 		this.que=que;
 		this.prop=new PropertiesHelper(prop);
-		shutdown = new AtomicBoolean(false);
+		doShutdown = new AtomicBoolean(false);
 		workers=new ThreadManager("Subscribers");
 		subscriberWorkers = Math.abs(Integer.parseInt(prop.getProperty("kvalobs.subscribe.workers", "1")));
 		
-		Runtime.getRuntime().addShutdownHook(new Hook(this));
-		
 		for( int i=0; i<subscriberWorkers; ++i){
-			workers.start(new ListenerEventRunner(shutdown, que));
+			workers.start(new ListenerEventRunner(doShutdown, que));
 		}
 		
 		isInterupted = false;
@@ -130,7 +133,7 @@ public class KafkaApp extends kvService {
 		return prop;
 	}
 	public AtomicBoolean getShutdown() {
-		return shutdown;
+		return doShutdown;
 	}
 	
 	
@@ -140,7 +143,9 @@ public class KafkaApp extends kvService {
 	
 	
 	public void shutdown()throws InterruptedException {
-		if(shutdown.compareAndSet(false, true)){
+		System.out.println("***** Shutdown *****\n" + ProcUtil.getStackTrace());
+		
+		if(doShutdown.compareAndSet(false, true)){
 			stop();
 			workers.shutdown();
 			workers.join(10000);
@@ -156,16 +161,19 @@ public class KafkaApp extends kvService {
 	}
 	public void run() throws InterruptedException {
 		System.err.println("Starting main thread, workers " + workers.size()+".");
+		Runtime.getRuntime().addShutdownHook(new Hook(this));
 		onStartup();
 		start();
-		while(!shutdown.get() && ! isInterupted){
+		while(!doShutdown.get() && ! isInterupted){
 			try {
 				Thread.sleep(500);
 			} catch (InterruptedException e) {
 				isInterupted = true;
-				shutdown();
 			}
 		}
+		
+		System.err.println("Try to shutdown the kafka service an close the database connections to kvalobs");
+		shutdown();
 		onExit();
 		System.err.println("Terminating main thread, workers still alive " + workers.size() + " (interupted: " + (isInterupted?"true":"false")+").");
 	}

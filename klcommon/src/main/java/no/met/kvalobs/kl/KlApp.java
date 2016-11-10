@@ -30,20 +30,20 @@
 */
 package no.met.kvalobs.kl;
 
+import no.met.kvutil.ProcUtil;
 import no.met.kvutil.PropertiesHelper;
 import no.met.kvutil.dbutil.DbConnection;
 import no.met.kvutil.dbutil.DbConnectionMgr;
-import no.met.kvclient.KvApp;
 import no.met.kvclient.kafka.KafkaApp;
 import no.met.kvclient.service.SendDataToKv;
 import no.met.kvclient.service.SendDataToKv.Result.EResult;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.sql.SQLException;
-import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
@@ -59,9 +59,11 @@ public class KlApp extends KafkaApp  implements SendDataToKv
     String textDataTableName=null;
     String foreignDataTableName=null;
     String foreignTextDataTableName=null;
+    boolean enableConMgr=true;
     static String           kvpath=null;
-    
-    static PropertiesHelper getConfile(String conf){
+	static String           appName=null;
+
+    static public PropertiesHelper getConfile(String conf){
     	if(conf==null){
     		logger.fatal("INTERNAL: No configuration file is given! (null)!");
     		System.exit(1);
@@ -109,10 +111,23 @@ public class KlApp extends KafkaApp  implements SendDataToKv
 	
     
     public KlApp(String[] args, String conffile, boolean usingSwing){
-    	this(args, conffile, null, usingSwing);
+    	this(args, conffile, null, usingSwing, true);
     }
-    
-    public String getDataTableName() {
+    public KlApp(String[] args, String conffile, String kvserver, boolean usingSwing){
+    	this(args, conffile, kvserver, usingSwing, true);
+    }
+
+    public KlApp(String[] args, PropertiesHelper confProp, boolean usingSwing){
+        this(args, confProp, null, usingSwing, true);
+    }
+    public KlApp(String[] args, PropertiesHelper confProp, String kvserver, boolean usingSwing){
+        this(args, confProp, kvserver, usingSwing, true);
+    }
+
+	static public String getAppName(){return appName;}
+	static public String setAppName(String name){return appName=name;}
+
+	public String getDataTableName() {
     	return dataTableName;
     }
     
@@ -128,89 +143,131 @@ public class KlApp extends KafkaApp  implements SendDataToKv
 		return foreignTextDataTableName;
     }
 
-    /**
+    public PropertiesHelper getKlConnectionsProperties(PropertiesHelper conf) {
+		PropertiesHelper prop=conf.removePrefix("kl.db*");
+
+		System.err.println(prop.toString("KlConnectionProperties:"));
+
+		return prop;
+	}
+
+
+	public KlApp(String[] args, PropertiesHelper confProp, String kvserver, boolean usingSwing, boolean enableConMgr){
+		super(confProp);
+		PropertiesHelper conf = getConf();
+		dataTableName = conf.getProperty("kl.datatable", "kv2klima" );
+		textDataTableName = conf.getProperty("kl.textdatatable", "T_TEXT_DATA" );
+		foreignDataTableName = conf.getProperty( "kl.foreign_datatable" );
+		foreignTextDataTableName = conf.getProperty( "kl.foreign_textdatatable" );
+		this.enableConMgr = enableConMgr;
+		try {
+			if( this.enableConMgr)
+				conMgr=new DbConnectionMgr(getKlConnectionsProperties(conf));
+		} catch (IllegalArgumentException e1) {
+			logger.fatal("Missing properties in the configuration file: " + e1.getMessage());
+			try {
+				shutdown(); // Stop kafka
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			ProcUtil.getStackTrace(" exit(1) ");
+			System.exit(1);
+		} catch (ClassNotFoundException e1) {
+			logger.fatal("Cant load databasedriver: "+e1.getMessage());
+			try {
+				shutdown();// Stop kafka
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			ProcUtil.getStackTrace(" exit(1) ");
+			System.exit(1);
+		}
+
+
+		if( ! this.enableConMgr ) {
+			System.out.println("Database setup: The Connection Manager is diasabled.");
+		} else {
+			System.out.println("Database setup: ");
+			System.out.println("     dbuser: " + conMgr.getDbuser());
+			System.out.println("   dbdriver: "+conMgr.getDbdriver());
+			System.out.println("  dbconnect: "+conMgr.getDbconnect());
+		}
+		System.out.println("");
+		System.out.println("Load data into tables: ");
+		System.out.println("      data: " + dataTableName );
+		System.out.println("  textdata: " + textDataTableName );
+		System.out.println("");
+		//  	System.out.println("Using kvalobs server: ");
+//    	System.out.println("          kvserver: "+this.kvserver);
+	}
+
+
+
+	/**
      * 
      * @param args
-     * @param conffile The name of the co
+     * @param conffile The name of the config file.
      * @param usingSwing
      */
-    public KlApp(String[] args, String conffile, String kvserver, boolean usingSwing){
-    	super(getConfile(conffile));
-    	PropertiesHelper conf = getConf();
-        dataTableName = conf.getProperty("datatable", "kv2klima" );
-        textDataTableName = conf.getProperty("textdatatable", "T_TEXT_DATA" );
-        foreignDataTableName = conf.getProperty( "foreign_datatable" );
-        foreignTextDataTableName = conf.getProperty( "foreign_textdatatable" );
-        
-        try {
-            conMgr=new DbConnectionMgr(conf);
-        } catch (IllegalArgumentException e1) {
-            logger.fatal("Missing properties in the configuration file: " + e1.getMessage());
-            try {
-				shutdown();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-            System.exit(1);
-        } catch (ClassNotFoundException e1) {
-            logger.fatal("Cant load databasedriver: "+e1.getMessage());
-            try {
-				shutdown();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-            System.exit(1);
-        }
+    public KlApp(String[] args, String conffile, String kvserver, boolean usingSwing, boolean enableConMgr){
+		this(args,getConfile(conffile), kvserver, usingSwing, enableConMgr);
 
-        
-    	System.out.println("Database setup: ");
-    	System.out.println("     dbuser: " + conMgr.getDbuser());
-    	System.out.println("   dbdriver: "+conMgr.getDbdriver());
-    	System.out.println("  dbconnect: "+conMgr.getDbconnect());
-    	System.out.println("");
-    	System.out.println("Load data into tables: ");
-    	System.out.println("      data: " + dataTableName );
-    	System.out.println("  textdata: " + textDataTableName );
-    	System.out.println("");
-  //  	System.out.println("Using kvalobs server: ");
-//    	System.out.println("          kvserver: "+this.kvserver);
-    	
     }
 
     public void setDbIdleTime(int secs){
-    	conMgr.setIdleTime(secs);
+    	if( conMgr != null )
+    		conMgr.setIdleTime(secs);
     }
     
     public void setDbTimeToLive(int secs){
-    	conMgr.setTimeToLive(secs);
+    	if( conMgr != null )
+    		conMgr.setTimeToLive(secs);
     }
     
     public int getDbIdleTime(){
-    	return conMgr.getIdleTime();
+    	if( conMgr != null )
+    		return conMgr.getIdleTime();
+    	else
+    		return 60; // Return a dummy value
     }
     
     public int getDbTimeToLive(){
-    	return conMgr.getTimeToLive();
+    	if( conMgr != null )
+    		return conMgr.getTimeToLive();
+    	else
+    		return 60; // Return a dummy value.
     }
     
     public int checkForConnectionsToClose(){
-    	return conMgr.checkForConnectionsToClose();
+    	if( conMgr != null )
+    		return conMgr.checkForConnectionsToClose();
+    	else
+    		return 0;
     }
     
 
     /**
-     * If we have a database connection, relese it. We are about to exit so
-     * there should be now users of this connectein so we release it 
+     * If we have a database connection, release it. We are about to exit so
+     * there should be now users of this connection so we release it 
      * unconditional.
      */ 
     protected void onExit(){
-        conMgr.closeDbDriver();
+    	
+    	System.err.println("*** KlApp.onExit: \n" + ProcUtil.getStackTrace());
+    	if( conMgr != null )
+    		conMgr.closeDbDriver();
     }
     
     public DbConnection newDbConnection(){
         
+    	if( conMgr != null ) {
+    		logger.warn("The ConnectionMgr is disabled.");
+    		logger.debug(ProcUtil.getStackTrace());
+    		return null;
+    	}
+    	
         try {
             return conMgr.newDbConnection();
         } catch (SQLException e) {
@@ -224,6 +281,11 @@ public class KlApp extends KafkaApp  implements SendDataToKv
         String msg;
         
         try {
+        	if( conMgr == null ){
+        		logger.warn("The ConnectionMgr is disabled.");
+        		logger.debug(ProcUtil.getStackTrace());
+        		return;
+        	}
             conMgr.releaseDbConnection(con);
             return;
         } catch (IllegalArgumentException e) {
@@ -238,6 +300,12 @@ public class KlApp extends KafkaApp  implements SendDataToKv
     }
     
     public DbConnectionMgr getConnectionMgr() {
+    	if( conMgr == null ){
+    		logger.warn("The ConnectionMgr is disabled.");
+    		logger.debug(ProcUtil.getStackTrace());
+    		return null;
+    	}
+
     	return conMgr;
     }
     	
@@ -247,15 +315,16 @@ public class KlApp extends KafkaApp  implements SendDataToKv
     	if(kvpath!=null)
     		return kvpath;
     	
-    	kvpath=System.getProperties().getProperty("KVALOBS");
+    	kvpath=System.getProperties().getProperty("KVDIST");
     	
     	if(kvpath==null){
-    		System.out.println("Environment variable KVALOBS is unset, using HOME!");
+    		System.out.println("Environment variable KVDIST is unset, using HOME!");
     		kvpath=System.getProperties().getProperty("user.home");
 	    
     		if(kvpath==null){
     			System.out.println("Hmmmm. No 'user.home', exiting!");
     			logger.fatal("Environment variable KVALOBS is unset, using HOME!");
+    			ProcUtil.getStackTrace(" exit(1) ");
     			System.exit(1);
     		}
     	}
@@ -282,54 +351,75 @@ public class KlApp extends KafkaApp  implements SendDataToKv
 	 * pidfile the application terminate.
 	 */
 	synchronized public void createPidFile(){
-		String pid=null;
-		String pidFilename=null;
-		
     	if(pidFile!=null)
     		return;
     	
-    	pidFilename=System.getProperties().getProperty("PIDFILE");
+    	String pidFilename=System.getProperties().getProperty("PIDFILE");
     	
     	if(pidFilename==null){
     		System.out.println("FATAL: Property variable PIDFILE is unset!");
     		logger.fatal("FATAL: Property variable PIDFILE is unset!");
     		System.exit(1);
     	}
-	
-    	pid=System.getProperties().getProperty("USEPID");
     	
-    	if( pid == null ) {
-    		System.out.println("FATAL: Property variable USEPID is unset!");
-    		logger.fatal("FATAL: Property variable USEPID is unset!");
+    	createPidFile(pidFilename);
+	}
+
+	synchronized public void createPidFile(String pidfile){
+    	if(pidFile!=null)
+    		return;
+    	    	
+    	if(pidfile==null){
+    		System.out.println("FATAL: pidfile name NOT given!");
+    		logger.fatal("FATAL: pidfile name NOT given!");
     		System.exit(1);
     	}
-
-    	pidFile = new File( pidFilename );
+	
+    	long pid=ProcUtil.getPid();
+    	
+    	if( pid < 0 ) {
+    		System.out.println("FATAL: Cant get the applications pid (process id)!");
+    		logger.fatal("FATAL: Cant get the applications pid (process id)!");
+    		System.exit(1);
+    	}
     	
     	try {
-    		if( ! pidFile.createNewFile() ) {
-    			logger.fatal("FATAL: The pidfile '"+pidFilename+"' allready exist!" +
-    					     "If an instance of the application is not running"+
-    					     " remove the file and try again.");
+    		System.err.println(" ***** pidfile 1: '" + pidfile +"'.");
+        	if( ProcUtil.isProcRunning(pidfile) ) {
+        		System.err.println("FATAL: The pidfile '"+pidfile+"' allready exist!" +
+    					"And the process the pid is referancing is running.");
+    			logger.fatal("FATAL: The pidfile '"+pidfile+"' allready exist!" +
+    					"And the process the pid is referancing is running.");
     			System.exit(1);
-    		}
-    		
-    		FileWriter fw = new FileWriter( pidFile, true );
-    		fw.write( pid );
-    		fw.close();
-    		System.out.println("Writing pidfile '" + pidFilename + "' with pid '"+pid+"'!");
-    		logger.info("Writing pidfile '" + pidFilename + "' with pid '"+pid+"'!");
+        	}
+
+        	System.err.println(" ***** pidfile: '" + pidfile +"'.");
+        	Path p=Paths.get(pidfile);
+        	System.err.println(" ***** pidfile: pid:'" + pid +"'.");
+        	p=Files.write(p, (""+pid+"\n").getBytes(), StandardOpenOption.CREATE_NEW,StandardOpenOption.WRITE);
+    		System.out.println("Writing pidfile '" + p.toString() + "' with pid '"+pid+"'!");
+    		logger.info("Writing pidfile '" + p.toString() + "' with pid '"+pid+"'!");
     	}
     	catch( java.io.IOException ex ) {
-    		logger.fatal("FATAL: " + ex.getMessage() );
+    		ex.printStackTrace();
+    		System.err.println("FATAL: createPidFile: " + ex.getMessage() );
+    		logger.fatal("FATAL: createPidFile: " + ex.getMessage() );
     		System.exit(1);
     	}
     	catch( java.lang.SecurityException ex ) {
+    		ex.printStackTrace();
+    		System.err.println("FATAL: createPidFile: " + ex.getMessage() );
+    		logger.fatal("FATAL: createPidFile: " + ex.getMessage() );
+    		System.exit(1);
+    	}
+    	catch( Exception ex ){
+    		ex.printStackTrace();
+    		System.err.println("FATAL: createPidFile: " + ex.getMessage() );
     		logger.fatal("FATAL: " + ex.getMessage() );
     		System.exit(1);
     	}
-    }
-
+	}
+	
 	/**
 	 * Remove a previous created pidfile.
 	 * 
@@ -338,7 +428,7 @@ public class KlApp extends KafkaApp  implements SendDataToKv
 	synchronized public void removePidFile() {
 		try {
 			if( pidFile != null ) {
-	    			System.out.println("Removing pidfile '" + pidFile.getName() + "!");	
+	    		System.out.println("Removing pidfile '" + pidFile.getName() + "!");	
 				logger.info("Removing pidfile '" + pidFile.getName() + "!");
 				pidFile.delete();
 			}

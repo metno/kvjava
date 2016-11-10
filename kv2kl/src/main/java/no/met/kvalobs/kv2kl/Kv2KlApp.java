@@ -125,44 +125,44 @@ public class Kv2KlApp extends KlApp
     	}
     }
 
-    
-    public Kv2KlApp(String[] args, String configfile, String kvserver, 
-    			    boolean usingSwing){
-    	super(args, configfile, kvserver, false);
 
-    	PropertiesHelper prop=getConf();
-        String admin=prop.getProperty("admin");
-        setDbIdleTime(300); //5 minutter
-        setDbTimeToLive(3600); //1 time
-        
-        if(admin!=null)
-        	admin=admin.trim();
-        
-        //Run the timer as a deamon, ie terminate the timer
-        //when the application is about to terminate.
-        dbCleanupTimer=new Timer(true);
-        dbCleanupTimer.schedule(new DbCleanup(this), 60000, 60000);
-        
-        
-        //Try to register an Admin interface in the CORBA name server.
-        //The interface is registered in the same context as the kvalobs
-        //server we are set up to receive data from. If we succeed an
-        //timerthread is started that update a logfile every 15th seconds
-        //with status information.
+	public Kv2KlApp(String[] args, KvConfig conf, String kvserver,
+					boolean usingSwing){
+		super(args, conf.conf, kvserver, false);
+
+		PropertiesHelper prop=getConf();
+		String admin=prop.getProperty("admin");
+		setDbIdleTime(300); //5 minutter
+		setDbTimeToLive(3600); //1 time
+
+		if(admin!=null)
+			admin=admin.trim();
+
+		//Run the timer as a deamon, ie terminate the timer
+		//when the application is about to terminate.
+		dbCleanupTimer=new Timer(true);
+		dbCleanupTimer.schedule(new DbCleanup(this), 60000, 60000);
+
+
+		//Try to register an Admin interface in the CORBA name server.
+		//The interface is registered in the same context as the kvalobs
+		//server we are set up to receive data from. If we succeed an
+		//timerthread is started that update a logfile every 15th seconds
+		//with status information.
 //        if(admin!=null && admin.length()>0){
 //        	kvIsUpLogFile=getKvpath()+"/var/log/kv2kl_"+admin+".log";
-//        
+//
 //        	String kvServer=getKvserver();
-//        	
+//
 //        	if(kvServer!=null){
 //        		String nsname=kvServer+"/"+admin;
-//        		
+//
 //        		Admin myAdmin=new Admin();
-//        		
+//
 //        		if(registerAdmin(nsname, myAdmin)){
 //        			logger.info("Registred a 'Admin' interface in CORBA name service: '"+nsname+"'.");
 //        			isUpTimer=new Timer(true);
-//        	
+//
 //        			//Run every 15th second.
 //        			isUpTimer.schedule(new IsUp(this, kvIsUpLogFile), 0, 15000);
 //        		}else{
@@ -170,7 +170,8 @@ public class Kv2KlApp extends KlApp
 //        		}
 //        	}
 //        }
-    }
+	}
+
 
     synchronized void setIsUpTimeIsRunning(boolean f){
     	isUpTaskIsRunning=f;
@@ -206,9 +207,9 @@ public class Kv2KlApp extends KlApp
     	
     		String buf="Stopped: "+ Instant.now();
     	
-    		if(!FileUtil.writeStr2File(kvIsUpLogFile, buf)){
-    			logger.warn("Cant update the file '"+kvIsUpLogFile+"'!");
-    		}
+//    		if(!FileUtil.writeStr2File(kvIsUpLogFile, buf)){
+//    			logger.warn("Cant update the file '"+kvIsUpLogFile+"'!");
+//    		}
     	}
     	removePidFile();
     	logger.info("Prorgram terminate!");

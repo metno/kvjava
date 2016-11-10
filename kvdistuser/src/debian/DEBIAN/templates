@@ -1,0 +1,11 @@
+Template: kvdist/homedir
+Type: string
+Default: /home/kvdist
+Description: Home directory for the kvdist admin user:
+ Specify where the home directory for the admin user should be located.
+
+Template: kvdist/user
+Type: string
+Default: kvdist
+Description: Name of the kvdist admin account:
+ Specify the name of the admin account.

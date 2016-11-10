@@ -28,15 +28,14 @@
   with KVALOBS; if not, write to the Free Software Foundation Inc., 
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package metno.kvalobs.kl2kvnew;
+package no.met.kvalobs.kl2kv;
 
 import java.sql.*;
 import java.util.*;
 
 import org.apache.log4j.Logger;
 
-import metno.dbutil.DbConnection;
-import CKvalObs.CDataSource.*;
+import no.met.kvutil.dbutil.DbConnection;
 import metno.kvalobs.kl.*;
 
 public class SendData implements DataToKv {

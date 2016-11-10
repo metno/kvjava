@@ -31,6 +31,8 @@
 package no.met.kvalobs.kl;
 
 import static no.met.DbTestUtil.*;
+
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -127,19 +129,23 @@ public class ParamFilterTest {
                             ""); 
     }
     
-    boolean doFilter(ParamFilter pf, DataElem de){
+    boolean doFilter(ParamFilter pf, DataElem de, DbConnection con) throws SQLException {
 		Timestamp obstime=Timestamp.from(de.obstime);
-		return pf.filter(de, obstime);
+		return pf.filter(de, obstime, con);
     }
-    
+
+    DbConnection newConnection( ) throws SQLException {
+        return mgr.newDbConnection();
+    }
+
+    void releaseConnection(DbConnection con ) throws SQLException {
+        mgr.releaseDbConnection(con);
+    }
+
     @Test
     public void loadFromDb(){
-    	DbConnection con=null;
-    	
-    	try{
-    		con=mgr.newDbConnection();
-    	
-    		assertNotNull("Cant create an dbconnection!", con);
+    	try(DbConnection con = newConnection()){
+            assertNotNull("Cant create an dbconnection!", con);
     	
     		LinkedList<ParamFilter.ParamElem> tl302=new LinkedList<>();
     		tl302.add(new ParamFilter.ParamElem(302,112,0,0));
@@ -151,20 +157,20 @@ public class ParamFilterTest {
     		tl330.add(new ParamFilter.ParamElem(330,125,0,0));
     		Collections.sort(tl330);
     	
-    		ParamFilter pf=new ParamFilter(18700, con);
+    		ParamFilter pf=new ParamFilter(18700, new Matrics());
     	    	
-    		LinkedList<ParamElem> paramList=pf.loadFromDb(302);
+    		LinkedList<ParamElem> paramList=pf.loadFromDb(302, con);
     	
     		System.out.println(pf.types);
     		assertEquals(paramList.toString(), tl302.toString());
     		assertEquals(pf.types.size(), 1);
     	
-    		paramList=pf.loadFromDb(330);
+    		paramList=pf.loadFromDb(330, con);
     		System.out.println(pf.types);
     		assertEquals(paramList.toString(), tl330.toString());
     		assertEquals(pf.types.size(), 2);
     	
-    		paramList=pf.loadFromDb(312);
+    		paramList=pf.loadFromDb(312, con);
     		System.out.println(pf.types);
     		assertTrue(paramList.size()==0);
     		assertEquals(pf.types.size(), 3);
@@ -174,13 +180,11 @@ public class ParamFilterTest {
     		assertNotNull(list);
     		assertTrue(list.size()==0);
 
-    		paramList=pf.loadFromDb(308);
+    		paramList=pf.loadFromDb(308, con);
     		System.out.println(pf.types);
     		assertTrue(paramList.size()==2);
     		assertTrue(pf.types.size()==4);
-    		
-    		mgr.releaseDbConnection(con);
-    	}
+        }
     	catch(Exception e){
     		e.printStackTrace();
     		fail("Unexpected exception!");
@@ -190,58 +194,56 @@ public class ParamFilterTest {
         
     @Test
     public void filter(){
-        DbConnection con=null;
         boolean         ret;
         
         assertNotNull(mgr);
         
-        try{
-           con=mgr.newDbConnection();
+        try(DbConnection con=mgr.newDbConnection()){
         
            assertNotNull("Cant create an dbconnection!", con);
         
-           ParamFilter pf=new ParamFilter(18700, con);
+           ParamFilter pf=new ParamFilter(18700, new Matrics());
     
-           ret=doFilter(pf, getDataElem(18700,302,"2006-06-14 12:00:00", 108, 0,0));
+           ret=doFilter(pf, getDataElem(18700,302,"2006-06-14 12:00:00", 108, 0,0), con);
    		   //System.out.println("filter 1\n"+pf.types+"\n\n");
            assertTrue(ret);
        
-           ret=doFilter(pf, getDataElem(18700,302,"2006-06-14 12:00:00", 112,0,0));
+           ret=doFilter(pf, getDataElem(18700,302,"2006-06-14 12:00:00", 112,0,0), con);
    		   //System.out.println("filter 2\n"+pf.types+"\n\n");
            assertFalse(ret);
            
-           ret=doFilter(pf, getDataElem(18700,330,"2006-06-14 12:00:00", 104,1,0));
+           ret=doFilter(pf, getDataElem(18700,330,"2006-06-14 12:00:00", 104,1,0), con);
    		   //System.out.println("filter 3\n"+pf.types+"\n\n");
            assertFalse(ret);
            
-           ret=doFilter(pf, getDataElem(18700,312,"2006-06-14 12:00:00", 104,1,0));
+           ret=doFilter(pf, getDataElem(18700,312,"2006-06-14 12:00:00", 104,1,0), con);
    		   //System.out.println("filter 4\n"+pf.types+"\n\n");
            assertTrue(ret);
            
-           ret=doFilter(pf, getDataElem(18700,308, "2006-06-14 12:00:00", 22,0,0));
+           ret=doFilter(pf, getDataElem(18700,308, "2006-06-14 12:00:00", 22,0,0), con);
    		   //System.out.println("filter 5\n"+pf.types+"\n\n");
            assertTrue(ret);
            
-           ret=doFilter(pf, getDataElem(18700,308, "2006-06-14 12:00:00", 109, 0,0));
+           ret=doFilter(pf, getDataElem(18700,308, "2006-06-14 12:00:00", 109, 0,0), con);
    		   //System.out.println("filter 6\n"+pf.types+"\n\n");
            assertFalse(ret);
            
-           ret=doFilter(pf, getDataElem(18700, 3,"2005-03-09 18:00:00", 104, 0, 0));
+           ret=doFilter(pf, getDataElem(18700, 3,"2005-03-09 18:00:00", 104, 0, 0), con);
    		   //System.out.println("filter 7\n"+pf.types+"\n\n");
            assertFalse(ret);
      	
-       	   ret=doFilter(pf, getDataElem(18700, 3,"2006-03-09 18:00:00", 104, 0, 0));
+       	   ret=doFilter(pf, getDataElem(18700, 3,"2006-03-09 18:00:00", 104, 0, 0), con);
    		   //System.out.println("filter 8\n"+pf.types+"\n\n");
        	   assertFalse(ret);
 
        	   
-           ret=doFilter(pf, getDataElem(18700, 3,"2005-03-09 18:00:00", 110, 0, 0));
+           ret=doFilter(pf, getDataElem(18700, 3,"2005-03-09 18:00:00", 110, 0, 0), con);
   		   //System.out.println("filter 9\n"+pf.types+"\n\n");
            assertTrue(ret);
            
            
-           pf=new ParamFilter(87110, con);
-           ret=doFilter(pf, getDataElem(87110, 1, "2006-09-08 06:00:00", 211, 0, 0));
+           pf=new ParamFilter(87110, new Matrics());
+           ret=doFilter(pf, getDataElem(87110, 1, "2006-09-08 06:00:00", 211, 0, 0), con);
  		   //System.out.println("filter 10\n"+pf.types+"\n\n");
            assertFalse(ret);
            

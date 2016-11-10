@@ -35,7 +35,7 @@ import junit.framework.*;
 public class FileUtilTest extends TestCase{
     static final String inFile="target/inFile.txt";
     static final String outFile="target/outFile.txt";
-    static final String readTstFile="src/test/java/no/met/kvutil/readtest.txt";
+    static final String readTstFile="kvutil/src/test/java/no/met/kvutil/readtest.txt";
 
     
     //filecontent must be equal to the content in the file test/metno/util/readtest.txt.
@@ -55,7 +55,7 @@ public class FileUtilTest extends TestCase{
     public void testReadFile(){
         String buf=FileUtil.readFile2Str(readTstFile);
 
-        assertNotNull("Failed to read file: "+readTstFile, buf);
+        assertNotNull("Failed to read file: "+readTstFile + "  cwd: '" + System.getProperty("user.dir","")+"'.", buf);
         assertEquals("Read content differ from expected content", filecontent, buf);
     }
     

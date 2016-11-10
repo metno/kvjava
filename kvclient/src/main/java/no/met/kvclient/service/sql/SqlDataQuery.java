@@ -20,6 +20,7 @@ import no.met.kvclient.service.TypeList;
 import no.met.kvclient.service.WhichData;
 import no.met.kvclient.service.WhichDataList;
 import no.met.kvclient.service.KvDataQuery;
+import no.met.kvutil.NotImplementedException;
 
 public class SqlDataQuery implements KvDataQuery {
 	ListenerEventQue que;
@@ -35,25 +36,26 @@ public class SqlDataQuery implements KvDataQuery {
 	@Override
 	public Optional<DataIterator> getData(WhichDataList whichData) {
 		// TODO Auto-generated method stub
-		return null;
+
+		throw new NotImplementedException("NotImplemented: SqlDataQuery.getData(WhichDataList whichData)");
 	}
 
 	@Override
 	public boolean getKvData(WhichDataList whichData, KvDataEventListener listener) {
 		// TODO Auto-generated method stub
-		return false;
+		throw new NotImplementedException("NotImplemented: getKvData(WhichDataList whichData, KvDataEventListener listener)");
 	}
 
 	@Override
 	public Optional<StationList> getStations() {
 		// TODO Auto-generated method stub
-		return null;
+		throw new NotImplementedException("NotImplemented: getStaions()");
 	}
 
 	@Override
 	public Optional<ParamList> getParams() {
 		// TODO Auto-generated method stub
-		return null;
+		throw new NotImplementedException("NotImplemented: getParams()");
 	}
 
 	@Override
@@ -80,55 +82,54 @@ public class SqlDataQuery implements KvDataQuery {
 		}
 		String sql=q.toString();
 		//TODO: Do the database query.
-		return Optional.ofNullable(null);
+		throw new NotImplementedException("NotImplemented: getModelData(WhichDataList whichData)");
+		//return Optional.ofNullable(null);
 	}
 
 	@Override
 	public Optional<RejectedIterator> getRejectdecode(RejectDecodeInfo decodeInfo) {
 		// TODO Auto-generated method stub
-		return null;
+		throw new NotImplementedException("NotImplement: getRejectdecode(RejectDecodeInfo decodeInfo)");
 	}
 
 	@Override
 	public Optional<Reference_stationList> getReferenceStation(long stationid, short paramsetid) {
 		// TODO Auto-generated method stub
-		return null;
+		throw new NotImplementedException("NotImplement: getReferenceStation(long stationid, short paramsetid)");
 	}
 
 	@Override
 	public Optional<Obs_pgmList> getObsPgm(StationIDList stationIDList, boolean aUnion) {
 		// TODO Auto-generated method stub
-		return null;
+		throw new NotImplementedException("NotImplement: getObsPgm(StationIDList stationIDList, boolean aUnion)");
 	}
 
 	@Override
 	public Optional<TypeList> getTypes() {
 		// TODO Auto-generated method stub
-		return null;
+		throw new NotImplementedException("NotImplement: getTypes()");
 	}
 
 	@Override
 	public Optional<OperatorList> getOperator() {
 		// TODO Auto-generated method stub
-		return null;
+		throw new NotImplementedException("NotImplement: getOperator()");
 	}
 
 	@Override
 	public Optional<Station_paramList> getStationParam(long stationid, long paramid, long day) {
 		// TODO Auto-generated method stub
-		return null;
+		throw new NotImplementedException("NotImplement: getStationParam(long stationid, long paramid, long day)");
 	}
 
 	@Override
 	public void stop() {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void start() {
 		// TODO Auto-generated method stub
-
 	}
 
 }

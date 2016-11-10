@@ -31,12 +31,12 @@
 package no.met.kvalobs.kl;
 
 import no.met.kvutil.MiGMTTime;
-import no.met.kvutil.dbutil.DbConnection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import no.met.kvutil.dbutil.*;
+
+import java.sql.*;
 import java.util.LinkedList;
 
+import no.met.kvutil.dbutil.IQuery;
 import org.apache.log4j.Logger;
 
 /** This class is a proxy for a row in the table T_KV2KLIMA_FILTER in the
@@ -139,17 +139,41 @@ public class Kv2KlimaFilter {
 		this.typeid=typeid;
 		filterElemList.add( new FilterElem(null, 0 ) );
 	}
-	
+
+
+	no.met.kvutil.dbutil.IQuery createQuery(long stnr_, long typeid_){
+		return new IQuery() {
+			final long stnr=stnr_;
+			final long typeid=typeid_;
+			@Override
+			public String name() {
+				return "Kv2KlimaFilterQuery";
+			}
+
+			@Override
+			public String create() {
+				return "SELECT * FROM T_KV2KLIMA_FILTER "+
+						"  WHERE stnr=? AND typeid=?";
+			}
+
+			@Override
+			public ResultSet exec(PreparedStatement s) throws SQLException {
+				s.setObject(1,stnr, Types.NUMERIC);
+				s.setObject(2,typeid, Types.NUMERIC);
+				return s.executeQuery();
+			}
+		};
+	}
+
 	public Kv2KlimaFilter(long stnr, long typeid, DbConnection con){
 		FilterElem filterElem;
 		
 		this.stnr=stnr;
 		this.typeid=typeid;
 		
-		String stmt="SELECT * FROM T_KV2KLIMA_FILTER "+
-					"  WHERE stnr="+ stnr + " AND typeid="+typeid;
+		IQuery stmt=createQuery(stnr,typeid);
 
-		logger.debug("Filter lookup: " + stmt);
+		logger.debug("Filter lookup: " + stmt.create());
 		
 		ResultSet rs=null;
 

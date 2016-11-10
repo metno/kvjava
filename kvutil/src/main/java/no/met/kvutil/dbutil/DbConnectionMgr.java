@@ -190,7 +190,7 @@ public class DbConnectionMgr
                 }
                 
                 try {
-                    con.close();
+                    con.closeConnection();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -200,10 +200,10 @@ public class DbConnectionMgr
         for(int i=0; i<dbconCache.length; i++){
             if(dbconCache[i]!=null){
                 if(dbconCache[i].getInuse()){
-                    System.out.println("WARNING: Shuting down the DbConnectionMgr, but connections still in use!");
+                    System.out.println("WARNING: Shutdown the DbConnectionMgr, but connections still in use!");
                 }else{
                     try {
-                        dbconCache[i].close();
+                        dbconCache[i].closeConnection();
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
@@ -240,7 +240,7 @@ public class DbConnectionMgr
              throw ex;
          }
          
-         return new DbConnection(con, statement, dbdriver);
+         return new DbConnection(con, statement, dbdriver, this);
      }
 
      
@@ -330,7 +330,7 @@ public class DbConnectionMgr
                 catch(SQLException ex){
                     System.out.println("DbConnectionMgr.releaseDbConnection: Exception in get/setAutoCommit: "+ex.getMessage());
                     try{
-                        dbcon.close();
+                        dbcon.closeConnection();
                     }
                     catch(SQLException e){
                         System.out.println("DbConnectionMgr.releaseDbConnection: Exception (get/setAutoCommit) in close  : "+e.getMessage());
@@ -445,7 +445,7 @@ public class DbConnectionMgr
                     if(tmp.secsTo(now)>=0){
                         cnt++;
                         try {
-                            dbconCache[i].close();
+                            dbconCache[i].closeConnection();
                         } catch (SQLException e) {
                             e.printStackTrace();
                         }
@@ -467,7 +467,7 @@ public class DbConnectionMgr
                         cnt++;
                         
                         try {
-                            dbconCache[i].close();
+                            dbconCache[i].closeConnection();
                         } catch (SQLException e) {
                             e.printStackTrace();
                         }

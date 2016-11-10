@@ -193,24 +193,24 @@ public class PropertiesHelperTest extends TestCase{
         prop.setProperty("18700.7","${sql1}");
       
         String val=prop.apply("mysql");
-        assertTrue(val!=null);
-        assertEquals("SELECT * FROM T", val);
+        assertTrue("Test1",val!=null);
+        assertEquals("Test2","SELECT * FROM T", val);
         
         val=prop.apply("18700.4");
-        assertTrue(val!=null);
-        assertEquals("18700", val);
+        assertTrue("Test3",val!=null);
+        assertEquals("Test4","18700", val);
 
         val=prop.apply("18700.5");
-        assertTrue(val!=null);
-        assertEquals("5", val);
+        assertTrue("Test5",val!=null);
+        assertEquals("Test6","5", val);
 
         val=prop.apply("18700.6");
-        assertTrue(val!=null);
-        assertEquals("18700 6", val);
+        assertTrue("Test7",val!=null);
+        assertEquals("Test8","18700 6", val);
   
         val=prop.apply("18700.7");
-        assertTrue(val!=null);
-        assertEquals(val, "SELECT * FROM T WHERE stnr=18700 AND typeid=7", val);
+        assertTrue("Test9",val!=null);
+        assertEquals("Test10: '"+val+"'", "SELECT * FROM T WHERE stnr=18700 AND typeid=7", val);
     }
     
     /*

@@ -12,6 +12,7 @@ crossPaths := false
 autoScalaLibrary := false
 
 libraryDependencies ++= Seq	(
-	"org.apache.kafka" % "kafka-clients" %"0.8.2.2",
-	"org.apache.kafka" %% "kafka" % "0.8.2.2"
+	"org.apache.kafka" % "kafka-clients" %"0.10.0.1",
+	"org.slf4j" % "slf4j-log4j12" %  "1.7.21"
+	//"org.apache.kafka" %% "kafka" % "0.10.0.1"
 )

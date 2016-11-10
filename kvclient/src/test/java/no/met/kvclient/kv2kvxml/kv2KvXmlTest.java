@@ -39,7 +39,7 @@ import no.met.kvclient.service.ObsDataList;
 
 public class kv2KvXmlTest extends TestCase {
 
-	static String testDir="src/test/java/no/met/kvclient/kv2kvxml/tests";
+	static String testDir="kvclient/src/test/java/no/met/kvclient/kv2kvxml/tests";
 	static Path getPath(String file) {
 		String p=testDir+"/"+file;
 		return FileSystems.getDefault().getPath(p);
@@ -119,6 +119,8 @@ public class kv2KvXmlTest extends TestCase {
 	public void testKvData1() {
 		System.out.println("--------- kvalobsdata1.xml ------------");
 		Path path=getPath("kvalobsdata1.xml");
+		
+		
 		try {
 			ObsDataList data = Kv2KvXml.decodeFromPath(path);
 			assertNotNull(data);
@@ -146,4 +148,22 @@ public class kv2KvXmlTest extends TestCase {
 			fail();
 		}
 	}
+	
+	public void testKvDataTbtime1() {
+		System.out.println("--------- kvalobsdatatbtime1.xml ------------");
+		Path path=getPath("kvalobsdatatbtime1.xml");
+
+		try {
+			ObsDataList data = Kv2KvXml.decodeFromPath(path);
+			assertNotNull(data);
+			System.err.println(data);
+			System.err.println("ObsDataSize: " + data.size());
+			assertTrue(data.size()==2);
+		}
+		catch(Exception ex){
+			System.err.println(ex.getMessage());
+			fail();
+		}
+	}
+
 }

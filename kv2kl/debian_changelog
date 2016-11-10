@@ -1,0 +1,4 @@
+kv2kl (3.0.0~rc2-1) UNRELEASED; urgency=medium
+  * Initial version using kafka.
+  
+ -- Borge Moe <borge.moe@met.no>  Wed, 8 Sep 2016 13:15:00 +0200

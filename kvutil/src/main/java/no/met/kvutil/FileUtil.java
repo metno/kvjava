@@ -30,7 +30,11 @@
 */
 package no.met.kvutil;
 import java.io.*;
-import java.lang.*;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 
 public class FileUtil {
 
@@ -106,6 +110,23 @@ public class FileUtil {
 			System.out.println("IOException: FileUtil.writeStr2File: "+e.getMessage());
 			return false;
 		}
+	}
+	
+	static public boolean checkDir(String path, boolean creatIfNotExist) throws FileAlreadyExistsException, IOException {
+		Path p = FileSystems.getDefault().getPath(path);
+		
+		if( Files.exists(p) ) {
+			if( Files.isDirectory(p) )
+				return true;
+			else
+				throw new FileAlreadyExistsException("The path '"+path +"' exist, but is not a directory.");
+		} else if( ! creatIfNotExist ) {
+			return false;
+		} else { // Try to create the directory.
+			Files.createDirectories(p);
+		}
+		
+		return true;
 	}
 
 }

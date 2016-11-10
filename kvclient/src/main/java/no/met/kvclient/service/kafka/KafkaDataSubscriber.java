@@ -1,9 +1,7 @@
 package no.met.kvclient.service.kafka;
 
 import java.util.Properties;
-import kafka.consumer.ConsumerConfig;
-import kafka.consumer.KafkaStream;
-import kafka.javaapi.consumer.ConsumerConnector;
+import org.apache.kafka.clients.consumer.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,41 +19,55 @@ import no.met.kvclient.service.ObsDataList;
 
 public class KafkaDataSubscriber implements KvSubsribeData {
 	private long nextSubscriberId = 0;
-	private ConsumerConnector consumer;
+	private KafkaConsumer<String, String> consumer =null;
 	private String topic = null;
 	private String groupId = null;
 	private ExecutorService executor;
 	private DataSubscribers<KvDataNotifyEventListener> dataNotifyList;
 	private DataSubscribers<KvDataEventListener> dataList;
 	private boolean isStarted = false;
-	ConsumerConfig conf=null;
+	Properties conf=null;
 	
-	ConsumerConfig createConfig(Properties conf) {
+	
+	Properties createConfig(Properties conf) {
 		Properties props = new Properties();
+		String brokers=null;
 		
 		if(conf==null)
 			conf =  new Properties();
 		
-		topic = conf.getProperty("topic", "kvalobs.data");
-		groupId = conf.getProperty("group.id");
-
+		topic = conf.getProperty("kafks.topic", "kvalobs.production.checked");
+		groupId = conf.getProperty("kafka.group.id");
+		brokers=conf.getProperty("kafka.connect");
+		
 		if (topic == null) {
 			System.out.println("No topic");
-			throw new IllegalArgumentException("Kafka: No topic");
+			throw new IllegalArgumentException("Kafka: No kafka.topic");
 		}
+		
 		if (groupId == null) {
 			System.out.println("No topic");
-			throw new IllegalArgumentException("Kafka: No group.id");
+			throw new IllegalArgumentException("Kafka: No kafka.group.id");
+		}
+		
+		if (brokers == null) {
+			System.out.println("No kafka brokers to connect is defined.");
+			throw new IllegalArgumentException("Kafka: No kafka.connect.brokers defined.");
 		}
 
-		props.put("zookeeper.connect", conf.getOrDefault("zookeeper.connect", "10.99.2.228:2181"));
-		props.put("group.id", conf.getProperty("group.id", "kvclient-borge-ea29af5c-1699-4299-a4dd-8cc272319436"));
-		props.put("zookeeper.session.timeout.ms", conf.getProperty("zookeeper.session.timeout.ms", "500"));
-		props.put("zookeeper.sync.time.ms", conf.getProperty("zookeeper.sync.time.ms", "250"));
-		props.put("auto.commit.interval.ms", conf.getProperty("auto.commit.interval.ms", "1000"));
-		topic = conf.getProperty("topic", "kvalobs.data");
-		return new ConsumerConfig(props);
+		props.put("bootstrap.servers", brokers);
+		props.put("group.id", groupId);
+		props.put("enable.auto.commit", conf.getOrDefault("kafka.auto.commit", "true"));
+		props.put("auto.commit.interval.ms", conf.getOrDefault("kafka.auto.commit.interval.ms", "1000"));
+		props.put("session.timeout.ms", conf.getOrDefault("kafka.session.timeout.ms", "30000"));
+		props.put("max.poll.records", conf.getOrDefault("kafka.max.poll.records", "2"));
+		props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+		props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+
+		return props;
 	}
+
+	
 
 	public KafkaDataSubscriber(Properties conf, ListenerEventQue defaultQue) {
 		dataNotifyList = new DataSubscribers<>(defaultQue);
@@ -92,8 +104,8 @@ public class KafkaDataSubscriber implements KvSubsribeData {
 
 	@Override
 	synchronized public SubscribeId subscribeKvHint(KvHintEventListener sub) {
-		// TODO Auto-generated method stub
-		return null;
+		SubscribeId subid=getSubscriberId("hint_subscriber-not_implemented");
+		return subid;
 	}
 
 	@Override
@@ -104,7 +116,10 @@ public class KafkaDataSubscriber implements KvSubsribeData {
 			dataNotifyList.remove(subid);
 		} else if (id.startsWith("data_subscriber-")) {
 			dataList.remove(subid);
+		} else if( id.startsWith("hint_subscriber-")) {
+			//NOT implemented.
 		}
+		
 		if( dataList.isEmpty() && dataNotifyList.isEmpty() )
 			stop();
 	}
@@ -129,21 +144,12 @@ public class KafkaDataSubscriber implements KvSubsribeData {
 	synchronized void tryStart() {	
 		if (isStarted)
 			return;
-		
-		consumer = kafka.consumer.Consumer.createJavaConsumerConnector(conf);
-		Map<String, Integer> topicMap = new HashMap<String, Integer>();
-		topicMap.put(topic,new Integer(1));
-		Map<String, List<KafkaStream<byte[], byte[]>>> consumerStreamsMap = consumer.createMessageStreams(topicMap);
-		List<KafkaStream<byte[], byte[]>> streamList =  consumerStreamsMap.get(topic);
-	 
-		//There should be only one stream.
-		if( streamList.isEmpty() ) {
-			System.err.println("No topic <"+topic+"> defined?");
-			return;
-		}
+
+		consumer = new KafkaConsumer<>(conf); 
 		executor = Executors.newFixedThreadPool(1);
-		KvDataConsumer kvConsumer=new KvDataConsumer(streamList.get(0), this, topic); 
+		KvDataConsumer kvConsumer=new KvDataConsumer(consumer, this, topic); 
 		executor.submit(kvConsumer);
+		System.out.println("*** Kafka: Started.......");
 		isStarted=true;
 	}
 	
@@ -154,11 +160,13 @@ public class KafkaDataSubscriber implements KvSubsribeData {
 
 	@Override
 	synchronized public void stop(){
+		System.out.println("**** KafkaDataSubscriber: Try to stop.");
 		if( consumer != null )
-			consumer.shutdown();
+			consumer.wakeup();
 		if(executor!=null)
 			executor.shutdown();
 		isStarted=false;
+		System.out.println("**** KafkaDataSubscriber: Stoped ??????.");
 	}
 
 

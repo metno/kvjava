@@ -30,32 +30,34 @@
 */
 package no.met.kvalobs.kv2kl;
 
+import no.met.kvalobs.kl.KlInsertHelper;
+import no.met.kvalobs.kl.KlSqlFactory;
 import no.met.kvclient.KvDataEvent;
 import no.met.kvclient.KvDataEventListener;
 import no.met.kvclient.service.ObsDataList;
-import no.met.kvalobs.kl.SqlInsertHelper;
 
 import org.apache.log4j.Logger;
 
 public class KlDataReceiver implements KvDataEventListener {
 
 	Kv2KlApp app;
-	SqlInsertHelper insertstmt;
+	KlInsertHelper insertstmt;
+	boolean saveDataToDb=true;
     static Logger logger=Logger.getLogger(KlDataReceiver.class);
     static Logger filterlog=Logger.getLogger("filter");
     
     public KlDataReceiver(Kv2KlApp app, String backupfile){
-    	this.app=app;
-    	insertstmt=new SqlInsertHelper(app.getConnectionMgr(), backupfile);
-    	insertstmt.setDataTableName( app.getDataTableName() );
-    	insertstmt.setTextDataTableName( app.getTextDataTableName() );
-    	insertstmt.setForeignDataTable( app.getForeignDataTableName() );
-    	insertstmt.setForeignTextDataTable( app.getForeignTextDataTableName() );
+    	this(app, backupfile, true, true);
     }
  
-    public KlDataReceiver(Kv2KlApp app, String backupfile, boolean enableFilter ){
+    public KlDataReceiver(Kv2KlApp app, String backupfile, boolean enableFilter, boolean saveDataToDb ){
     	this.app=app;
-    	insertstmt=new SqlInsertHelper(app.getConnectionMgr(), backupfile, enableFilter );
+    	this.saveDataToDb=saveDataToDb;
+    	
+    	if( ! this.saveDataToDb )
+    		return;
+    	
+    	insertstmt=new KlInsertHelper(app.getConnectionMgr(), backupfile, enableFilter );
     	insertstmt.setDataTableName( app.getDataTableName() );
     	insertstmt.setTextDataTableName( app.getTextDataTableName() );
     	insertstmt.setForeignDataTable( app.getForeignDataTableName() );
@@ -65,7 +67,11 @@ public class KlDataReceiver implements KvDataEventListener {
     public void kvDataEvent(KvDataEvent event) {
     	ObsDataList obsData=event.getObsData();
     	app.updateLastKvContact();
-    	insertstmt.insertData(obsData, null);
+    	
+    	if( saveDataToDb)
+    		insertstmt.insertData(obsData, null);
+    	else // This is typical for debug sessions so just write the data to standard out.
+    		System.out.println(obsData);
     }
 }
 

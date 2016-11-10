@@ -121,33 +121,22 @@ public class DbTestUtil {
     	
     	if(buf==null)
     		return false;
-    	
-    	return runSqlFromString(mgr, buf);
+        //System.err.println("\n --runSqlFromFile: '"+filename + "'--------\n"+buf+"\n--------------------------\n");
+        return runSqlFromString(mgr, buf);
 	}
 	
 	
 	static public boolean runSqlFromString(DbConnectionMgr mgr, String sqlstmt){
-    	
-    	DbConnection con=null;
-        
-        try{
-            con=mgr.newDbConnection();
+        try(DbConnection con=mgr.newDbConnection()){
+            //System.err.println("\n --- runSqlFromString ------\n"+sqlstmt+"\n--------------------------\n");
             con.exec(sqlstmt);
-            mgr.releaseDbConnection(con);
-            
             return true;
-        }catch(Exception e){
-        	e.printStackTrace(); 
-        	if(con!=null){
-        		try{
-        			mgr.releaseDbConnection(con);
-                }
-                catch (Exception ex) {
-                }
-            }
-                
-            return false;
         }
+        catch(Exception e){
+        	e.printStackTrace(); 
+        }
+                
+        return false;
     }
     
 	static public void deleteDir(String path){

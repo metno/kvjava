@@ -30,8 +30,9 @@ public class FormatException extends Exception {
 				nameList += ", " + e;
 		}
 
+		String endStart=xml.isStartElement()?" (StartElement)":(xml.isEndElement()?" (EndElemet)":" (UNKNOWN ELEMENT)");
 		String msg = "Line: " + xml.getLocation().getLineNumber() + ". Element '" + xml.getName().getLocalPart()
-				+ "'. Expecting start element(s) '" + nameList + "'.";
+				+ "' " + endStart + ". Expecting start element(s) '" + nameList + "'.";
 		return new FormatException(msg);
 	}
 
@@ -44,21 +45,24 @@ public class FormatException extends Exception {
 				nameList += ", " + e;
 		}
 
+		String endStart=xml.isStartElement()?" (StartElement)":(xml.isEndElement()?" (EndElemet)":" (UNKNOWN ELEMENT)");
 		String msg = "Line: " + xml.getLocation().getLineNumber() + ". Element '" + xml.getName().getLocalPart()
-				+ "'. Expecting start/end element(s) '" + nameList + "'.";
+				+ "' " + endStart +". Expecting start/end element(s) '" + nameList + "'.";
 		return new FormatException(msg);
 	}
 
 	static FormatException endElementFormat(XMLStreamReader xml, String name) throws XMLStreamException {
+		String endStart=xml.isStartElement()?" (StartElement)":(xml.isEndElement()?" (EndElemet)":" (UNKNOWN ELEMENT)");
 		String msg = "Line: " + xml.getLocation().getLineNumber() + " Element '" + xml.getName().getLocalPart()
-				+ "'. Expecting end element '" + name + "'.";
+				+ "' " + endStart + ". Expecting end element '" + name + "'.";
 		return new FormatException(msg);
 	}
 
 	static FormatException expectingFormat(XMLStreamReader xml, String expectingMsg, String gotMsg)
 			throws XMLStreamException {
+		String endStart=xml.isStartElement()?" (StartElement)":(xml.isEndElement()?" (EndElemet)":" (UNKNOWN ELEMENT)");
 		String msg = "Line: " + xml.getLocation().getLineNumber() + " Element '" + xml.getName().getLocalPart()
-				+ "'. Expecting: " + expectingMsg + ". Got: '" + gotMsg + "'.";
+				+ "' " + endStart+". Expecting: " + expectingMsg + ". Got: '" + gotMsg + "'.";
 		return new FormatException(msg);
 	}
 }

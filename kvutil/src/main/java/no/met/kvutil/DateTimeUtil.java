@@ -41,6 +41,7 @@ import java.util.regex.Pattern;
 
 public class DateTimeUtil {
 	static DateTimeFormatter FMT_PARSE = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ssx");
+	static DateTimeFormatter FMT_PARSE_DESIMAL_SECOND = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSx");
 	/** yyyy-MM-dd HH:mm:ss */
 	public static final String FMT_ISO = "yyyy-MM-dd HH:mm:ss";
 
@@ -121,6 +122,44 @@ public class DateTimeUtil {
 		return OffsetDateTime.parse(dt, fmt);
 	}
 
+	static public int firstNotIn(int startAt, String str, String validSet) {
+		int n = str.length();
+		
+		if (startAt >= n)
+			return -1;
+
+		for( int i = startAt; i<n; i++ ) {
+			if( ! validSet.contains(str.subSequence(i, i+1)))
+				return i;
+		}
+		return n;
+	}
+
+	static int getDesimalSecondsAsMs(StringHolder res) {
+		String ts=res.getValue();
+		int point=ts.indexOf('.');
+		
+		if( point < 0 ) 
+			return 0;
+		
+		int i = firstNotIn(point+1, ts, "0123456789");
+		
+		if( i < 0 )
+			return 0;
+		
+		//Remove the decimal point part.
+		String sub = ts.substring(0, point);
+		
+		if( i < ts.length())
+			sub.concat(ts.substring(i));
+		
+		res.setValue(sub);
+		
+		sub=ts.substring(point+1, i);
+		
+		return Math.round(Float.parseFloat("0."+sub)*1000);
+	}
+	
 	/**
 	 * 
 	 * @param timestamp
@@ -137,12 +176,22 @@ public class DateTimeUtil {
 		ts = timestamp.replace('T', ' ');
 		ts = ts.replace("z", "+00");
 		ts = ts.replace("Z", "+00");
+			
 
 		if (ts.lastIndexOf('+') < 0 && ts.lastIndexOf('-') <= 9)
 			ts = ts + "+00";
-
 		return OffsetDateTime.parse(ts, FMT_PARSE);
 	}
+	
+	public static Instant parseToInstant(String timestamp) {
+		
+		StringHolder ts=new StringHolder(timestamp);
+		int millis=getDesimalSecondsAsMs(ts);
+		OffsetDateTime dt=parse(ts.getValue());
+		
+		return dt.toInstant().plusMillis(millis); 
+	}
+
 
 	static public Instant parseOptHms(String time, StringBuilder remaining) {
 		int year, month, day, hour, min, second;
@@ -218,9 +267,7 @@ public class DateTimeUtil {
 			return null;
 		}
 
-		return Instant.from(OffsetDateTime.of(year, month, day,hour,min,second,0, ZoneOffset.UTC));
+		return Instant.from(OffsetDateTime.of(year, month, day, hour, min, second, 0, ZoneOffset.UTC));
 	}
 
-	
-		
 }
