@@ -53,11 +53,11 @@ public interface KvDataNotifyEventListener extends KvEventListener {
 			}
 
 			if (!od.dataList.isEmpty()) {
-				wl.add(new What(od.stationid, od.typeID, od.obstime, onlyMissing));
+				wl.add(new What(od.stationID, od.typeID, od.obstime, onlyMissing));
 				break;
 			}
 			if (!od.textDataList.isEmpty())
-				wl.add(new What(od.stationid, od.typeID, od.obstime, false));
+				wl.add(new What(od.stationID, od.typeID, od.obstime, false));
 		}
 		if (!wl.isEmpty()) {
 			kvDataNotifyEvent(new KvDataNotifyEvent(source, id, wl));

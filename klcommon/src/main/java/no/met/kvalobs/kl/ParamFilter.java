@@ -383,7 +383,7 @@ public class ParamFilter {
 	}
 
 	public boolean filter(TextDataElem data, Timestamp obstime, DbConnection con) {
-		return filter(data.paramID, data.typeID_, 0, 0, false, obstime, con);
+		return filter(data.paramID, data.typeID, 0, 0, false, obstime, con);
 	}
 
     synchronized public boolean filter(int paramid, long typeid, int level, int sensor, boolean useLevelAndSensor, Timestamp obstime, DbConnection con) {

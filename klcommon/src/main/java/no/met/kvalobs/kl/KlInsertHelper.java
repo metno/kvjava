@@ -38,6 +38,7 @@ import java.time.Instant;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.ListIterator;
+
 import no.met.kvutil.dbutil.DbConnectionMgr;
 import no.met.kvutil.dbutil.DbConnection;
 import no.met.kvutil.StringHolder;
@@ -48,100 +49,96 @@ import no.met.kvutil.dbutil.IExec;
 import org.apache.log4j.Logger;
 
 public class KlInsertHelper {
-    static Logger logger=Logger.getLogger(KlInsertHelper.class);
-    static Logger filterlog=Logger.getLogger("filter");
+    static Logger logger = Logger.getLogger(KlInsertHelper.class);
+    static Logger filterlog = Logger.getLogger("filter");
     PrintWriter fout;
-    DbConnectionMgr conMgr=null;
-    String dataTableName=null;
-    String textDataTableName=null;
-    String foreignDataTableName=null;
-    String foreignTextDataTableName=null;
-    boolean    enableFilter;
+    DbConnectionMgr conMgr = null;
+    String dataTableName = null;
+    String textDataTableName = null;
+    String foreignDataTableName = null;
+    String foreignTextDataTableName = null;
+    boolean enableFilter;
 
 
+    public KlInsertHelper(DbConnectionMgr conMgr, String backupfile, boolean enableFilter) {
+        fout = null;
+        this.conMgr = conMgr;
+        this.enableFilter = enableFilter;
 
-    public KlInsertHelper(DbConnectionMgr conMgr, String backupfile, boolean enableFilter){
-        fout=null;
-        this.conMgr=conMgr;
-        this.enableFilter=enableFilter;
-
-        if(backupfile!=null){
+        if (backupfile != null) {
             try {
-                fout = new PrintWriter(new FileWriter (backupfile,true), true);
+                fout = new PrintWriter(new FileWriter(backupfile, true), true);
                 fout.println("Starter her:");
-            }
-            catch(IOException e){
+            } catch (IOException e) {
                 logger.error(e);
             }
         }
     }
 
 
-    public KlInsertHelper(DbConnectionMgr conMgr, String backupfile){
+    public KlInsertHelper(DbConnectionMgr conMgr, String backupfile) {
         this(conMgr, backupfile, true);
     }
 
-    public KlInsertHelper(DbConnectionMgr conMgr){
+    public KlInsertHelper(DbConnectionMgr conMgr) {
         this(conMgr, null, true);
     }
 
-    public DbConnection newDbConnection(){
+    public DbConnection newDbConnection() {
         try {
             return conMgr.newDbConnection();
         } catch (SQLException e) {
-            logger.warn("Cant create a new database connection: "+
+            logger.warn("Cant create a new database connection: " +
                     e.getMessage());
             return null;
         }
     }
 
 
-    public void  releaseDbConnection(DbConnection con){
+    public void releaseDbConnection(DbConnection con) {
         String msg;
 
         try {
             conMgr.releaseDbConnection(con);
             return;
         } catch (IllegalArgumentException e) {
-            msg=e.getMessage();
+            msg = e.getMessage();
         } catch (IllegalStateException e) {
-            msg=e.getMessage();
+            msg = e.getMessage();
         } catch (SQLException e) {
-            msg=e.getMessage();
+            msg = e.getMessage();
         }
 
-        logger.warn("Cant release the database connection: "+msg);
+        logger.warn("Cant release the database connection: " + msg);
     }
 
-    public void setDataTableName( String dataTable ) {
+    public void setDataTableName(String dataTable) {
         dataTableName = dataTable;
     }
 
-    public void setTextDataTableName( String textDataTable ) {
+    public void setTextDataTableName(String textDataTable) {
         textDataTableName = textDataTable;
     }
 
-    public void setForeignDataTable( String foreignData ) {
+    public void setForeignDataTable(String foreignData) {
         foreignDataTableName = foreignData;
     }
 
-    public void setForeignTextDataTable( String foreignTextData ) {
+    public void setForeignTextDataTable(String foreignTextData) {
         foreignDataTableName = foreignTextData;
     }
 
-    protected boolean usetypeid(long  typeid, LinkedList<Long> typelist){
-        if( typelist == null )
+    protected boolean usetypeid(long typeid, LinkedList<Long> typelist) {
+        if (typelist == null || typelist.isEmpty())
             return true;
 
-        if(typelist!=null){
-            ListIterator<Long> it=typelist.listIterator();
+        ListIterator<Long> it = typelist.listIterator();
 
-            while(it.hasNext()){
-                Long n=it.next();
+        while (it.hasNext()) {
+            Long n = it.next();
 
-                if(typeid==n ){
-                    return true;
-                }
+            if (typeid == n || n==0) {
+                return true;
             }
         }
 
@@ -149,134 +146,130 @@ public class KlInsertHelper {
     }
 
 
+    protected boolean doInsertData(DbConnection dbcon, IExec insertQuery, IExec updateQuery) {
+        IExec query = insertQuery;
 
-    protected boolean doInsertData(DbConnection dbcon, IExec insertQuery, IExec updateQuery){
-        IExec query=insertQuery;
-
-        if( query == null )
+        if (query == null)
             return true;
 
         logger.debug(query);
 
-        try{
+        try {
             dbcon.exec(query);
             return true;
-        }
-        catch(SQLException SQLe){
-            String sqlState=SQLe.getSQLState();
+        } catch (SQLException SQLe) {
+            String sqlState = SQLe.getSQLState();
 
-            if(sqlState!=null &&
-                    sqlState.startsWith("23")){
-                logger.warn(Instant.now() +": "+ SQLe);
+            if (sqlState != null &&
+                    sqlState.startsWith("23")) {
+                logger.warn(Instant.now() + ": " + SQLe);
                 query = updateQuery;
-                return updateData( dbcon, query );
-            }else{
-                logger.error(Instant.now() +": "+ SQLe);
+                return updateData(dbcon, query);
+            } else {
+                logger.error(Instant.now() + ": " + SQLe);
             }
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             logger.error(Instant.now() + ": " + e);
         }
 
-        if(query!=null && fout!=null)
+        if (query != null && fout != null)
             fout.println(query);
 
         return false;
     }
 
-    protected boolean updateData(DbConnection dbcon, IExec updateQuery ){
-        IExec query=updateQuery;
+    protected boolean updateData(DbConnection dbcon, IExec updateQuery) {
+        IExec query = updateQuery;
 
-        if( query == null )
+        if (query == null)
             return true;
 
-        try{
+        try {
             dbcon.exec(query);
             return true;
-        }catch(SQLException SQLe){
-            logger.error(Instant.now() +": "+ SQLe + "\n" + query);
-        }
-        catch(Exception e){
+        } catch (SQLException SQLe) {
+            logger.error(Instant.now() + ": " + SQLe + "\n" + query);
+        } catch (Exception e) {
             logger.error(Instant.now() + ": " + e);
         }
 
-        if(query!=null && fout!=null)
+        if (query != null && fout != null)
             fout.println(query);
 
         return false;
     }
 
 
-    public boolean insertData(ObsDataList obsData, LinkedList<Long> typelist){
-        DbConnection dbconn=newDbConnection();
-        Filter filter=new Filter(dbconn);
+    public boolean insertData(ObsDataList obsData, LinkedList<Long> typelist) {
+        DbConnection dbconn = newDbConnection();
+        Filter filter = new Filter(dbconn);
         boolean loggedFilter;
         boolean loggedNewObs;
-        long     typeid=0;
-        StringHolder msg=new StringHolder();
-        boolean  filterRet;
-        boolean  ret=true;
+        long typeid = 0;
+        StringHolder msg = new StringHolder();
+        boolean filterRet;
+        boolean ret = true;
 
-        if(!enableFilter)
+        if (!enableFilter)
             filter.setFilterEnabled(false);
 
-        logger.debug("InsertData (Enter): "+Instant.now());
+        logger.debug("InsertData (Enter): " + Instant.now());
 
-        if(dbconn==null){
+        if (dbconn == null) {
             logger.error("No Db connection!");
             return false;
         }
 
-        try{
-            if(obsData==null){
+        try {
+            if (obsData == null) {
                 logger.warn("Opppsss: NO DATA!");
                 return true;
             }
 
-            KlDataHelper dh = new KlDataHelper( dbconn.getDbdriver(),
+            KlDataHelper dh = new KlDataHelper(dbconn.getDbdriver(),
                     dataTableName, textDataTableName,
-                    foreignDataTableName, foreignTextDataTableName );
+                    foreignDataTableName, foreignTextDataTableName);
 
-            Iterator<ObsData> itObsData=obsData.iterator();
-            while(itObsData.hasNext() ){
-                ObsData data=itObsData.next();
+            Iterator<ObsData> itObsData = obsData.iterator();
+            while (itObsData.hasNext()) {
+                ObsData data = itObsData.next();
                 msg.setValue(null);
-                loggedFilter=false;
-                loggedNewObs=false;
+                loggedFilter = false;
+                loggedNewObs = false;
 
                 //DataElem[] elem=obsData[i].dataList;
-                dh.init( data.dataList, data.textDataList );
+                dh.init(data.dataList, data.textDataList);
                 LongHolder stationID = new LongHolder();
 
 
-                while( dh.next() ){
-                    if(typeid!=dh.getTypeID() ){
-                        typeid=dh.getTypeID();
-                        loggedNewObs=false;
+                while (dh.next()) {
+                    if (typeid != dh.getTypeID()) {
+                        typeid = dh.getTypeID();
+                        loggedNewObs = false;
                     }
-
-                    if(!usetypeid(dh.getTypeID(), typelist))
+                    if (!usetypeid(dh.getTypeID(), typelist)) {
                         continue;
-
-                    if(!loggedNewObs){
-                        loggedNewObs=true;
-                        logger.info("New obs: stationid: "+dh.getStationID()+
-                                " typid: "+dh.getTypeID()+
-                                " obstime: " + dh.getObstime() );
                     }
 
-                    stationID.setValue( dh.getStationID() );
+                    if (!loggedNewObs) {
+                        loggedNewObs = true;
+                        logger.info("New obs: stationid: " + dh.getStationID() +
+                                " typid: " + dh.getTypeID() +
+                                " obstime: " + dh.getObstime());
+                    }
 
-                    filterRet=filter.filter(stationID, dh.getTypeID(), dh.getParamID(),
+                    stationID.setValue(dh.getStationID());
+
+                    filterRet = filter.filter(stationID, dh.getTypeID(), dh.getParamID(),
                             dh.getLevel(), dh.getSensor(), dh.useLevelAndSensor(),
-                            dh.getObstime(), msg );
+                            dh.getObstime(), msg);
 
                     //The stationid my have changed
-                    dh.setStationID( stationID.getValue() );
+                    dh.setStationID(stationID.getValue());
 
 
-                    if(!loggedFilter && msg.getValue()!=null){
-                        loggedFilter=true;
+                    if (!loggedFilter && msg.getValue() != null) {
+                        loggedFilter = true;
                         filterlog.info(dh.getStationID() +
                                 " " +
                                 dh.getTypeID() +
@@ -285,22 +278,21 @@ public class KlInsertHelper {
                                 msg.getValue());
                     }
 
-                    if(!filterRet)
+                    if (!filterRet)
                         continue;
 
-                    if(!doInsertData( dbconn, dh.createInsertQuery(), dh.createUpdateQuery() ) )
-                        ret=false;
+                    if (!doInsertData(dbconn, dh.createInsertQuery(), dh.createUpdateQuery()))
+                        ret = false;
                 }
             }
-        }
-        catch(Exception e){
-            logger.error(Instant.now()+ ": " + e);
+        } catch (Exception e) {
+            logger.error(Instant.now() + ": " + e);
             e.printStackTrace();
         }
 
         releaseDbConnection(dbconn);
 
-        logger.debug("DataReceiver (Return): "+Instant.now());
+        logger.debug("DataReceiver (Return): " + Instant.now());
         return ret;
     }
 }

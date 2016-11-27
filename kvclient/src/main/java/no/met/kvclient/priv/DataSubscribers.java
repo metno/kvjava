@@ -65,7 +65,7 @@ public class DataSubscribers<Listener extends KvEventListener>
 		ObsDataList dataToSend = new ObsDataList();
 
 		for (no.met.kvclient.service.ObsData de : data) {
-			ObsData obsData = new ObsData(de.stationid, de.typeID, de.obstime, de.textDataList);
+			ObsData obsData = new ObsData(de.stationID, de.typeID, de.obstime, de.textDataList);
 
 			for (DataElem elem : de.dataList) {
 				if (info.has(elem)) {

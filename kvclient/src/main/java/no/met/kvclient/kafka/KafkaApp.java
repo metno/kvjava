@@ -21,8 +21,7 @@ public class KafkaApp extends kvService {
 	boolean isInterupted;
 	int subscriberWorkers;
 	ThreadManager workers;
-		
-	
+
 	static class Hook extends Thread {
 		KafkaApp app;
 		public Hook(KafkaApp app){
@@ -46,7 +45,7 @@ public class KafkaApp extends kvService {
 	}
 	
 	
-	static public KafkaApp factory(Properties prop) {
+	static public KafkaApp factory(PropertiesHelper prop) {
 		ListenerEventQue que = new ListenerEventQue(Math.abs(Integer.parseInt(prop.getProperty("que.size", "10"))));
 		KafkaDataSubscriber sub = null;
 		SqlDataQuery query=null;
@@ -78,20 +77,20 @@ public class KafkaApp extends kvService {
 	}
 
 	static public KafkaApp factory(String conf) {
-		Properties prop = PropertiesHelper.loadFile(conf);
+		PropertiesHelper prop = PropertiesHelper.loadFile(conf);
 		if( prop == null )
 			return null;
 		
 		return factory(prop);
 	}
-	
-	
-	
-	public KafkaApp(Properties prop) {
+
+
+
+	public KafkaApp(PropertiesHelper prop) {
 		this( prop, new ListenerEventQue(Math.abs(Integer.parseInt(prop.getProperty("que.size", "10")))));
 		KafkaDataSubscriber sub = null;
 		SqlDataQuery query=null;
-		
+
 		try {
 			sub = new KafkaDataSubscriber(prop, que);
 			query = new SqlDataQuery(prop,que);
@@ -99,18 +98,19 @@ public class KafkaApp extends kvService {
 		}
 		catch( Exception ex){
 			System.err.println("Configuration error: " + ex.getMessage());
-			
+
 			if( sub != null )
 				sub.stop();
-			
+
 			if(query !=  null )
 				query.stop();
-			
+
 			throw new InternalError();
 		}
 	}
+
 	
-	KafkaApp(Properties prop, ListenerEventQue que) {
+	KafkaApp(PropertiesHelper prop, ListenerEventQue que) {
 		this.que=que;
 		this.prop=new PropertiesHelper(prop);
 		doShutdown = new AtomicBoolean(false);
@@ -124,7 +124,7 @@ public class KafkaApp extends kvService {
 		isInterupted = false;
 	}
 	
-	public KafkaApp(Properties prop, ListenerEventQue que, KvDataQuery query, KvSubsribeData subscribers ){
+	public KafkaApp(PropertiesHelper prop, ListenerEventQue que, KvDataQuery query, KvSubsribeData subscribers ){
 		this(prop, que);
 		init(subscribers, query);
 	}
@@ -143,9 +143,8 @@ public class KafkaApp extends kvService {
 	
 	
 	public void shutdown()throws InterruptedException {
-		System.out.println("***** Shutdown *****\n" + ProcUtil.getStackTrace());
-		
-		if(doShutdown.compareAndSet(false, true)){
+		//System.out.println("***** Shutdown *****\n" + ProcUtil.getStackTrace());
+		if (doShutdown.compareAndSet(false, true)) {
 			stop();
 			workers.shutdown();
 			workers.join(10000);

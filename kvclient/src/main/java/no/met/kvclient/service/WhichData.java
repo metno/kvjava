@@ -6,6 +6,7 @@ import no.met.kvutil.DateTimeUtil;
 
 public class WhichData {
 	public long stationid; // 0 all stations
+	public long stationid2; //When range
 	public long typeid_; // 0 all typeids
 	public long paramid; // 0 all paramids
 	public StatusId status;
@@ -14,35 +15,50 @@ public class WhichData {
 
 	public WhichData(long stationid, long typeid_, long paramid, StatusId status, String fromObsTime, String toObsTime) {
 		this.stationid = stationid;
+		this.stationid2=stationid;
 		this.typeid_ = typeid_;
 		this.paramid = paramid;
 		this.status = status;
 		this.fromTime = DateTimeUtil.parse(fromObsTime).toInstant();
-		this.toTime = DateTimeUtil.parse(toObsTime).toInstant();
+
+		if(toObsTime==null || toObsTime.isEmpty())
+			this.toTime=Instant.now();
+		else
+			this.toTime = DateTimeUtil.parse(toObsTime).toInstant();
 	}
 
 	public WhichData(long stationid, long typeid_, long paramid, StatusId status, OffsetDateTime fromTime,
 			OffsetDateTime toTime) {
 		this.stationid = stationid;
+		this.stationid2=stationid;
 		this.typeid_ = typeid_;
 		this.paramid = paramid;
 		this.status = status;
 		this.fromTime = fromTime.toInstant();
-		this.toTime = toTime.toInstant();
+		if(toTime==null)
+			this.toTime=Instant.now();
+		else
+			this.toTime = toTime.toInstant();
 	}
 	
 	public WhichData(long stationid, long typeid_, long paramid, StatusId status, Instant fromTime,
 			Instant toTime) {
 		this.stationid = stationid;
+		this.stationid2=stationid;
 		this.typeid_ = typeid_;
 		this.paramid = paramid;
 		this.status = status;
 		this.fromTime = fromTime;
-		this.toTime = toTime;
+
+		if( toTime==null)
+			this.toTime=Instant.now();
+		else
+			this.toTime = toTime;
 	}
 
 	public WhichData(WhichData other) {
 		this.stationid = other.stationid;
+		this.stationid2= other.stationid2;
 		this.typeid_ = other.typeid_;
 		this.paramid = other.paramid;
 		this.status = other.status;
@@ -50,6 +66,10 @@ public class WhichData {
 
 	public WhichData(long stationid, StatusId status, String fromObsTime, String toObsTime) {
 		this(stationid, 0, 0, status, fromObsTime, toObsTime);
+	}
+
+	public WhichData(long stationid, long tid, StatusId status, String fromObsTime, String toObsTime) {
+		this(stationid, tid, 0, status, fromObsTime, toObsTime);
 	}
 
 	public WhichData(long stationid, StatusId status, OffsetDateTime fromObsTime, OffsetDateTime toObsTime) {
@@ -70,5 +90,16 @@ public class WhichData {
 
 	public WhichData(OffsetDateTime fromObstTime, OffsetDateTime toObsTime) {
 		this(0, 0, 0, StatusId.All, fromObstTime, toObsTime);
+	}
+
+	@Override
+	public String toString() {
+		String res= Long.toString(stationid);
+
+		if( stationid != stationid2)
+			res+=" - " + Long.toString(stationid2);
+
+		res+="," + typeid_ + "," + fromTime + " - " + toTime;
+		return res;
 	}
 }

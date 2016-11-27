@@ -30,6 +30,7 @@
 */
 package no.met.kvalobs.kl;
 
+import no.met.kvutil.PidFileUtil;
 import no.met.kvutil.ProcUtil;
 import no.met.kvutil.PropertiesHelper;
 import no.met.kvutil.dbutil.DbConnection;
@@ -47,21 +48,22 @@ import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
 
-public class KlApp extends KafkaApp  implements SendDataToKv 
+public class KlApp extends KafkaApp  implements SendDataToKv
 {
 	
 	static Logger logger=Logger.getLogger(KlApp.class);
 
-    DbConnectionMgr conMgr=null;
-    //String           kvserver;
-    File             pidFile=null;
+    static DbConnectionMgr conKlMgr =null;
+	static DbConnectionMgr conKvMgr =null;
+	File             pidFile=null;
     String dataTableName=null;
     String textDataTableName=null;
     String foreignDataTableName=null;
     String foreignTextDataTableName=null;
-    boolean enableConMgr=true;
+    boolean enableKlConMgr =true;
     static String           kvpath=null;
 	static String           appName=null;
+	static String           confname=null;
 
     static public PropertiesHelper getConfile(String conf){
     	if(conf==null){
@@ -74,7 +76,7 @@ public class KlApp extends KafkaApp  implements SendDataToKv
     		System.exit(1);
     	}
     
-    	String path=KlApp.getKvpath();
+    	String path= KlApp.getKvpath();
 
     	String confFile=conf;
     	
@@ -111,20 +113,15 @@ public class KlApp extends KafkaApp  implements SendDataToKv
 	
     
     public KlApp(String[] args, String conffile, boolean usingSwing){
-    	this(args, conffile, null, usingSwing, true);
-    }
-    public KlApp(String[] args, String conffile, String kvserver, boolean usingSwing){
-    	this(args, conffile, kvserver, usingSwing, true);
+    	this(args, conffile, usingSwing, true);
     }
 
     public KlApp(String[] args, PropertiesHelper confProp, boolean usingSwing){
-        this(args, confProp, null, usingSwing, true);
-    }
-    public KlApp(String[] args, PropertiesHelper confProp, String kvserver, boolean usingSwing){
-        this(args, confProp, kvserver, usingSwing, true);
+        this(args, confProp, usingSwing, true);
     }
 
 	static public String getAppName(){return appName;}
+	static public String getConfName(){return confname;}
 	static public String setAppName(String name){return appName=name;}
 
 	public String getDataTableName() {
@@ -143,66 +140,57 @@ public class KlApp extends KafkaApp  implements SendDataToKv
 		return foreignTextDataTableName;
     }
 
-    public PropertiesHelper getKlConnectionsProperties(PropertiesHelper conf) {
-		PropertiesHelper prop=conf.removePrefix("kl.db*");
-
-		System.err.println(prop.toString("KlConnectionProperties:"));
-
+    public PropertiesHelper getConnectionsProperties(PropertiesHelper conf, String prefix) {
+		PropertiesHelper prop=conf.removePrefix(prefix);
+		System.err.println(prop.toString("ConnectionProperties (" + prefix +"): "));
 		return prop;
 	}
 
 
-	public KlApp(String[] args, PropertiesHelper confProp, String kvserver, boolean usingSwing, boolean enableConMgr){
+	public KlApp(String[] args, PropertiesHelper confProp, boolean usingSwing, boolean enableKlConMgr){
 		super(confProp);
 		PropertiesHelper conf = getConf();
 		dataTableName = conf.getProperty("kl.datatable", "kv2klima" );
 		textDataTableName = conf.getProperty("kl.textdatatable", "T_TEXT_DATA" );
 		foreignDataTableName = conf.getProperty( "kl.foreign_datatable" );
 		foreignTextDataTableName = conf.getProperty( "kl.foreign_textdatatable" );
-		this.enableConMgr = enableConMgr;
-		try {
-			if( this.enableConMgr)
-				conMgr=new DbConnectionMgr(getKlConnectionsProperties(conf));
-		} catch (IllegalArgumentException e1) {
-			logger.fatal("Missing properties in the configuration file: " + e1.getMessage());
-			try {
-				shutdown(); // Stop kafka
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			ProcUtil.getStackTrace(" exit(1) ");
-			System.exit(1);
-		} catch (ClassNotFoundException e1) {
-			logger.fatal("Cant load databasedriver: "+e1.getMessage());
-			try {
-				shutdown();// Stop kafka
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			ProcUtil.getStackTrace(" exit(1) ");
-			System.exit(1);
-		}
+		appName = conf.getProperty("appname", "");
+		confname= conf.getProperty("confname", "");
+		this.enableKlConMgr = enableKlConMgr;
+		conKlMgr=getConnectionMgr(conf, "kl");
+		conKvMgr=(DbConnectionMgr)super.getInfo().get("kv.dbmanager");
 
-
-		if( ! this.enableConMgr ) {
+		if( ! this.enableKlConMgr) {
 			System.out.println("Database setup: The Connection Manager is diasabled.");
 		} else {
 			System.out.println("Database setup: ");
-			System.out.println("     dbuser: " + conMgr.getDbuser());
-			System.out.println("   dbdriver: "+conMgr.getDbdriver());
-			System.out.println("  dbconnect: "+conMgr.getDbconnect());
+			System.out.println("     dbuser: " + conKlMgr.getDbuser());
+			System.out.println("   dbdriver: "+ conKlMgr.getDbdriver());
+			System.out.println("  dbconnect: "+ conKlMgr.getDbconnect());
 		}
 		System.out.println("");
 		System.out.println("Load data into tables: ");
 		System.out.println("      data: " + dataTableName );
 		System.out.println("  textdata: " + textDataTableName );
 		System.out.println("");
-		//  	System.out.println("Using kvalobs server: ");
-//    	System.out.println("          kvserver: "+this.kvserver);
 	}
 
+	private DbConnectionMgr getConnectionMgr(PropertiesHelper conf, String prefix) {
+		try {
+			if( this.enableKlConMgr)
+				return new DbConnectionMgr(conf, prefix, 1);
+		} catch (Exception e1) {
+			logger.fatal("Cant load databasedriver: "+e1.getMessage());
+			try {
+				shutdown(); // Stop kafka
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			ProcUtil.getStackTrace(" exit(1) ");
+			System.exit(1);
+		}
+		return null;
+	}
 
 
 	/**
@@ -211,38 +199,38 @@ public class KlApp extends KafkaApp  implements SendDataToKv
      * @param conffile The name of the config file.
      * @param usingSwing
      */
-    public KlApp(String[] args, String conffile, String kvserver, boolean usingSwing, boolean enableConMgr){
-		this(args,getConfile(conffile), kvserver, usingSwing, enableConMgr);
+    public KlApp(String[] args, String conffile, boolean usingSwing, boolean enableKlConMgr){
+		this(args,getConfile(conffile), usingSwing, enableKlConMgr);
 
     }
 
     public void setDbIdleTime(int secs){
-    	if( conMgr != null )
-    		conMgr.setIdleTime(secs);
+    	if( conKlMgr != null )
+    		conKlMgr.setIdleTime(secs);
     }
     
     public void setDbTimeToLive(int secs){
-    	if( conMgr != null )
-    		conMgr.setTimeToLive(secs);
+    	if( conKlMgr != null )
+    		conKlMgr.setTimeToLive(secs);
     }
     
     public int getDbIdleTime(){
-    	if( conMgr != null )
-    		return conMgr.getIdleTime();
+    	if( conKlMgr != null )
+    		return conKlMgr.getIdleTime();
     	else
     		return 60; // Return a dummy value
     }
     
     public int getDbTimeToLive(){
-    	if( conMgr != null )
-    		return conMgr.getTimeToLive();
+    	if( conKlMgr != null )
+    		return conKlMgr.getTimeToLive();
     	else
     		return 60; // Return a dummy value.
     }
     
     public int checkForConnectionsToClose(){
-    	if( conMgr != null )
-    		return conMgr.checkForConnectionsToClose();
+    	if( conKlMgr != null )
+    		return conKlMgr.checkForConnectionsToClose();
     	else
     		return 0;
     }
@@ -256,37 +244,39 @@ public class KlApp extends KafkaApp  implements SendDataToKv
     protected void onExit(){
     	
     	System.err.println("*** KlApp.onExit: \n" + ProcUtil.getStackTrace());
-    	if( conMgr != null )
-    		conMgr.closeDbDriver();
+    	if( conKlMgr != null )
+    		conKlMgr.closeDbDriver();
+		if( conKvMgr != null)
+			conKvMgr.closeDbDriver();
     }
     
-    public DbConnection newDbConnection(){
+    public DbConnection newKlDbConnection(){
         
-    	if( conMgr != null ) {
+    	if( conKlMgr != null ) {
     		logger.warn("The ConnectionMgr is disabled.");
     		logger.debug(ProcUtil.getStackTrace());
     		return null;
     	}
     	
         try {
-            return conMgr.newDbConnection();
+            return conKlMgr.newDbConnection();
         } catch (SQLException e) {
             logger.warn("Cant create a new database connection: "+
                          e.getMessage());
             return null;
         }
     }
- 
-    public void  releaseDbConnection(DbConnection con){
+
+    public void releaseKlDbConnection(DbConnection con){
         String msg;
         
         try {
-        	if( conMgr == null ){
+        	if( conKlMgr == null ){
         		logger.warn("The ConnectionMgr is disabled.");
         		logger.debug(ProcUtil.getStackTrace());
         		return;
         	}
-            conMgr.releaseDbConnection(con);
+            conKlMgr.releaseDbConnection(con);
             return;
         } catch (IllegalArgumentException e) {
             msg=e.getMessage();
@@ -299,17 +289,21 @@ public class KlApp extends KafkaApp  implements SendDataToKv
         logger.warn("Cant release the database connection: "+msg);
     }
     
-    public DbConnectionMgr getConnectionMgr() {
-    	if( conMgr == null ){
+    static public DbConnectionMgr getKlConnectionMgr() {
+    	if( conKlMgr == null ){
     		logger.warn("The ConnectionMgr is disabled.");
     		logger.debug(ProcUtil.getStackTrace());
     		return null;
     	}
 
-    	return conMgr;
+    	return conKlMgr;
     }
-    	
-    
+
+	static public DbConnectionMgr getKvConnectionMgr() {
+		return conKvMgr;
+	}
+
+
 	synchronized public static String getKvpath(){
 
     	if(kvpath!=null)
@@ -366,58 +360,11 @@ public class KlApp extends KafkaApp  implements SendDataToKv
 	}
 
 	synchronized public void createPidFile(String pidfile){
-    	if(pidFile!=null)
+    	if(PidFileUtil.getPidFile() != null)
     		return;
-    	    	
-    	if(pidfile==null){
-    		System.out.println("FATAL: pidfile name NOT given!");
-    		logger.fatal("FATAL: pidfile name NOT given!");
-    		System.exit(1);
-    	}
-	
-    	long pid=ProcUtil.getPid();
-    	
-    	if( pid < 0 ) {
-    		System.out.println("FATAL: Cant get the applications pid (process id)!");
-    		logger.fatal("FATAL: Cant get the applications pid (process id)!");
-    		System.exit(1);
-    	}
-    	
-    	try {
-    		System.err.println(" ***** pidfile 1: '" + pidfile +"'.");
-        	if( ProcUtil.isProcRunning(pidfile) ) {
-        		System.err.println("FATAL: The pidfile '"+pidfile+"' allready exist!" +
-    					"And the process the pid is referancing is running.");
-    			logger.fatal("FATAL: The pidfile '"+pidfile+"' allready exist!" +
-    					"And the process the pid is referancing is running.");
-    			System.exit(1);
-        	}
 
-        	System.err.println(" ***** pidfile: '" + pidfile +"'.");
-        	Path p=Paths.get(pidfile);
-        	System.err.println(" ***** pidfile: pid:'" + pid +"'.");
-        	p=Files.write(p, (""+pid+"\n").getBytes(), StandardOpenOption.CREATE_NEW,StandardOpenOption.WRITE);
-    		System.out.println("Writing pidfile '" + p.toString() + "' with pid '"+pid+"'!");
-    		logger.info("Writing pidfile '" + p.toString() + "' with pid '"+pid+"'!");
-    	}
-    	catch( java.io.IOException ex ) {
-    		ex.printStackTrace();
-    		System.err.println("FATAL: createPidFile: " + ex.getMessage() );
-    		logger.fatal("FATAL: createPidFile: " + ex.getMessage() );
-    		System.exit(1);
-    	}
-    	catch( java.lang.SecurityException ex ) {
-    		ex.printStackTrace();
-    		System.err.println("FATAL: createPidFile: " + ex.getMessage() );
-    		logger.fatal("FATAL: createPidFile: " + ex.getMessage() );
-    		System.exit(1);
-    	}
-    	catch( Exception ex ){
-    		ex.printStackTrace();
-    		System.err.println("FATAL: createPidFile: " + ex.getMessage() );
-    		logger.fatal("FATAL: " + ex.getMessage() );
-    		System.exit(1);
-    	}
+		PidFileUtil.createPidFile(pidfile);
+
 	}
 	
 	/**
@@ -426,17 +373,7 @@ public class KlApp extends KafkaApp  implements SendDataToKv
 	 * @see createPidFile
 	 */
 	synchronized public void removePidFile() {
-		try {
-			if( pidFile != null ) {
-	    		System.out.println("Removing pidfile '" + pidFile.getName() + "!");	
-				logger.info("Removing pidfile '" + pidFile.getName() + "!");
-				pidFile.delete();
-			}
-		}
-		catch( java.lang.SecurityException ex ) {
-			System.out.println("SecurityException: Removing pidfile '" + pidFile.getName() + "!");	
-			//NOOP
-		}
+		PidFileUtil.removePidFile();
 	}
 
 

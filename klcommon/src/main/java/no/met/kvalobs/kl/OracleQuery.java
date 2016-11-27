@@ -94,7 +94,7 @@ public class OracleQuery implements IQuery {
 	
 	public String createTextDataUpdateQuery( TextDataElem elem ){
 		logger.debug("Update textData in a Oracle database ("+getTextDataTableName()+") sid: "+elem.stationID+" tid: " + 
-	             elem.typeID_ + " pid: " + elem.paramID+ " obstime: '"+elem.obstime+"' tbtime: "+elem.tbtime);
+	             elem.typeID + " pid: " + elem.paramID+ " obstime: '"+elem.obstime+"' tbtime: "+elem.tbtime);
 	   	String query="UPDATE "+ getTextDataTableName() +
 	   				 " SET " +
 	   				 "  original='"+elem.original + "'," +
@@ -103,20 +103,20 @@ public class OracleQuery implements IQuery {
 	   				 "  stationid=" + elem.stationID + " AND " +
 	   				 "  obstime=to_date('" + elem.obstime + "','yyyy-mm-dd hh24:mi:ss') AND " +
 	   				 "  paramid=" + elem.paramID + " AND " +
-	   				 "  typeid=" + elem.typeID_;
+	   				 "  typeid=" + elem.typeID;
 	   	return query;
 	}
 	
 	public String createTextDataInsertQuery(TextDataElem elem){
 		logger.debug("Insert textData into a Oracle database ("+getTextDataTableName()+") sid: "+elem.stationID+" tid: " + 
-	             elem.typeID_ + " pid: " + elem.paramID+ " obstime: '"+elem.obstime+"' tbtime: "+elem.tbtime);
+	             elem.typeID + " pid: " + elem.paramID+ " obstime: '"+elem.obstime+"' tbtime: "+elem.tbtime);
 	   	String query="insert into " + getTextDataTableName() + "(stationid,obstime,original,paramid,tbtime,typeid) values ("
 	   				 +elem.stationID+",to_date('"
 	   				 +elem.obstime+"','yyyy-mm-dd hh24:mi:ss'),'"
 	   				 +elem.original+"',"
 	   				 +elem.paramID+",to_date('"
 	   				 +elem.tbtime+"','yyyy-mm-dd hh24:mi:ss'),"
-	   				 +elem.typeID_
+	   				 +elem.typeID
 	   				 +")";
 	   	return query;
 	}

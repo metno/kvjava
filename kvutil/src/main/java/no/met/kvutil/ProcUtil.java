@@ -91,28 +91,31 @@ public class ProcUtil {
 		else
 			throw new Exception("Unknown exit code from 'kill -0 " + pid + "'.");
 	}
-	
+
 	static public boolean isProcRunning(String pidfile) throws IOException, InterruptedException, Exception{
-		Path p=Paths.get(pidfile);
-		
-		if( ! Files.exists(p) )
+		return isProcRunning(Paths.get(pidfile));
+	}
+
+	static public boolean isProcRunning(Path pidfile) throws IOException, InterruptedException, Exception{
+		if( ! Files.exists(pidfile) )
 			return false;
-		
-		String pid=new String(Files.readAllBytes(p)).trim();
-				
+
+		String pid=new String(Files.readAllBytes(pidfile)).trim();
+
 		if( pid.isEmpty() ) {
-			Files.deleteIfExists(p);
+			Files.deleteIfExists(pidfile);
 			return false;
 		}
-		
+
 		System.err.println("pid from file: '"+pid+"'.");
-		
-		if(isProcRunning(Long.parseLong(pid))) 
+
+		if(isProcRunning(Long.parseLong(pid)))
 			return true;
-		
-		Files.deleteIfExists(p);
+
+		Files.deleteIfExists(pidfile);
 		return false;
 	}
+
 
 	
 	static public int getPeakThreadCount() {

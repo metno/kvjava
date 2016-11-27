@@ -30,7 +30,7 @@ debianPackageDependencies in Debian ++= Seq("kvdistuser")
 
 linuxPackageMappings in Debian += packageTemplateMapping(s"/etc/kvalobs")() withGroup("kvdist") withPerms("0775")
 
-linuxPackageMappings in Debian += packageTemplateMapping(s"/var/run/kvalobs")() withGroup("kvdist") withPerms("0775")
+linuxPackageMappings in Debian += packageTemplateMapping(s"/var/lib/kvalobs/run")() withGroup("kvdist") withPerms("0775")
 
 linuxPackageMappings in Debian += packageTemplateMapping(s"/var/log/kvalobs")() withGroup("kvdist") withPerms("0775")
 
@@ -38,6 +38,6 @@ linuxPackageMappings in Debian += packageTemplateMapping(s"/var/lib/kvalobs")() 
 
 linuxPackageSymlinks in Debian += LinuxSymlink(s"/etc/kvalobs", s"/usr/share/kv2kl/etc/kv2kl.conf.template" )
 
-bashScriptExtraDefines ++= IO.readLines(baseDirectory.value / "scripts" / "kv2kl-extra.sh")
+bashScriptExtraDefines ++= IO.readLines(baseDirectory.value / ".." / "/scripts" / "kv2kl-extra.sh")
 
 

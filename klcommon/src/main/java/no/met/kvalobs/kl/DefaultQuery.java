@@ -100,7 +100,7 @@ public class DefaultQuery implements IQuery{
 	
 	public String createTextDataUpdateQuery( TextDataElem elem ){
 		logger.debug("Update textData in a SQL92 database ("+getTextDataTableName()+") sid: "+elem.stationID+" tid: " + 
-	             elem.typeID_ + " pid: " + elem.paramID+ " obstime: '"+elem.obstime+"' tbtime: "+elem.tbtime);
+	             elem.typeID + " pid: " + elem.paramID+ " obstime: '"+elem.obstime+"' tbtime: "+elem.tbtime);
 		String query="UPDATE " + getTextDataTableName() +
 			 " SET " +
 			 "  original='"+elem.original + "'," +
@@ -109,13 +109,13 @@ public class DefaultQuery implements IQuery{
 			 "  stationid=" + elem.stationID + " AND " +
 			 "  obstime='" + elem.obstime + "' AND " +
 			 "  paramid=" + elem.paramID + " AND " +
-			 "  typeid=" + elem.typeID_; 
+			 "  typeid=" + elem.typeID;
 		return query;
 	}
 	
 	public String createTextDataInsertQuery( TextDataElem elem ) {
 		logger.debug("Insert textData into a SQL92 database ("+getTextDataTableName()+") sid: "+elem.stationID+" tid: " + 
-	             elem.typeID_ + " pid: " + elem.paramID+ " obstime: '"+elem.obstime+"' tbtime: "+elem.tbtime);
+	             elem.typeID + " pid: " + elem.paramID+ " obstime: '"+elem.obstime+"' tbtime: "+elem.tbtime);
 		String query="INSERT INTO "+getTextDataTableName() + "(stationid,obstime,original,paramid,tbtime,typeid) "+
 		             "values ("
 				 	     +elem.stationID+","
@@ -123,7 +123,7 @@ public class DefaultQuery implements IQuery{
 				         +elem.original+"',"
 				         +elem.paramID+","
 				         +"'"+elem.tbtime+"',"
-				         +elem.typeID_
+				         +elem.typeID
 				     +")";
 		return query;
 	}

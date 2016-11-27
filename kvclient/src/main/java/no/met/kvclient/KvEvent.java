@@ -37,7 +37,7 @@ import no.met.kvclient.service.SubscribeId;
 public class KvEvent extends EventObject
 {
 	private static final long serialVersionUID = 9190398844527040865L;
-	protected SubscribeId id;
+	private SubscribeId id;
 	private String eventName;
 	
 	public KvEvent(Object source, SubscribeId id, String eventName){

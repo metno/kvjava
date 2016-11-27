@@ -207,7 +207,7 @@ public class KlDataHelper {
             return currentDataElem.typeID;
 
         if( currentTextDataElem != null )
-            return currentTextDataElem.typeID_;
+            return currentTextDataElem.typeID;
 
         throw new NoData();
     }
@@ -263,6 +263,15 @@ public class KlDataHelper {
         throw new NoData();
     }
 
+    @Override public String toString() {
+        if( currentDataElem != null )
+            return currentDataElem.toString();
+
+        if( currentTextDataElem != null )
+            return currentTextDataElem.toString();
+
+        return "Unexpected: NoData";
+    }
 }
 
 

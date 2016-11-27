@@ -30,8 +30,12 @@
 */
 package no.met.kvutil.dbutil;
 import no.met.kvutil.MiGMTTime;
+import no.met.kvutil.Tuple2;
+
 import java.sql.*;
+import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.TimeoutException;
 
 public class DbConnectionMgr
 {
@@ -65,11 +69,48 @@ public class DbConnectionMgr
      */
     public DbConnectionMgr(Properties prop)
         throws ClassNotFoundException,IllegalArgumentException{
+        this(prop, 1);
+    }
+
+    static int maxConnection(Properties prop, String prefix, int maxConnectionsMustBeLE) {
+        String name;
+        if(prefix== null || prefix.length()==0)
+            name="dbmaxconnections";
+        else
+            name=prefix+".dbmaxconnections";
+        int max=Integer.parseInt(prop.getProperty(name, Integer.toString(maxConnectionsMustBeLE)));
+        if(max<maxConnectionsMustBeLE)
+            max=maxConnectionsMustBeLE;
+        return max;
+    }
+
+    //Must be called from a synchronized method
+    private void increaseConCache(int n) {
+        if( n<=dbconCache.length)
+            return;  // we only increase.
+        DbConnection[]  con=new DbConnection[n];
+        for(int i=0; i<dbconCache.length; i++)
+            con[i]=dbconCache[i];
+
+        dbconCache=con;
+    }
+
+    public DbConnectionMgr(Properties prop, int minimumMaxConnections)
+            throws ClassNotFoundException,IllegalArgumentException{
         this(prop.getProperty("dbdriver"),
-             prop.getProperty("dbuser", ""),
-             prop.getProperty("dbpasswd", ""),
-             prop.getProperty("dbconnect"),
-             Integer.parseInt(prop.getProperty("dbmaxconnections", "1")));
+                prop.getProperty("dbuser", ""),
+                prop.getProperty("dbpasswd", ""),
+                prop.getProperty("dbconnect"),
+                maxConnection(prop, null, minimumMaxConnections));
+    }
+
+    public DbConnectionMgr(Properties prop, String prefix, int minimumMaxConnections)
+            throws ClassNotFoundException,IllegalArgumentException{
+        this(prop.getProperty(prefix+".dbdriver"),
+                prop.getProperty(prefix+".dbuser", ""),
+                prop.getProperty(prefix+".dbpasswd", ""),
+                prop.getProperty(prefix+".dbconnect"),
+                maxConnection(prop, prefix, minimumMaxConnections));
     }
     
     
@@ -253,7 +294,7 @@ public class DbConnectionMgr
       */
      synchronized public DbConnection newDbConnection()
      	throws SQLException{
-    	 return newDbConnection(0);
+    	 return doGetDbConnection(0);
      }
      
      /**
@@ -276,47 +317,123 @@ public class DbConnectionMgr
       */
      synchronized public DbConnection newDbConnection(int timeoutInSec)
          throws SQLException{
-         
-         checkForConnectionsToClose();
-         
-         DbConnection dbcon=null;
-         int nullSlot=-1;
-        
-         for(int i=0; dbcon==null && i<dbconCache.length; i++){
-            if(dbconCache[i]==null){
-                if(nullSlot==-1)
-                    nullSlot=i;
-            }else if(!dbconCache[i].getInuse()){
-                dbcon=dbconCache[i];
-            }
-        }   
+
+         return doGetDbConnection(timeoutInSec);
+    }
+
+    private DbConnection doGetDbConnection(int timeoutInSec) throws SQLException {
+        checkForConnectionsToClose();
+
+        DbConnection dbcon=null;
+        int nullSlot=-1;
+
+        for(int i=0; dbcon==null && i<dbconCache.length; i++){
+           if(dbconCache[i]==null){
+               if(nullSlot==-1)
+                   nullSlot=i;
+           }else if(!dbconCache[i].getInuse()){
+               dbcon=dbconCache[i];
+           }
+       }
 
         if(dbcon!=null){
             dbcon.setInuse(true);
             dbcon.setTimeout(timeoutInSec);
             return dbcon;
         }
-        
+
         if(nullSlot!=-1){
             dbcon=realNewDbConnection();
             dbcon.setTimeout(timeoutInSec);
             dbconCache[nullSlot]=dbcon;
             return dbcon;
         }
-        
-        
-        
+
         return null;
     }
 
-     
+    synchronized public DbConnection waitForDbConnection(int secondsToWait ) throws TimeoutException, SQLException, InterruptedException {
+        int millis=1000*secondsToWait;
+        Instant now=Instant.now();
+        Instant waitTo=now.plusMillis(millis);
+        while(now.isAfter(waitTo)){
+            DbConnection con=doGetDbConnection(0);
+            if( con!=null)
+                return con;
+            else wait(millis);
+        }
+        throw new TimeoutException();
+    }
+
+    synchronized public DbConnection[] waitForDbConnection(int secondsToWait, int nConnections ) throws TimeoutException, SQLException, InterruptedException, Exception {
+        int millis=1000*secondsToWait;
+        Instant now=Instant.now();
+        Instant waitTo=now.plusMillis(millis);
+        DbConnection[] con=new DbConnection[nConnections];
+        int i=0;
+
+
+        if( getMaxconnections()<nConnections)
+            increaseConCache(nConnections);
+
+        try {
+            while (i < con.length && now.isBefore(waitTo)) {
+                con[i] = doGetDbConnection(0);
+                if (con[i] != null) {
+                    if (i+1 == con.length)
+                        return con;
+                    else
+                        i++;
+                } else wait(500);
+            }
+        }
+        catch( final Throwable ex) {
+            doReleaseConnections(con); // May throw exception
+            //if not throw the exception we caught.
+            throw ex;
+        }
+
+        doReleaseConnections(con); // May throw exception
+        //If not throw timeout
+        throw new TimeoutException("Timeout: waitForDbConnection: waited: ");
+    }
+
+
     synchronized public void  releaseDbConnection(DbConnection con)
         throws SQLException, IllegalArgumentException, IllegalStateException{
+        doReleaseConnection(con);
+    }
+
+    synchronized public void  releaseDbConnection(DbConnection[] con)
+            throws SQLException, IllegalArgumentException, IllegalStateException{
+        doReleaseConnections(con);
+     }
+
+    private void doReleaseConnections(DbConnection[] con) {
+        Throwable anException;
+
+        for(int i=0; i<con.length; i++) {
+            try {
+                if(con[i]!=null)
+                    doReleaseConnection(con[i]);
+            } catch (final Throwable ex) {
+                for(int n=i+1; n<con.length;n++) {
+                    try {
+                        doReleaseConnection(con[i]);
+                    } catch (Exception ignored) {
+                    }
+                }
+                throw ex;
+            }
+        }
+    }
+
+    private void doReleaseConnection(DbConnection con) {
         DbConnection dbcon=null;
 
         if(con==null)
             throw new IllegalArgumentException("DbConnectionMgr.releaseDbConnection: Expected con!=null!");
-        
+
         if(!con.getInuse())
             throw new IllegalStateException("Connection allready released!");
 
@@ -337,13 +454,14 @@ public class DbConnectionMgr
                     }
                     dbconCache[i]=null;
                     checkForConnectionsToClose();
+                    notifyAll();
                     return;
                 }
                 dbconCache[i]=dbcon;
                 break;
             }
         }
-        
+
         if(dbcon==null)
             throw new IllegalArgumentException("Connection was not created by this DbConnectionMgr!");
 
@@ -352,14 +470,15 @@ public class DbConnectionMgr
                 dbcon.setAutoCommit(true);
         }
         catch(SQLException ex){
-            
+
         }
-        
+
         dbcon.setInuse(false);
-        
+
         checkForConnectionsToClose();
+        notifyAll();
     }
-    
+
     public String getDbconnect(){
         return dbconnect;
     }
@@ -440,7 +559,7 @@ public class DbConnectionMgr
                     MiGMTTime tmp=new MiGMTTime(dbconCache[i].getCreated());
                     
                     tmp.addSec(timeToLive);
-                    System.out.println("timeToLive: secsTo: "+tmp.secsTo(now));
+                    //System.out.println("timeToLive: secsTo: "+tmp.secsTo(now));
                     
                     if(tmp.secsTo(now)>=0){
                         cnt++;
@@ -461,7 +580,7 @@ public class DbConnectionMgr
                     MiGMTTime tmp=new MiGMTTime(dbconCache[i].getLastAccess());
                     
                     tmp.addSec(idleTime);
-                    System.out.println("idleTime: secsTo: "+tmp.secsTo(now));
+                    //System.out.println("idleTime: secsTo: "+tmp.secsTo(now));
 
                     if(tmp.secsTo(now)>=0){
                         cnt++;
@@ -478,5 +597,9 @@ public class DbConnectionMgr
         }
 
         return cnt;
+    }
+
+    public String connectInfo() {
+        return "connect: '"+dbconnect + "' user: '"+dbuser+"' driver: '"+dbdriver+"'";
     }
 }

@@ -112,6 +112,9 @@ public class DateTimeUtil {
 	static public String toString(Instant dt, DateTimeFormatter fmt) {
 		return OffsetDateTime.from(dt).format(fmt);
 	}
+	static public String nowToString() {
+		return toString(Instant.now(), FMT_PARSE);
+	}
 
 	static public OffsetDateTime parse(String dt, String format) {
 		DateTimeFormatter fmt = DateTimeFormatter.ofPattern(format);
@@ -180,6 +183,8 @@ public class DateTimeUtil {
 
 		if (ts.lastIndexOf('+') < 0 && ts.lastIndexOf('-') <= 9)
 			ts = ts + "+00";
+
+		System.err.println("DateTimeUtil.parse: '" + ts +"' ("+timestamp+")");
 		return OffsetDateTime.parse(ts, FMT_PARSE);
 	}
 	

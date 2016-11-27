@@ -206,7 +206,7 @@ public class DataHelper {
 			return currentDataElem.typeID;
 		
 		if( currentTextDataElem != null )
-			return currentTextDataElem.typeID_;
+			return currentTextDataElem.typeID;
 		
 		throw new NoData();
 	}

@@ -38,6 +38,7 @@ import java.io.InputStream;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -363,5 +364,26 @@ public class PropertiesHelper extends Properties {
 
 	public String apply(String key, Properties prop) {
 		return null;
+	}
+
+	public PropertiesHelper loadFrom(Properties prop) {
+		return loadFrom(prop, false);
+	}
+
+	public PropertiesHelper loadFrom(Properties prop, boolean onlyIfNotExist) {
+		Enumeration<?> it = prop.propertyNames();
+
+		while (it.hasMoreElements()) {
+			Object k = it.nextElement();
+			if( k instanceof String) {
+				if (onlyIfNotExist) {
+					if (super.getProperty((String) k) == null)
+						super.put(k, prop.get(k));
+				} else {
+					super.put(k, prop.get(k));
+				}
+			}
+		}
+		return this;
 	}
 }

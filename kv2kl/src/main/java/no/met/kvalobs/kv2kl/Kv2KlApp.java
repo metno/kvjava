@@ -126,9 +126,8 @@ public class Kv2KlApp extends KlApp
     }
 
 
-	public Kv2KlApp(String[] args, KvConfig conf, String kvserver,
-					boolean usingSwing){
-		super(args, conf.conf, kvserver, false);
+	public Kv2KlApp(String[] args, KvConfig conf, boolean usingSwing){
+		super(args, conf.conf, usingSwing);
 
 		PropertiesHelper prop=getConf();
 		String admin=prop.getProperty("admin");

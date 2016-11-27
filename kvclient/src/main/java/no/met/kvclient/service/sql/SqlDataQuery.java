@@ -1,52 +1,90 @@
 package no.met.kvclient.service.sql;
 
+import java.io.Closeable;
+import java.io.IOException;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Optional;
-import java.util.Properties;
+import java.util.concurrent.TimeoutException;
 
 import no.met.kvclient.KvDataEventListener;
 import no.met.kvclient.ListenerEventQue;
-import no.met.kvclient.service.DataIterator;
-import no.met.kvclient.service.ModelDataIterator;
-import no.met.kvclient.service.Obs_pgmList;
-import no.met.kvclient.service.OperatorList;
-import no.met.kvclient.service.ParamList;
-import no.met.kvclient.service.Reference_stationList;
-import no.met.kvclient.service.RejectDecodeInfo;
-import no.met.kvclient.service.RejectedIterator;
-import no.met.kvclient.service.StationIDList;
-import no.met.kvclient.service.StationList;
-import no.met.kvclient.service.Station_paramList;
-import no.met.kvclient.service.TypeList;
-import no.met.kvclient.service.WhichData;
-import no.met.kvclient.service.WhichDataList;
-import no.met.kvclient.service.KvDataQuery;
+import no.met.kvclient.service.*;
 import no.met.kvutil.NotImplementedException;
+import no.met.kvutil.PropertiesHelper;
+import no.met.kvutil.Tuple2;
+import no.met.kvutil.dbutil.DbConnection;
+import no.met.kvutil.dbutil.DbConnectionMgr;
+import no.met.kvutil.dbutil.IQuery;
+
 
 public class SqlDataQuery implements KvDataQuery {
 	ListenerEventQue que;
+	DbConnectionMgr mgr;
 
-	public SqlDataQuery(Properties prop) {
-		que = new ListenerEventQue(Integer.parseInt(prop.getProperty("que.size", "10")));
-	}
+	void setDbMgr(PropertiesHelper prop, String prefix){
+        try {
+            mgr=new DbConnectionMgr(prop, prefix, 2);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            mgr=null;
+        }
+    }
 
-	public SqlDataQuery(Properties prop, ListenerEventQue que) {
+
+	public SqlDataQuery(PropertiesHelper prop) {
+        this(prop,new ListenerEventQue(Integer.parseInt(prop.getProperty("que.size", "10"))));
+    }
+
+	public SqlDataQuery(PropertiesHelper prop, ListenerEventQue que) {
 		this.que = que;
+        setDbMgr(prop, "kv");
 	}
 
-	@Override
-	public Optional<DataIterator> getData(WhichDataList whichData) {
-		// TODO Auto-generated method stub
+	public DbConnectionMgr getSqlDbConnectionMgr() {
+        return mgr;
+    }
 
-		throw new NotImplementedException("NotImplemented: SqlDataQuery.getData(WhichDataList whichData)");
+	@Override
+	public DataIterator getData(WhichDataList whichData) throws Exception {
+
+		DbConnection[] con = mgr.waitForDbConnection(60, 2);
+        return new SqlDataIterator(con, whichData, 100);
 	}
 
-	@Override
-	public boolean getKvData(WhichDataList whichData, KvDataEventListener listener) {
-		// TODO Auto-generated method stub
-		throw new NotImplementedException("NotImplemented: getKvData(WhichDataList whichData, KvDataEventListener listener)");
-	}
+    @Override
+    public boolean getKvData(WhichDataList whichData, KvDataEventListener listener) throws Exception {
+        //TODO: This must go in its own thread
+        ObsDataList dl;
+        DataIterator it = getData(whichData);
 
-	@Override
+        do {
+            dl=it.next();
+            if( dl!=null)
+                listener.callListener(this, null, dl);
+        }while( dl!=null);
+
+        return true;
+    }
+
+    static class Connections implements AutoCloseable {
+        DbConnection[] con;
+        DbConnectionMgr mgr;
+        Connections(DbConnectionMgr mgr, int nConnections, int secsToWait) throws Exception {
+            this.mgr=mgr;
+            con = this.mgr.waitForDbConnection(secsToWait, nConnections);
+        }
+
+        @Override
+        public void close() throws SQLException {
+            mgr.releaseDbConnection(con);
+        }
+    }
+
+    @Override
 	public Optional<StationList> getStations() {
 		// TODO Auto-generated method stub
 		throw new NotImplementedException("NotImplemented: getStaions()");
@@ -122,9 +160,20 @@ public class SqlDataQuery implements KvDataQuery {
 		throw new NotImplementedException("NotImplement: getStationParam(long stationid, long paramid, long day)");
 	}
 
-	@Override
+    @Override
+    public PropertiesHelper getInfo() {
+        PropertiesHelper prop=new PropertiesHelper();
+        prop.setProperty("kv.dbconnect", mgr.getDbconnect());
+        prop.setProperty("kv.dbuser", mgr.getDbuser());
+        prop.setProperty("kv.dbdriver", mgr.getDbdriver());
+        prop.put("kv.dbmanager", mgr);
+        return prop;
+    }
+
+    @Override
 	public void stop() {
 		// TODO Auto-generated method stub
+        mgr.closeDbDriver();
 	}
 
 	@Override

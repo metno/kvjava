@@ -292,7 +292,7 @@ public class Filter {
             StringHolder msg){
 		LongHolder stationID = new LongHolder(data.stationID);
 
-		if( filter(stationID, data.typeID_, data.paramID, 0, 0, 
+		if( filter(stationID, data.typeID, data.paramID, 0, 0,
 				false, data.obstime, msg ) ){
 			//The stationid may have changed.
 			data.stationID = stationID.getValue();

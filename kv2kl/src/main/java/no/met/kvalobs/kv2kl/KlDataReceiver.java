@@ -31,7 +31,6 @@
 package no.met.kvalobs.kv2kl;
 
 import no.met.kvalobs.kl.KlInsertHelper;
-import no.met.kvalobs.kl.KlSqlFactory;
 import no.met.kvclient.KvDataEvent;
 import no.met.kvclient.KvDataEventListener;
 import no.met.kvclient.service.ObsDataList;
@@ -57,7 +56,7 @@ public class KlDataReceiver implements KvDataEventListener {
     	if( ! this.saveDataToDb )
     		return;
     	
-    	insertstmt=new KlInsertHelper(app.getConnectionMgr(), backupfile, enableFilter );
+    	insertstmt=new KlInsertHelper(app.getKlConnectionMgr(), backupfile, enableFilter );
     	insertstmt.setDataTableName( app.getDataTableName() );
     	insertstmt.setTextDataTableName( app.getTextDataTableName() );
     	insertstmt.setForeignDataTable( app.getForeignDataTableName() );

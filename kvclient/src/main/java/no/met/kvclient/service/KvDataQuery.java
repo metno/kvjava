@@ -4,11 +4,12 @@ import java.util.Optional;
 
 import no.met.kvclient.KvDataEventListener;
 import no.met.kvutil.LifeCycle;
+import no.met.kvutil.PropertiesHelper;
 
 public interface KvDataQuery extends LifeCycle{
-	Optional<DataIterator> getData(WhichDataList whichData);
+	DataIterator getData(WhichDataList whichData) throws Exception ;
 	
-	boolean getKvData(WhichDataList whichData, KvDataEventListener listener);
+	boolean getKvData(WhichDataList whichData, KvDataEventListener listener) throws Exception ;
 
 	Optional<StationList> getStations();
 
@@ -75,6 +76,9 @@ public interface KvDataQuery extends LifeCycle{
 	Optional<OperatorList> getOperator();
 
 	Optional<Station_paramList> getStationParam(long stationid, long paramid, long day);
+
+	PropertiesHelper getInfo();
+
 	void stop();
 	void start();
 }

@@ -1,6 +1,8 @@
 package no.met.kvclient.service.kafka;
 
 import java.util.Properties;
+
+import no.met.kvutil.PropertiesHelper;
 import org.apache.kafka.clients.consumer.*;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +28,7 @@ public class KafkaDataSubscriber implements KvSubsribeData {
 	private DataSubscribers<KvDataNotifyEventListener> dataNotifyList;
 	private DataSubscribers<KvDataEventListener> dataList;
 	private boolean isStarted = false;
+	private Properties baseConf;
 	Properties conf=null;
 	
 	
@@ -72,8 +75,7 @@ public class KafkaDataSubscriber implements KvSubsribeData {
 	public KafkaDataSubscriber(Properties conf, ListenerEventQue defaultQue) {
 		dataNotifyList = new DataSubscribers<>(defaultQue);
 		dataList = new DataSubscribers<>(defaultQue);
-
-		this.conf = createConfig(conf);
+		baseConf=conf;
 	}
 
 	// Must be called in by a synchronized method
@@ -144,7 +146,7 @@ public class KafkaDataSubscriber implements KvSubsribeData {
 	synchronized void tryStart() {	
 		if (isStarted)
 			return;
-
+		conf = createConfig(baseConf);
 		consumer = new KafkaConsumer<>(conf); 
 		executor = Executors.newFixedThreadPool(1);
 		KvDataConsumer kvConsumer=new KvDataConsumer(consumer, this, topic); 
@@ -152,7 +154,12 @@ public class KafkaDataSubscriber implements KvSubsribeData {
 		System.out.println("*** Kafka: Started.......");
 		isStarted=true;
 	}
-	
+
+	@Override
+	public PropertiesHelper getInfo() {
+		return new PropertiesHelper();
+	}
+
 	@Override
 	public void start(){
 		start( true );

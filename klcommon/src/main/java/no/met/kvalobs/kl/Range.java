@@ -77,7 +77,7 @@ public class Range {
 		}
 	}
 
-	public boolean isInterval(){ return first>0 && last>0;}
+	public boolean isInterval(){ return first>=0 && last>0;}
 	
 	public boolean contains(int id){
 		if(isInterval())
@@ -92,7 +92,13 @@ public class Range {
 	public int getLast(){return last;}
 		
 	public String toString(){
-		return new String("["+first+"-"+last+"]");
+		if(first==0 && last==0) {
+			return "all";
+		} else if ( last==0 ) {
+			return Integer.toString(first);
+		} else {
+			return Integer.toString(first) + "-" + Integer.toString(last);
+		}
 	}
 	
 	static public String toString( Range[] rangeList){
@@ -118,12 +124,13 @@ public class Range {
 	 *  1. A station 14000
 	 *  2. An interval 18700-20000
 	 *  
-	 * @param range A list of range and/or elements
+	 * @param rangeList A list of range and/or elements
 	 * @return A list of Range elements intervals.
 	 */
 	public static Range[] ranges( List<String> rangeList ){
 		if(rangeList==null || rangeList.size()==0){
-			Range[] stl=new Range[0];
+			Range[] stl=new Range[1];
+			stl[0]=new Range();
 			return stl;
 		}
 		

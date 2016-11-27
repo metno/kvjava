@@ -54,9 +54,9 @@ public class KvDataIterator
         }
         
         try{
-        	java.util.Optional<ObsDataList> dl=it.next(); 
-            if(dl.isPresent()){
-                return dl.get().toArray(new ObsData[0]);
+        	ObsDataList dl=it.next();
+            if(dl != null){
+                return dl.values().toArray(new ObsData[0]);
             }else{
                 it.destroy();
                 it=null;

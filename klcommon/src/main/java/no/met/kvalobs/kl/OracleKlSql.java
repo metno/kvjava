@@ -112,7 +112,7 @@ public class OracleKlSql extends KlTblNames implements IKlSql {
 
     public IExec createTextDataUpdateQuery( TextDataElem elem ){
         logger.debug("Update textData in a SQL92 database ("+getTextDataTableName()+") sid: "+elem.stationID+" tid: " +
-                elem.typeID_ + " pid: " + elem.paramID+ " obstime: '"+elem.obstime+"' tbtime: "+elem.tbtime);
+                elem.typeID + " pid: " + elem.paramID+ " obstime: '"+elem.obstime+"' tbtime: "+elem.tbtime);
         return new IExec() {
             final TextDataElem e=elem;
             @Override
@@ -141,7 +141,7 @@ public class OracleKlSql extends KlTblNames implements IKlSql {
                 s.setObject(3,e.stationID, Types.NUMERIC);
                 s.setObject(4,new java.sql.Timestamp(e.obstime.toEpochMilli()), Types.TIMESTAMP);
                 s.setObject(5,e.paramID, Types.NUMERIC);
-                s.setObject(6,e.typeID_, Types.NUMERIC);
+                s.setObject(6,e.typeID, Types.NUMERIC);
                 return s.executeUpdate();
             }
         };
@@ -150,7 +150,7 @@ public class OracleKlSql extends KlTblNames implements IKlSql {
 
     public IExec createTextDataInsertQuery( TextDataElem elem ) {
         logger.debug("Insert textData into a SQL92 database ("+getTextDataTableName()+") sid: "+elem.stationID+" tid: " +
-                elem.typeID_ + " pid: " + elem.paramID+ " obstime: '"+elem.obstime+"' tbtime: "+elem.tbtime);
+                elem.typeID + " pid: " + elem.paramID+ " obstime: '"+elem.obstime+"' tbtime: "+elem.tbtime);
 
         return new IExec() {
             private final TextDataElem e=elem;
@@ -174,7 +174,7 @@ public class OracleKlSql extends KlTblNames implements IKlSql {
                 s.setString(3, e.original);
                 s.setObject(4,e.paramID, Types.NUMERIC);
                 s.setObject(5,new java.sql.Timestamp(e.tbtime.toEpochMilli()), Types.TIMESTAMP);
-                s.setObject(6,e.typeID_, Types.NUMERIC);
+                s.setObject(6,e.typeID, Types.NUMERIC);
                 return s.executeUpdate();
 
             }

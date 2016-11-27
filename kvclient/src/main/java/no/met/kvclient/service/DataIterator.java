@@ -5,5 +5,5 @@ import java.util.Optional;
 public interface DataIterator {
 	void destroy();
 
-	Optional<ObsDataList> next();
+	ObsDataList next() throws Exception;
 }

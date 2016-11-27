@@ -51,7 +51,6 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 import static java.lang.System.exit;
-import static java.lang.System.setProperty;
 
 public class Kv2KlMain {
     static Logger logger = Logger.getLogger(Kv2KlMain.class);
@@ -103,8 +102,8 @@ public class Kv2KlMain {
         SubscribeId hintid;
         Instant now = Instant.now();
         GetOpt go = new GetOpt("c:hkdpnl:");
-        String kvserver = null;
-        String kvname = null;
+//        String kvserver = null;
+//        String kvname = null;
         int hoursBack = 0;
         boolean enableFilter = true;
         boolean createPidFile = true;
@@ -187,9 +186,9 @@ public class Kv2KlMain {
 
         go = null; //We dont need it anymore.
 
-        app = new Kv2KlApp(args, conf, kvserver, false);
+        app = new Kv2KlApp(args, conf, false);
         dataSubscribeInfo = new KvDataSubscribeInfo();
-        dataReceiver = new KlDataReceiver(app, kvname + ".dat", enableFilter, saveDataToDb);
+        dataReceiver = new KlDataReceiver(app, conf.appName + ".dat", enableFilter, saveDataToDb);
         hint = new KvHintListener(app);
 
         logger.info("Starting: " + now);
@@ -210,7 +209,7 @@ public class Kv2KlMain {
 //			}
 //   			return;
 //   		}
-//	
+
 
         logger.info("getKvData: a background thread is started!");
 
