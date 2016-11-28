@@ -259,6 +259,7 @@ public class Filter {
 		//There was a problem with loading from the database.
 			logger.error(Instant.now() 
 		     			+" ERROR: filter: DB error, blocking the observation!");
+			addToString(msg, "BLOCKED: DB error, blocking the observation. obstime: "+ obstime +" stationid: " + stationID.getValue() + " typeid: " +  typeID_ );
 			return false;
 		}
 
@@ -266,11 +267,13 @@ public class Filter {
 		
 		if( ! dbElem.hasFilterElements() ){
 			logger.info("BLOCKED: No filter data for station: " + stationID.getValue() + " typeid: " +  typeID_ );
+			addToString(msg, "BLOCKED: No filter data for stationid: " + stationID.getValue() + " typeid: " +  typeID_ );
 			return false;
 		}
 		
 		if( ! dbElem.setCurrentFilterElem(obstime) ) {
 			logger.info("BLOCKED: No filter element for station that match obstime.");
+			addToString(msg, "BLOCKED: No filter data for station at obstime : " + obstime + " stationid: " + stationID.getValue() + " typeid: " +  typeID_ );
 			return false;
 		}
 

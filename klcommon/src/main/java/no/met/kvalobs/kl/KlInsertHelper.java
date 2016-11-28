@@ -267,7 +267,6 @@ public class KlInsertHelper {
                     //The stationid my have changed
                     dh.setStationID(stationID.getValue());
 
-
                     if (!loggedFilter && msg.getValue() != null) {
                         loggedFilter = true;
                         filterlog.info(dh.getStationID() +
