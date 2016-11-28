@@ -258,7 +258,7 @@ public class Filter {
 		if( ! dbElem.isOk() ) {
 		//There was a problem with loading from the database.
 			logger.error(Instant.now() 
-		     			+" ERROR: filter.filter: DB error, blocking the observation!");
+		     			+" ERROR: filter: DB error, blocking the observation!");
 			return false;
 		}
 
@@ -306,7 +306,7 @@ public class Filter {
 	
 	/** Shall we use this observation element. 
 	 * 
-	 * @param DataElem an observation element.
+	 * @param data an observation element.
 	 * 
 	 * @return true if we shall use this observation element and false otherwise.
 	 */

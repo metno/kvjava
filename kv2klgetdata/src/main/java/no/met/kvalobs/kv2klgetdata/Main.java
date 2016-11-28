@@ -42,7 +42,6 @@ import no.met.kvalobs.kl.Range;
 import no.met.kvclient.KvBaseConfig;
 import no.met.kvclient.service.*;
 import no.met.kvutil.*;
-import no.met.kvalobs.kl.SqlInsertHelper;
 import no.met.kvutil.MiGMTTime;
 import no.met.kvutil.dbutil.DbConnectionMgr;
 import org.apache.log4j.Logger;
