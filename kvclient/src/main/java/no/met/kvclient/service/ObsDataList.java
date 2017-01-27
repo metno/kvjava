@@ -1,12 +1,13 @@
 package no.met.kvclient.service;
 
+import java.time.Instant;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.TreeMap;
 
 public class ObsDataList extends TreeMap<DataIdElement, ObsData> implements Iterable<ObsData> { //java.util.LinkedList<ObsData> {
 	private static final long serialVersionUID = -3426183075859993004L;
-
+	Instant created;  //Set by the data deserializer
 	public ObsDataList() {
         super(DataIdElement.cmp);
 	}
@@ -34,6 +35,9 @@ public class ObsDataList extends TreeMap<DataIdElement, ObsData> implements Iter
 	public void add(ObsData data) {
 		put(data, data);
 	}
+
+	public Instant getCreated() { return created;}
+	public void setCreated(Instant time) { created=time;}
 
 	@Override
 	public Iterator<ObsData> iterator() {

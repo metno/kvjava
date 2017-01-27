@@ -18,7 +18,7 @@ import no.met.kvutil.DateTimeUtil;
 
 /*
 <?xml version="1.0" encoding="UTF-8"?>
-<KvalobsData>
+<KvalobsData created="2016-12-22 14:32:20">
   <station val="29350">
     <typeid val="502">
       <obstime val="2015-11-17 12:00:00">
@@ -127,6 +127,7 @@ class Reader {
 	int currentLevel;
 	Instant currentObstime;
 	Instant currentTbtime;
+	Instant created;
 	ObsData currentObsData;
 	static XMLInputFactory factory = XMLInputFactory.newFactory();
 	XMLStreamReader xml;
@@ -513,12 +514,19 @@ class Reader {
 		currentTypeId = Long.MAX_VALUE;
 		currentObstime = null;
 		currentTbtime = null;
+		created=null;
 		currentObsData = null;
 		currentSensor = 0;
 		currentLevel = 0;
 
 		try {
 			getStartElement("kvalobsdata");
+			try {
+				obsData.setCreated(getAttributeAsInstant("created"));
+			} catch ( Exception ex) {
+				obsData.setCreated(null);
+			}
+
 			// System.out.println("KvalobsData: Start");
 			decodeStation();
 		} catch (Exception ex) {

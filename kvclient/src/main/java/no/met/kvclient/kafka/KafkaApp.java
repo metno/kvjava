@@ -120,7 +120,7 @@ public class KafkaApp extends kvService {
 		for( int i=0; i<subscriberWorkers; ++i){
 			workers.start(new ListenerEventRunner(doShutdown, que));
 		}
-		
+
 		isInterupted = false;
 	}
 	

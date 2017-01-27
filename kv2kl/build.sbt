@@ -1,9 +1,12 @@
+import sbt.File
 import com.typesafe.sbt.packager.linux._
 import NativePackagerHelper._
 
 name := "kv2kl"
 
 description := "kv2kl - listen to data from kvalobs and load into a klima database"
+
+version in Debian := "3.0.0~rc4-1"
 
 // Enables publishing to maven repo
 publishMavenStyle := true
@@ -15,18 +18,18 @@ crossPaths := false
 autoScalaLibrary := false
 
 libraryDependencies ++= Seq	(
-	"org.postgresql" % "postgresql" % "9.4.1211",
+	"org.postgresql" % "postgresql" % "9.4.1212.jre7",
 	"com.oracle" % "ojdbc14" % "10.2.0.1.0"
 )
 
 
-//changelog in Debian := baseDirectory.value / "debian_changelog"
+debianChangelog in Debian := Some( baseDirectory.value / "debian_changelog")
 
 packageSummary := "Utility to transfer data from a kvalobs data base to the klimadb"
 
 packageDescription := """Utility to transfer data from a kvalobs data base to the \"klimadb\"."""
 
-debianPackageDependencies in Debian ++= Seq("kvdistuser")
+debianPackageDependencies in Debian ++= Seq("kvdistuser", "openjdk-8-jdk")
 
 linuxPackageMappings in Debian += packageTemplateMapping(s"/etc/kvalobs")() withGroup("kvdist") withPerms("0775")
 

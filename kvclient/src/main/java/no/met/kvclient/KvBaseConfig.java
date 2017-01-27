@@ -118,6 +118,8 @@ public class KvBaseConfig {
     public void getDbCredentials(String dbPrefix, PropertiesHelper fromProp) {
         String dbuser="default."+dbPrefix+".dbuser";
         String dbpasswd="default."+dbPrefix+".dbpasswd";
+        String dbuserVal=fromProp.getProperty(dbuser, "");
+        String dbpasswdVal=fromProp.getProperty(dbpasswd, "");
 
         if( !confname.isEmpty()) {
             dbuser=dbuser.replaceFirst("default", confname);
@@ -127,8 +129,8 @@ public class KvBaseConfig {
         System.err.println("Reading credential for: "+dbuser);
         System.err.println("Reading credential for: "+dbpasswd);
 
-        conf.setProperty(dbPrefix+".dbuser",fromProp.getProperty(dbuser, ""));
-        conf.setProperty(dbPrefix+".dbpasswd",fromProp.getProperty(dbpasswd, ""));
+        conf.setProperty(dbPrefix+".dbuser",fromProp.getProperty(dbuser, dbuserVal));
+        conf.setProperty(dbPrefix+".dbpasswd",fromProp.getProperty(dbpasswd, dbpasswdVal));
     }
 
     void getDbCredentials(String dbPrefix) {

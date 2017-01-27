@@ -39,38 +39,41 @@ import org.apache.log4j.Logger;
 
 public class KlDataReceiver implements KvDataEventListener {
 
-	Kv2KlApp app;
-	KlInsertHelper insertstmt;
-	boolean saveDataToDb=true;
-    static Logger logger=Logger.getLogger(KlDataReceiver.class);
-    static Logger filterlog=Logger.getLogger("filter");
-    
-    public KlDataReceiver(Kv2KlApp app, String backupfile){
-    	this(app, backupfile, true, true);
+    Kv2KlApp app;
+    KlInsertHelper insertstmt;
+    boolean saveDataToDb = true;
+    KvState kvState;
+    static Logger logger = Logger.getLogger(KlDataReceiver.class);
+    static Logger filterlog = Logger.getLogger("filter");
+
+
+    public KlDataReceiver(Kv2KlApp app, String backupfile) {
+        this(app, null,backupfile, true, true);
     }
- 
-    public KlDataReceiver(Kv2KlApp app, String backupfile, boolean enableFilter, boolean saveDataToDb ){
-    	this.app=app;
-    	this.saveDataToDb=saveDataToDb;
-    	
-    	if( ! this.saveDataToDb )
-    		return;
-    	
-    	insertstmt=new KlInsertHelper(app.getKlConnectionMgr(), backupfile, enableFilter );
-    	insertstmt.setDataTableName( app.getDataTableName() );
-    	insertstmt.setTextDataTableName( app.getTextDataTableName() );
-    	insertstmt.setForeignDataTable( app.getForeignDataTableName() );
-    	insertstmt.setForeignTextDataTable( app.getForeignTextDataTableName() );
+
+    public KlDataReceiver(Kv2KlApp app, KvState kvState, String backupfile, boolean enableFilter, boolean saveDataToDb) {
+        this.app = app;
+        this.saveDataToDb = saveDataToDb;
+        this.kvState = kvState;
+        if (!this.saveDataToDb)
+            return;
+
+        insertstmt = new KlInsertHelper(app.getKlConnectionMgr(), kvState, backupfile, enableFilter);
+        insertstmt.setDataTableName(app.getDataTableName());
+        insertstmt.setTextDataTableName(app.getTextDataTableName());
+        insertstmt.setForeignDataTable(app.getForeignDataTableName());
+        insertstmt.setForeignTextDataTable(app.getForeignTextDataTableName());
     }
-    
+
     public void kvDataEvent(KvDataEvent event) {
-    	ObsDataList obsData=event.getObsData();
-    	app.updateLastKvContact();
-    	
-    	if( saveDataToDb)
-    		insertstmt.insertData(obsData, null);
-    	else // This is typical for debug sessions so just write the data to standard out.
-    		System.out.println(obsData);
+        ObsDataList obsData = event.getObsData();
+        if( kvState !=null )
+            kvState.updateLastReceivedMessageTime();
+
+        if (saveDataToDb)
+            insertstmt.insertData(obsData, null);
+        else // This is typical for debug sessions so just write the data to standard out.
+            System.out.println(obsData);
     }
 }
 

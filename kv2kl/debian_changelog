@@ -1,4 +1,14 @@
+kv2kl (3.0.0~rc4-1) UNRELEASED; urgency=medium
+  * Activate monitoring for db.
+
+ -- Borge Moe <borge.moe@met.no>  Thu, 26 Jan 2017 21:55:00 +0100
+
+kv2kl (3.0.0~rc3-1) UNRELEASED; urgency=medium
+  * Add some monitoring helper.
+
+ -- Borge Moe <borge.moe@met.no>  Thu, 26 Jan 2017 13:45:00 +0100
+
 kv2kl (3.0.0~rc2-1) UNRELEASED; urgency=medium
   * Initial version using kafka.
   
- -- Borge Moe <borge.moe@met.no>  Wed, 8 Sep 2016 13:15:00 +0200
+ -- Borge Moe <borge.moe@met.no>  Tue, 24 Jan 2017 13:35:00 +0100

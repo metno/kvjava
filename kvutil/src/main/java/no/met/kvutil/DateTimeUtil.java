@@ -110,7 +110,7 @@ public class DateTimeUtil {
 	}
 
 	static public String toString(Instant dt, DateTimeFormatter fmt) {
-		return OffsetDateTime.from(dt).format(fmt);
+		return dt.atOffset(ZoneOffset.UTC).format(fmt);
 	}
 	static public String nowToString() {
 		return toString(Instant.now(), FMT_PARSE);

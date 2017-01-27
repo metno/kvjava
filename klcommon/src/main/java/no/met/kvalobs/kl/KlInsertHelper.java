@@ -51,6 +51,7 @@ import org.apache.log4j.Logger;
 public class KlInsertHelper {
     static Logger logger = Logger.getLogger(KlInsertHelper.class);
     static Logger filterlog = Logger.getLogger("filter");
+    IDbStatus status;
     PrintWriter fout;
     DbConnectionMgr conMgr = null;
     String dataTableName = null;
@@ -59,8 +60,26 @@ public class KlInsertHelper {
     String foreignTextDataTableName = null;
     boolean enableFilter;
 
+    class DummyStatus implements IDbStatus {
 
-    public KlInsertHelper(DbConnectionMgr conMgr, String backupfile, boolean enableFilter) {
+        public DummyStatus() {
+        }
+
+        @Override
+        public void updateLastDbTime() {
+        }
+
+        @Override
+        public void setDbError(String message) {
+        }
+    }
+
+    public KlInsertHelper(DbConnectionMgr conMgr, IDbStatus status, String backupfile, boolean enableFilter) {
+        if( status==null )
+            this.status=new DummyStatus();
+        else
+            this.status=status;
+
         fout = null;
         this.conMgr = conMgr;
         this.enableFilter = enableFilter;
@@ -73,6 +92,10 @@ public class KlInsertHelper {
                 logger.error(e);
             }
         }
+    }
+
+    public KlInsertHelper(DbConnectionMgr conMgr, String backupfile, boolean enableFilter) {
+        this(conMgr, null, backupfile,enableFilter);
     }
 
 
@@ -284,7 +307,9 @@ public class KlInsertHelper {
                         ret = false;
                 }
             }
+            status.updateLastDbTime();
         } catch (Exception e) {
+            status.setDbError(e.getMessage());
             logger.error(Instant.now() + ": " + e);
             e.printStackTrace();
         }

@@ -37,7 +37,7 @@ public class KvDataConsumer implements Runnable {
 			for (ConsumerRecord<String, String> record : records) {
 				System.out.println("KvDataConsumer: BEGIN  '" + topic + "'.");
 				System.out.printf("KvDataConsumer: offset = %d, key = %s", record.offset(), record.key());
-				System.out.println("KvDataConsumer: value\n" + record.value());
+				//System.out.println("KvDataConsumer: value\n" + record.value());
 				System.out.println("KvDataConsumer: -----------   END ---------------------");
 				try {
 					ObsDataList data = Kv2KvXml.decodeFromString(record.value());

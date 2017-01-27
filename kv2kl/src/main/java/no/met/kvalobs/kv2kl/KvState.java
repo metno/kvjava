@@ -31,6 +31,8 @@
 
 package no.met.kvalobs.kv2kl;
 
+import no.met.kvalobs.kl.IDbStatus;
+import no.met.kvutil.DateTimeUtil;
 import no.met.kvutil.PropertiesHelper;
 
 import java.io.IOException;
@@ -43,17 +45,36 @@ import java.nio.file.Path;
 import java.util.Properties;
 import java.util.UUID;
 
-public class KvState {
+
+public class KvState implements IDbStatus {
     Properties stateProp;
     KvConfig conf;
     Path statefile;
     String kafkaGroup;
     boolean hasChanges;
+    int dbErrorCount=0;
     static KvState kvState;
 
     public KvState(KvConfig conf) {
         this.conf = conf;
+        stateProp = new Properties();
         hasChanges = false;
+    }
+
+    @Override
+    synchronized public void updateLastDbTime() {
+        stateProp.setProperty("db_last_write_time",DateTimeUtil.nowToString());
+        stateProp.setProperty("db_error", "false");
+        hasChanges=true;
+    }
+
+    @Override
+    synchronized public void setDbError(String message) {
+        stateProp.setProperty("db_last_error_time", DateTimeUtil.nowToString());
+        stateProp.setProperty("db_error", "true");
+        stateProp.setProperty("db_last_error_message", message);
+        stateProp.setProperty("db_error_count", Integer.toString(++dbErrorCount));
+        hasChanges=true;
     }
 
     void readStateFromFile(Path statefile) throws IOException {
@@ -95,12 +116,32 @@ public class KvState {
         hasChanges = true;
     }
 
+    static synchronized public void updateLastReceivedMessageTime(){
+        if( kvState == null )
+            return;
+
+        kvState.stateProp.setProperty("last_received_message_time", DateTimeUtil.nowToString());
+        kvState.hasChanges=true;
+    }
+
+    void setDefaultValuesOnLoadtime() {
+        stateProp.setProperty("db_last_write_time", "");
+        stateProp.setProperty("db_error", "false");
+        stateProp.setProperty("db_last_error_time", "");
+        stateProp.setProperty("db_last_error_message", "");
+        stateProp.setProperty("db_error_count", "0");
+        stateProp.setProperty("last_received_message_time", "");
+        hasChanges = true;
+    }
+
     static public KvState loadState(KvConfig conf) {
         kvState = new KvState(conf);
         try {
             kvState.readStateFromFile(conf.getStatePath());
             //Set the kafkagroup variable in the conf file.
             conf.conf.setProperty("kafka.group.id", kvState.getKafkaGroup());
+            kvState.setDefaultValuesOnLoadtime();
+            kvState.saveState();
         }
         catch( IOException ex) {
             System.err.println("Cant read state file '"+conf.getStatePath()+"'. It may be corrupt, remove it. ("+ex.getMessage()+")");
@@ -109,7 +150,7 @@ public class KvState {
         return kvState;
     }
 
-    public void saveState() {
+    synchronized public void saveState() {
         try {
             if( !hasChanges)
                 return;

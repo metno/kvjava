@@ -48,6 +48,7 @@ import no.met.kvutil.FileUtil;
 
 
 import org.apache.log4j.Logger;
+import org.apache.log4j.NDC;
 import org.apache.log4j.PropertyConfigurator;
 
 import static java.lang.System.exit;
@@ -79,18 +80,33 @@ public class Kv2KlMain {
         }
     }
 
+    static class SaveKvState extends TimerTask{
+        KvState kvState;
+
+        public SaveKvState(KvState kvState) {
+            this.kvState=kvState;
+        }
+
+        public void run(){
+            NDC.push("SaveKvState");
+            kvState.saveState();
+            NDC.pop();
+        }
+    }
+
+
     public static void main(String[] args) {
         //Set the default timezone to GMT.
         TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
-
         ParamList param;
         Kv2KlApp app;
         WhichDataList whichData = new WhichDataList();
         KvDataSubscribeInfo dataSubscribeInfo;
         KlDataReceiver dataReceiver;
         KvHintListener hint;
+        Timer saveStateTimer=new Timer(true);
         KvConfig conf = KvConfig.config("kv2kl");
-        KvState kvState=KvState.loadState(conf);
+        KvState kvState= KvState.loadState(conf);
 
         System.out.println(conf);
 
@@ -108,7 +124,7 @@ public class Kv2KlMain {
         boolean enableFilter = true;
         boolean createPidFile = true;
         boolean saveDataToDb = true;
-        boolean printConfigAndExit=false;
+        boolean printConfigAndExit = false;
 
         char c;
 
@@ -121,7 +137,7 @@ public class Kv2KlMain {
                     conf.configfile = go.optarg();
                     break;
                 case 'k':
-                    printConfigAndExit=true;
+                    printConfigAndExit = true;
                     break;
                 case 'd':
                     enableFilter = false;
@@ -135,10 +151,9 @@ public class Kv2KlMain {
                 case 'l':
                     try {
                         hoursBack = Integer.parseInt(go.optarg());
-                        if( hoursBack < 0)
-                            hoursBack*=-1;
-                    }
-                    catch(NumberFormatException ex ) {
+                        if (hoursBack < 0)
+                            hoursBack *= -1;
+                    } catch (NumberFormatException ex) {
                         System.err.println("The argument to -l must be a number.");
                         System.exit(1);
                     }
@@ -150,7 +165,7 @@ public class Kv2KlMain {
             }
         }
 
-        if( printConfigAndExit  ) {
+        if (printConfigAndExit) {
             System.err.println("Config\n\n" + conf.toString());
             System.exit(0);
         }
@@ -188,7 +203,7 @@ public class Kv2KlMain {
 
         app = new Kv2KlApp(args, conf, false);
         dataSubscribeInfo = new KvDataSubscribeInfo();
-        dataReceiver = new KlDataReceiver(app, conf.appName + ".dat", enableFilter, saveDataToDb);
+        dataReceiver = new KlDataReceiver(app, kvState,conf.appName + ".dat", enableFilter, saveDataToDb);
         hint = new KvHintListener(app);
 
         logger.info("Starting: " + now);
@@ -245,6 +260,11 @@ public class Kv2KlMain {
         try {
             System.out.println("Subscribe on <KvData>, subscriberid <"
                     + subscriberid + "> Ctrl+c for aa avslutte!");
+
+            //Save to the state file every 5 minute.
+            //The statefile has some monitoring information and the kafka group var.
+            saveStateTimer.schedule(new SaveKvState(kvState),60000, 60000);
+
             app.run();
         } catch (InterruptedException e) {
             e.printStackTrace();

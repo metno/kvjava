@@ -36,6 +36,7 @@ public class ThreadManager {
 				toRun.run();
 			}
 			catch(Exception ex ){
+				ex.printStackTrace();
 				System.err.println("Ucaught exception: "+manager.thrGroup.getName());
 			}
 			manager.numberOfThreads.decrementAndGet();
