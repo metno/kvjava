@@ -150,15 +150,22 @@ public class KlApp extends KafkaApp  implements SendDataToKv
 	public KlApp(String[] args, PropertiesHelper confProp, boolean usingSwing, boolean enableKlConMgr){
 		super(confProp);
 		PropertiesHelper conf = getConf();
-		dataTableName = conf.getProperty("kl.datatable", "kv2klima" );
-		textDataTableName = conf.getProperty("kl.textdatatable", "T_TEXT_DATA" );
-		foreignDataTableName = conf.getProperty( "kl.foreign_datatable" );
-		foreignTextDataTableName = conf.getProperty( "kl.foreign_textdatatable" );
-		appName = conf.getProperty("appname", "");
-		confname= conf.getProperty("confname", "");
+		dataTableName = conf.getProperty("kl.datatable", "kv2klima" ).trim();
+		textDataTableName = conf.getProperty("kl.textdatatable", "T_TEXT_DATA" ).trim();
+		foreignDataTableName = conf.getProperty( "kl.foreign_datatable","" ).trim();
+		foreignTextDataTableName = conf.getProperty( "kl.foreign_textdatatable","" ).trim();
+		appName = conf.getProperty("appname", "").trim();
+		confname= conf.getProperty("confname", "").trim();
 		this.enableKlConMgr = enableKlConMgr;
 		conKlMgr=getConnectionMgr(conf, "kl");
 		conKvMgr=(DbConnectionMgr)super.getInfo().get("kv.dbmanager");
+
+		if(foreignDataTableName.isEmpty())
+			foreignDataTableName=null;
+
+		if(foreignTextDataTableName.isEmpty())
+			foreignTextDataTableName=null;
+
 
 		if( ! this.enableKlConMgr) {
 			System.out.println("Database setup: The Connection Manager is diasabled.");
@@ -172,6 +179,8 @@ public class KlApp extends KafkaApp  implements SendDataToKv
 		System.out.println("Load data into tables: ");
 		System.out.println("      data: " + dataTableName );
 		System.out.println("  textdata: " + textDataTableName );
+		System.out.println("  foreign_data: " + (foreignDataTableName!=null?foreignDataTableName:"(Not set)") );
+		System.out.println("  foreign_textdata: " + (foreignTextDataTableName!=null?foreignTextDataTableName:"(Not set)") );
 		System.out.println("");
 	}
 

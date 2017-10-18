@@ -24,7 +24,7 @@ public enum StatusId {
 	}
 
 	static boolean onlyOk(int useinfo2) {
-		return useinfo2 < 2 ? true : false;
+		return useinfo2>=0 && useinfo2 < 2 ? true : false;
 	}
 
 	private StatusId(IntPredicate func) {
@@ -33,10 +33,9 @@ public enum StatusId {
 
 	public boolean has(int useinfo2) {
 		// useinfo2 < 0, means no value is given for the flag.
-		if (useinfo2 < 0 || useinfo2 > 3)
-			return false;
+		//if (useinfo2!=9 && (useinfo2 < 0 || useinfo2 > 3))
+		//	return false;
 
 		return func.test(useinfo2);
 	}
-
 }

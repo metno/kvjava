@@ -2,6 +2,8 @@ package no.met.kvalobs.kl;
 
 import org.apache.log4j.Logger;
 
+import java.time.OffsetDateTime;
+
 
 /**
  * Used to implement default common methodes in code that implements the IKlSql interface.
@@ -19,8 +21,22 @@ public class KlTblNames {
         textDataTable = "T_TEXT_DATA";
     }
 
+
+    public KlTblNames(String dataTableName, String textDataTableName ){
+        if( dataTableName != null  && !dataTableName.isEmpty())
+            dataTable = dataTableName;
+        else
+            dataTable = "kv2klima";
+
+        if( textDataTableName != null && !textDataTableName.isEmpty())
+            textDataTable = textDataTableName;
+        else
+            textDataTable = "T_TEXT_DATA";
+    }
+
+
     public String setDataTableName( String tableName ) {
-        if( tableName != null )
+        if( tableName == null )
             return null;
 
         String old=dataTable;
@@ -29,7 +45,7 @@ public class KlTblNames {
     }
 
     public String setTextDataTableName( String tableName ) {
-        if( tableName != null )
+        if( tableName == null )
             return null;
 
         String old=textDataTable;
@@ -37,17 +53,6 @@ public class KlTblNames {
         return old;
     }
 
-    public KlTblNames(String dataTableName, String textDataTableName ){
-        if( dataTableName != null )
-            dataTable = dataTableName;
-        else
-            dataTable = "kv2klima";
-
-        if( textDataTableName != null )
-            textDataTable = textDataTableName;
-        else
-            textDataTable = "T_TEXT_DATA";
-    }
 
     public String getDataTableName() {
         return dataTable;
@@ -56,4 +61,5 @@ public class KlTblNames {
     public String getTextDataTableName(){
         return textDataTable;
     }
+
 }

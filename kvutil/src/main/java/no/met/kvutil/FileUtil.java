@@ -30,10 +30,9 @@
 */
 package no.met.kvutil;
 import java.io.*;
-import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.*;
+import static java.nio.file.StandardOpenOption.APPEND;
+import static java.nio.file.StandardOpenOption.CREATE;
 
 
 public class FileUtil {
@@ -111,7 +110,19 @@ public class FileUtil {
 			return false;
 		}
 	}
-	
+
+	static public boolean appendStr2File(String file2write, String buf){
+		try {
+			OutputStream out = Files.newOutputStream(Paths.get(file2write), CREATE, APPEND);
+			out.write(buf.getBytes());
+			out.close();
+			return true;
+		} catch (IOException e) {
+			System.out.println("IOException: FileUtil.appendStr2File: "+e.getMessage());
+			return false;
+		}
+	}
+
 	static public boolean checkDir(String path, boolean creatIfNotExist) throws FileAlreadyExistsException, IOException {
 		Path p = FileSystems.getDefault().getPath(path);
 		

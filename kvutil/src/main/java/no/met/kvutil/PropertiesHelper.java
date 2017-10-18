@@ -174,6 +174,22 @@ public class PropertiesHelper extends Properties {
 		fout.close();
 	}
 
+	static public boolean saveToFile(Properties prop,String filename){
+		File f = new File(filename);
+
+		try {
+			FileOutputStream fout = new FileOutputStream(f);
+			prop.store(fout, "WARNING Dont create comment in this file, they will be lost!");
+			fout.close();
+			return true;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+
+	}
+
+
 	/*-
 	 * Same as apply(String key, String Value), but we look up the value for the
 	 * key in the properties.

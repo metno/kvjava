@@ -13,7 +13,8 @@ public class WhichData {
 	public Instant fromTime;
 	public Instant toTime;
 
-	public WhichData(long stationid, long typeid_, long paramid, StatusId status, String fromObsTime, String toObsTime) {
+	public WhichData(long stationid, long typeid_, long paramid, StatusId status,
+					 String fromObsTime, String toObsTime) {
 		this.stationid = stationid;
 		this.stationid2=stationid;
 		this.typeid_ = typeid_;
@@ -27,8 +28,8 @@ public class WhichData {
 			this.toTime = DateTimeUtil.parse(toObsTime).toInstant();
 	}
 
-	public WhichData(long stationid, long typeid_, long paramid, StatusId status, OffsetDateTime fromTime,
-			OffsetDateTime toTime) {
+	public WhichData(long stationid, long typeid_, long paramid, StatusId status,
+					 OffsetDateTime fromTime, OffsetDateTime toTime) {
 		this.stationid = stationid;
 		this.stationid2=stationid;
 		this.typeid_ = typeid_;
@@ -41,8 +42,8 @@ public class WhichData {
 			this.toTime = toTime.toInstant();
 	}
 	
-	public WhichData(long stationid, long typeid_, long paramid, StatusId status, Instant fromTime,
-			Instant toTime) {
+	public WhichData(long stationid, long typeid_, long paramid, StatusId status,
+					 Instant fromTime,	Instant toTime) {
 		this.stationid = stationid;
 		this.stationid2=stationid;
 		this.typeid_ = typeid_;
@@ -64,11 +65,18 @@ public class WhichData {
 		this.status = other.status;
 	}
 
-	public WhichData(long stationid, StatusId status, String fromObsTime, String toObsTime) {
+	public WhichData(long stationid, StatusId status,
+					 String fromObsTime, String toObsTime) {
 		this(stationid, 0, 0, status, fromObsTime, toObsTime);
 	}
 
-	public WhichData(long stationid, long tid, StatusId status, String fromObsTime, String toObsTime) {
+	public WhichData(long stationid, long tid, StatusId status,
+					 String fromObsTime, String toObsTime) {
+		this(stationid, tid, 0, status, fromObsTime, toObsTime);
+	}
+
+	public WhichData(long stationid, long tid, StatusId status,
+					 OffsetDateTime fromObsTime, OffsetDateTime toObsTime) {
 		this(stationid, tid, 0, status, fromObsTime, toObsTime);
 	}
 

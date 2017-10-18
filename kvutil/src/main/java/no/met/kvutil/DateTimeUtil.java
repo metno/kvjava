@@ -40,8 +40,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class DateTimeUtil {
-	static DateTimeFormatter FMT_PARSE = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ssx");
-	static DateTimeFormatter FMT_PARSE_DESIMAL_SECOND = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSx");
+	public static DateTimeFormatter FMT_PARSE = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ssx");
+	public static DateTimeFormatter FMT_PARSE_xx = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ssxx");
+    public static DateTimeFormatter FMT_PARSE_DESIMAL_SECOND = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSx");
+    public static DateTimeFormatter FMT_PARSE_DESIMAL_SECOND_xx = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSxx");
+
+	public static DateTimeFormatter ISO_WITH_MICRO_SECOND_xx = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSSxx");
+
 	/** yyyy-MM-dd HH:mm:ss */
 	public static final String FMT_ISO = "yyyy-MM-dd HH:mm:ss";
 
@@ -61,14 +66,22 @@ public class DateTimeUtil {
 	static Pattern datePattern = Pattern
 			.compile("^ *(\\d{4})-(\\d{1,2})-(\\d{1,2})((T| +)(\\d{1,2})(:\\d{1,2}){0,2})? *");
 
+
+	static public OffsetDateTime plusMicosecond(OffsetDateTime dt, long microSecond) {
+		return dt.plusNanos(1000*microSecond);
+	}
+	static public OffsetDateTime minusMicosecond(OffsetDateTime dt, long microSecond) {
+		return dt.minusNanos(1000*microSecond);
+	}
+
 	/**
 	 * Create a string representation of the date in the given format, fmt.
 	 * 
-	 * @param fmt
+	 * @param format
 	 *            The format we want the string in.
 	 * @return An string in the format given by fmt.
 	 * 
-	 * @see java.time.DateTimeFormatter for an description of fmt.
+	 * @see java.time.format.DateTimeFormatter for an description of fmt.
 	 */
 	static public String toString(OffsetDateTime dt, String format) {
 		DateTimeFormatter fmt = DateTimeFormatter.ofPattern(format);
@@ -84,6 +97,7 @@ public class DateTimeUtil {
 		DateTimeFormatter fmt = DateTimeFormatter.ofPattern(format);
 		return dt.format(fmt);
 	}
+
 
 	static public String toString(OffsetDateTime dt, DateTimeFormatter fmt) {
 		return dt.format(fmt);
@@ -112,8 +126,12 @@ public class DateTimeUtil {
 	static public String toString(Instant dt, DateTimeFormatter fmt) {
 		return dt.atOffset(ZoneOffset.UTC).format(fmt);
 	}
+
 	static public String nowToString() {
 		return toString(Instant.now(), FMT_PARSE);
+	}
+	static public String nowToString(DateTimeFormatter fmt) {
+		return toString(Instant.now(), fmt);
 	}
 
 	static public OffsetDateTime parse(String dt, String format) {
@@ -167,11 +185,9 @@ public class DateTimeUtil {
 	 * 
 	 * @param timestamp
 	 *            time as a string
-	 * @param fmt
-	 *            The format of the string.
 	 * @return True if the timestamp could be parsed as a timestamp in
 	 *         accordance with fmt. False otherwise.
-	 * @throws DateTimeParseException
+	 * @throws java.time.format.DateTimeParseException
 	 * @see java.text.SimpleDateFormat for an description of fmt.
 	 */
 	public static OffsetDateTime parse(String timestamp) {
@@ -184,7 +200,7 @@ public class DateTimeUtil {
 		if (ts.lastIndexOf('+') < 0 && ts.lastIndexOf('-') <= 9)
 			ts = ts + "+00";
 
-		System.err.println("DateTimeUtil.parse: '" + ts +"' ("+timestamp+")");
+		//System.err.println("DateTimeUtil.parse: '" + ts +"' ("+timestamp+")");
 		return OffsetDateTime.parse(ts, FMT_PARSE);
 	}
 	

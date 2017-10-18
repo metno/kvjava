@@ -39,6 +39,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
+import no.met.kvclient.service.DataIdElement;
+import no.met.kvutil.DateTimeUtil;
+import no.met.kvutil.FileUtil;
 import no.met.kvutil.dbutil.DbConnectionMgr;
 import no.met.kvutil.dbutil.DbConnection;
 import no.met.kvutil.StringHolder;
@@ -248,6 +251,16 @@ public class KlInsertHelper {
                 logger.warn("Opppsss: NO DATA!");
                 return true;
             }
+
+            //Debug
+            /*for(DataIdElement e : obsData.keySet()) {
+                if( e.stationID==12550 && e.typeID==502) {
+                    String out="------- stationid: " + e.stationID + " typeid: " + e.typeID + " received: " + DateTimeUtil.nowToString() + "---\n";
+                    out += obsData + "------------- END -----------------\n";
+                    FileUtil.appendStr2File("level_insert_debug.txt", out);
+                }
+            }*/
+
 
             KlDataHelper dh = new KlDataHelper(dbconn.getDbdriver(),
                     dataTableName, textDataTableName,

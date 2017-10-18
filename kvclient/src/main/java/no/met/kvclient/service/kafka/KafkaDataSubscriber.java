@@ -18,8 +18,10 @@ import no.met.kvclient.service.DataSubscribeInfo;
 import no.met.kvclient.service.SubscribeId;
 import no.met.kvclient.service.KvSubsribeData;
 import no.met.kvclient.service.ObsDataList;
+import org.apache.log4j.Logger;
 
 public class KafkaDataSubscriber implements KvSubsribeData {
+	static Logger logger = Logger.getLogger(KafkaDataSubscriber.class);
 	private long nextSubscriberId = 0;
 	private KafkaConsumer<String, String> consumer =null;
 	private String topic = null;
@@ -151,7 +153,7 @@ public class KafkaDataSubscriber implements KvSubsribeData {
 		executor = Executors.newFixedThreadPool(1);
 		KvDataConsumer kvConsumer=new KvDataConsumer(consumer, this, topic); 
 		executor.submit(kvConsumer);
-		System.out.println("*** Kafka: Started.......");
+		logger.debug("KafkaDataSubscriber.tryStart: Kafka: Started.......");
 		isStarted=true;
 	}
 
@@ -167,15 +169,13 @@ public class KafkaDataSubscriber implements KvSubsribeData {
 
 	@Override
 	synchronized public void stop(){
-		System.out.println("**** KafkaDataSubscriber: Try to stop.");
+		logger.debug("KafkaDataSubscriber.stop() called");
 		if( consumer != null )
 			consumer.wakeup();
 		if(executor!=null)
 			executor.shutdown();
 		isStarted=false;
-		System.out.println("**** KafkaDataSubscriber: Stoped ??????.");
+		logger.debug("KafkaDataSubscriber.stop() returning.");
 	}
 
-
-	
 }

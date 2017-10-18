@@ -61,16 +61,20 @@ public class KvState implements IDbStatus {
         hasChanges = false;
     }
 
+    static public String now() {
+        return DateTimeUtil.nowToString(DateTimeUtil.FMT_PARSE_xx);
+    }
+
     @Override
     synchronized public void updateLastDbTime() {
-        stateProp.setProperty("db_last_write_time",DateTimeUtil.nowToString());
+        stateProp.setProperty("db_last_write_time", now());
         stateProp.setProperty("db_error", "false");
         hasChanges=true;
     }
 
     @Override
     synchronized public void setDbError(String message) {
-        stateProp.setProperty("db_last_error_time", DateTimeUtil.nowToString());
+        stateProp.setProperty("db_last_error_time", now());
         stateProp.setProperty("db_error", "true");
         stateProp.setProperty("db_last_error_message", message);
         stateProp.setProperty("db_error_count", Integer.toString(++dbErrorCount));
@@ -120,7 +124,7 @@ public class KvState implements IDbStatus {
         if( kvState == null )
             return;
 
-        kvState.stateProp.setProperty("last_received_message_time", DateTimeUtil.nowToString());
+        kvState.stateProp.setProperty("last_received_message_time", now());
         kvState.hasChanges=true;
     }
 

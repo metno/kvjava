@@ -47,6 +47,7 @@ import no.met.kvutil.ProcUtil;
 import no.met.kvutil.FileUtil;
 
 
+import no.met.kvutil.PropertiesHelper;
 import org.apache.log4j.Logger;
 import org.apache.log4j.NDC;
 import org.apache.log4j.PropertyConfigurator;
@@ -197,7 +198,12 @@ public class Kv2KlMain {
 //    	 
 //    	//    	Konfigurer loggesystemet, log4j.
 //     	System.out.println("log4j conf: "+kvpath+"/etc/"+logfile);
-        PropertyConfigurator.configure(InitLogger.getLogProperties(conf));
+        FileUtil.writeStr2File(conf.logdir+"/"+conf.appName+"_conf.properties",conf.toString());
+
+        Properties logProperties=InitLogger.getLogProperties(conf);
+        PropertiesHelper.saveToFile(logProperties, conf.logdir+"/"+conf.appName+"_log.properties");
+
+        PropertyConfigurator.configure(logProperties);
 
         go = null; //We dont need it anymore.
 

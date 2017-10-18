@@ -1,8 +1,11 @@
 package no.met.kvclient.service;
 
 import no.met.kvclient.datasource.Data;
+import no.met.kvutil.DateTimeUtil;
 
 import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Comparator;
 
 /**
@@ -29,6 +32,17 @@ public class DataIdElement {
         this.stationID=stationID;
         this.typeID=typeID;
         this.obstime=obstime;
+    }
+
+
+    public String getObsTime() {
+        OffsetDateTime tb=obstime.atOffset(ZoneOffset.UTC);
+        return DateTimeUtil.toString(tb, DateTimeUtil.FMT_PARSE_xx);
+    }
+
+
+    public String getQuotedObsTime() {
+        return "'" + getObsTime()+"'";
     }
 
 }

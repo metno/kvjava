@@ -68,10 +68,15 @@ public class DataSubscribers<Listener extends KvEventListener>
 			ObsData obsData = new ObsData(de.stationID, de.typeID, de.obstime, de.textDataList);
 
 			for (DataElem elem : de.dataList) {
-				if (info.has(elem)) {
-					obsData.dataList.add(elem);
-				}
+				if( elem.paramID<=0) // Invalid parameterid
+					continue;
+
+				if (! info.has(elem))
+					continue;
+
+				obsData.dataList.add(elem);
 			}
+
 			if (!(obsData.dataList.isEmpty() && obsData.textDataList.isEmpty())) {
 				dataToSend.add(obsData);
 			}

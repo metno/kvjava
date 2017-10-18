@@ -33,9 +33,13 @@ package no.met.kvclient.kv2kvxml;
 
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.util.Iterator;
 
 import junit.framework.*;
+import no.met.kvclient.service.DataElem;
+import no.met.kvclient.service.ObsData;
 import no.met.kvclient.service.ObsDataList;
+import no.met.kvutil.FileUtil;
 
 public class kv2KvXmlTest extends TestCase {
 
@@ -165,5 +169,6 @@ public class kv2KvXmlTest extends TestCase {
 			fail();
 		}
 	}
+
 
 }

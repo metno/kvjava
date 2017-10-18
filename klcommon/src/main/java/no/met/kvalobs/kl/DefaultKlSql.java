@@ -69,6 +69,26 @@ public class DefaultKlSql extends KlTblNames implements IKlSql {
 
                 return s.executeUpdate();
             }
+
+            @Override
+            public String toString() {
+                return "UPDATE " + getDataTableName() +
+                        " SET " +
+                        "  original=" +d.original+ "," +
+                        "  kvstamp="+ d.getQuotedTbTime()+"," +
+                        "  useinfo='"+d.useinfo+"'" +
+                        "  corrected="+d.corrected+"," +
+                        "  controlinfo='"+d.controlinfo+"'," +
+                        "  cfailed='"+d.cfailed+"'," +
+                        "WHERE " +
+                        "  stnr="+d.stationID+" AND " +
+                        "  dato="+d.getQuotedObsTime() +" AND " +
+                        "  paramid="+d.paramID +" AND " +
+                        "  typeid="+d.typeID+" AND " +
+                        "  xlevel="+d.level+" AND " +
+                        "  sensor="+d.sensor;
+            }
+
         };
     }
 
@@ -107,6 +127,18 @@ public class DefaultKlSql extends KlTblNames implements IKlSql {
                 s.setString(12,d.cfailed);
                 return s.executeUpdate();
             }
+
+            @Override
+            public String toString() {
+                return "INSERT INTO " + getDataTableName() +
+                        "(stnr,dato,original,kvstamp,paramid,typeid,xlevel,sensor,useinfo," +
+                        "corrected,controlinfo,cfailed) values (" +
+                        d.stationID+","+d.getQuotedObsTime()+"," + d.original+"," +
+                        d.getQuotedTbTime()+","+ d.paramID+","+d.typeID+"," +d.level+"," +
+                        d.sensor+",'"+ d.useinfo+"',"+d.corrected+",'"+d.controlinfo+"','"+d.cfailed+"')";
+
+            }
+
         };
     }
 
@@ -144,6 +176,19 @@ public class DefaultKlSql extends KlTblNames implements IKlSql {
                 s.setObject(6,e.typeID, Types.NUMERIC);
                 return s.executeUpdate();
             }
+
+            @Override
+            public String toString() {
+                return "UPDATE " + getTextDataTableName() +
+                        " SET " +
+                        "  original='" +e.original+ "'," +
+                        "  tbtime="+ e.getQuotedTbTime()+" " +
+                        "WHERE " +
+                        "  stnr="+e.stationID+" AND " +
+                        "  obstime="+e.getQuotedObsTime() +" AND " +
+                        "  paramid="+e.paramID +" AND " +
+                        "  typeid="+e.typeID;
+            }
         };
     }
 
@@ -176,8 +221,16 @@ public class DefaultKlSql extends KlTblNames implements IKlSql {
                 s.setObject(5,new java.sql.Timestamp(e.tbtime.toEpochMilli()), Types.TIMESTAMP);
                 s.setObject(6,e.typeID, Types.NUMERIC);
                 return s.executeUpdate();
-
             }
+
+            @Override
+            public String toString() {
+                return "INSERT INTO "+getTextDataTableName() +
+                        "(stationid,obstime,original,paramid,tbtime,typeid) "+
+                        "values ("+e.stationID+","+ e.getObsTime()+",'"+e.original+","
+                        +e.paramID+","+e.getQuotedTbTime()+","+e.typeID+")";
+            }
+
         };
     }
 

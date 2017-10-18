@@ -3,6 +3,10 @@ package no.met.kvclient.service.kafka;
 import java.util.Arrays;
 import java.util.Map;
 
+import no.met.kvclient.service.DataIdElement;
+import no.met.kvclient.service.ObsData;
+import no.met.kvutil.DateTimeUtil;
+import no.met.kvutil.FileUtil;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -11,9 +15,11 @@ import org.apache.kafka.common.errors.*;
 import no.met.kvclient.kv2kvxml.FormatException;
 import no.met.kvclient.kv2kvxml.Kv2KvXml;
 import no.met.kvclient.service.ObsDataList;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 public class KvDataConsumer implements Runnable {
-	
+	static Logger receivelog = Logger.getLogger("receive");
 	private KafkaConsumer<String,String> consumer =null;
 	private String topic;
 	KafkaDataSubscriber subscribers;
@@ -41,6 +47,30 @@ public class KvDataConsumer implements Runnable {
 				System.out.println("KvDataConsumer: -----------   END ---------------------");
 				try {
 					ObsDataList data = Kv2KvXml.decodeFromString(record.value());
+
+
+					for (DataIdElement e : data.keySet()) {
+						ObsData od = data.get(e);
+						String toLog = e.stationID + ", " + e.typeID + ", " + DateTimeUtil.toString(e.obstime, DateTimeUtil.FMT_PARSE);
+
+						if (od == null) {
+							toLog += ", (null)";
+						} else {
+							toLog += ", #d: " + od.dataList.size() + ", #td: " + od.textDataList.size();
+						}
+						receivelog.info(toLog);
+					}
+
+					//Debug
+//					for(DataIdElement e : data.keySet()) {
+//						if( e.stationID==12550 && e.typeID==502) {
+//							String out="------- stationid: " + e.stationID + " typeid: " + e.typeID + " received: " + DateTimeUtil.nowToString() + "---\n";
+//							out += "----   decoded ----- \n" + data + "\n";
+//							out += record.value() + "------------- END -----------------\n";
+//							FileUtil.appendStr2File("level_debug.txt", out);
+//						}
+//					}
+
 					subscribers.callListeners(this, data);
 				} catch (FormatException ex) {
 					System.err.println(ex.getMessage());

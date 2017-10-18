@@ -22,6 +22,7 @@ public class KlDataHelper {
     String foreignTextDataTable=null;
 
     public KlDataHelper( String dbdriver ){
+
         this( dbdriver, null, null, null, null );
     }
 
@@ -39,10 +40,10 @@ public class KlDataHelper {
         this.foreignDataTable = foreignDataTable;
         this.foreignTextDataTable = foreignTextDataTable;
 
-        if( this.foreignDataTable=="" )
+        if( this.foreignDataTable!= null && this.foreignDataTable.isEmpty() )
             this.foreignDataTable = null;
 
-        if( this.foreignTextDataTable=="" )
+        if( this.foreignTextDataTable!= null && this.foreignTextDataTable.isEmpty() )
             this.foreignTextDataTable = null;
 
         query = KlSqlFactory.createQuery( dbdriver, dataTableName, textDataTableName );
@@ -83,31 +84,28 @@ public class KlDataHelper {
     public IExec createInsertQuery(){
         IExec retQ = null;
         String oldtable=null;
-        boolean isForeign=false;
 
         if( currentDataElem != null) {
             if( currentDataElem.stationID > 100000 ) {
-                if( foreignDataTable != null ) {
-                    isForeign = true;
+                if( foreignDataTable != null && !foreignDataTable.isEmpty()) {
                     oldtable = query.setDataTableName( foreignDataTable );
                 }
             }
 
             retQ = query.createDataInsertQuery( currentDataElem );
 
-            if( isForeign )
+            if( oldtable != null )
                 query.setDataTableName( oldtable );
-        } else if( currentTextDataElem!= null) {
+        } else if( currentTextDataElem!= null && !foreignTextDataTable.isEmpty()) {
             if( currentTextDataElem.stationID > 100000 ) {
-                if( foreignTextDataTable != null ) {
-                    isForeign = true;
-                    query.setTextDataTableName( foreignTextDataTable );
+                if( foreignTextDataTable != null  && !foreignTextDataTable.isEmpty() ) {
+                   oldtable = query.setTextDataTableName( foreignTextDataTable );
                 }
             }
 
             retQ = query.createTextDataInsertQuery( currentTextDataElem );
 
-            if( isForeign )
+            if( oldtable != null  )
                 query.setTextDataTableName( oldtable );
         }
 
@@ -117,32 +115,29 @@ public class KlDataHelper {
     public IExec createUpdateQuery(){
         IExec retQ = null;
         String oldtable=null;
-        boolean isForeign=false;
 
         if( currentDataElem != null) {
             if( currentDataElem.stationID > 100000 ) {
-                if( foreignDataTable != null ) {
+                if( foreignDataTable != null && !foreignDataTable.isEmpty()) {
                     oldtable = query.setDataTableName( foreignDataTable );
-                    isForeign = true;
                 }
             }
 
             retQ = query.createDataUpdateQuery( currentDataElem );
 
-            if( isForeign )
+            if( oldtable != null )
                 query.setDataTableName( oldtable );
 
-        } else if( currentDataElem != null) {
-            if( currentDataElem.stationID > 100000 ) {
-                if( foreignTextDataTable != null ) {
+        } else if( currentTextDataElem != null) {
+            if( currentTextDataElem.stationID > 100000 ) {
+                if( foreignTextDataTable != null && !foreignTextDataTable.isEmpty() ) {
                     oldtable = query.setTextDataTableName( foreignTextDataTable);
-                    isForeign = true;
                 }
             }
 
             retQ = query.createTextDataUpdateQuery( currentTextDataElem );
 
-            if( isForeign )
+            if( oldtable != null )
                 query.setTextDataTableName( oldtable );
 
         }

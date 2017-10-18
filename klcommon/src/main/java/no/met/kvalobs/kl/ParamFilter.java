@@ -424,12 +424,10 @@ public class ParamFilter {
 			logger.debug("-- ParamFilter: ParamElem: " + param);
 
 			if (param.paramid == paramid && param.typeid == typeid) {
-
-				if (useLevelAndSensor)
+				if (useLevelAndSensor) {
 					if (param.level != level)
 						continue;
 
-				if (useLevelAndSensor) {
 					if (param.sensor == sensor) {
 						if (obstime.compareTo(param.fdato) >= 0 && obstime.compareTo(param.tdato) <= 0)
 							return false;

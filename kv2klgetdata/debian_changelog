@@ -1,3 +1,8 @@
+kv2klgetdata (3.0.0~rc3-1) UNRELEASED; urgency=medium
+  * Fix todate to be inclusive .
+
+ -- Borge Moe <borge.moe@met.no>  Mon, 16 Oct 2017 17:45:00 +0200
+
 kv2klgetdata (3.0.0~rc2-1) UNRELEASED; urgency=medium
   * Initial version.
   

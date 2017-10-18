@@ -65,9 +65,9 @@ public class Main {
         System.out.println("   -e termin Hent data kun for denne observasjonsterminen.");
         System.out.println("   --termin termin Hent data kun for denne observasjonsterminen.");
         System.out.println("   -f fromdate Hent data fra og med denne observasjonsterminen.");
-        System.out.println("   -t todate hent data til denne observasjonsterminen, men ikke denne terminen.");
+        System.out.println("   -t todate hent data til og med denne observasjonsterminen.");
         System.out.println("             Hvis -t ikke angis hentes data frem til nåtid.");
-        System.out.println("             For å hente data fra bare en termin set todate til det samme som fromdate.");
+        System.out.println("             For å hente data fra bare en termin set todate til det samme som fromdate eller bruk -e termin .");
         System.out.println("   -i typeid En liste av typeid som skal hentes.");
         System.out.println("             Hvis -i ikke angis lagres data for alle typeid.");
         System.out.println("   -v verbose.");
@@ -88,12 +88,11 @@ public class Main {
 
     }
 
-    static String datecheck(String date) {
+    static OffsetDateTime datecheck(String date, OffsetDateTime ifNull) {
         if (date == null)
-            return "";
+            return ifNull;
         try {
-            OffsetDateTime dt = DateTimeUtil.parse(date);
-            return DateTimeUtil.toString(dt, DateTimeUtil.FMT_ISO);
+            return DateTimeUtil.parse(date);
         }
         catch(DateTimeParseException ex) {
             System.err.println("Invalid time format: '"+date+"'. " + ex.getMessage());
@@ -156,8 +155,10 @@ public class Main {
         boolean disableFilter = false;
         boolean saveData = true;
         boolean verbose = false;
-        String toDate = null;
-        String fromDate = null;
+        String sToDate = null;
+        String sFromDate = null;
+        OffsetDateTime dtToDate;
+        OffsetDateTime dtFromDate;
         String typeid = null;
         List<String> list = null;
         LinkedList<Long> typelist = null;
@@ -172,14 +173,14 @@ public class Main {
                     use(0);
                     break;
                 case 't':
-                    toDate = opt.optarg();
+                    sToDate = opt.optarg();
                     break;
                 case 'f':
-                    fromDate = opt.optarg();
+                    sFromDate = opt.optarg();
                     break;
                 case 'e':
-                    fromDate = opt.optarg();
-                    toDate = fromDate;
+                    sFromDate = opt.optarg();
+                    sToDate = sFromDate;
                     break;
                 case 'i':
                     typeid = opt.optarg();
@@ -213,15 +214,24 @@ public class Main {
 
         System.err.println(myConf);
 
-        toDate = datecheck(toDate);
-        fromDate = datecheck(fromDate);
+        dtToDate = datecheck(sToDate, OffsetDateTime.now());
+        dtFromDate = datecheck(sFromDate, OffsetDateTime.MAX);
 
-        if (fromDate == null) {
-            logger.error("ERROR: Ugyldig fromdate!\n");
+        if( dtToDate == null ){
+            logger.error("ERROR: Ugyldig todate '"+sToDate+"'.\n");
             use(1);
         }
 
-        if (fromDate.length() == 0) {
+        //To implement inclusive todate.
+        //Microsecond is the time resolution to timestamp in the database.
+        OffsetDateTime dtToDate_ = DateTimeUtil.plusMicosecond(dtToDate, 1);
+
+        if (dtFromDate == null) {
+            logger.error("ERROR: Ugyldig fromdate '"+sFromDate+"'.\n");
+            use(1);
+        }
+
+        if (dtFromDate.isEqual(OffsetDateTime.MAX)) {
             logger.error("ERROR: fromdate må angis!\n");
             use(1);
         }
@@ -247,7 +257,7 @@ public class Main {
 
             for (Long tid : typelist) {
                 WhichData wd = new WhichData(station.getFirst(), tid, StatusId.All,
-                        fromDate, toDate);
+                        dtFromDate, dtToDate_);
                 wd.stationid2 = stationid2;
                 whichData.add(wd);
             }
@@ -264,8 +274,8 @@ public class Main {
         MiGMTTime start = new MiGMTTime();
 
         logger.info("Options: ");
-        logger.info("toDate: " + toDate);
-        logger.info("fromDate: " + fromDate);
+        logger.info("fromDate: " + DateTimeUtil.toString(dtFromDate, DateTimeUtil.FMT_PARSE));
+        logger.info("toDate: " + DateTimeUtil.toString(dtToDate, DateTimeUtil.FMT_PARSE));
         logger.info("Stations: " + Range.toString(stationList));
         logger.info("typeid:   " + typelist);
         logger.info("kvserver: " + myConf.conf.getProperty("kv.dbconnect", ""));

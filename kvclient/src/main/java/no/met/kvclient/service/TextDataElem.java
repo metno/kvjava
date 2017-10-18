@@ -1,8 +1,12 @@
 package no.met.kvclient.service;
 
+import no.met.kvutil.DateTimeUtil;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 public class TextDataElem extends DataIdElement {
 	public String original;
@@ -39,4 +43,14 @@ public class TextDataElem extends DataIdElement {
 	@Override public String toString() {
 		return "sid: " + stationID+" tid: "+typeID + " ot: " + obstime +" pid: " + paramID+" o: "+ original +  " tbt: "+tbtime;
 	}
+
+	public String getTbTime() {
+		OffsetDateTime tb=tbtime.atOffset(ZoneOffset.UTC);
+		return DateTimeUtil.toString(tb, DateTimeUtil.ISO_WITH_MICRO_SECOND_xx);
+	}
+
+	public String getQuotedTbTime() {
+		return "'" + getTbTime()+"'";
+	}
+
 }

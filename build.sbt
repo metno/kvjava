@@ -7,7 +7,7 @@ publishMavenStyle := true
 lazy val commonSettings = Seq(
 	organization := "no.met.kvalobs",
 	version := "3.0.0-SNAPSHOT",
-	version in Debian := "3.0.0~rc2-1",
+	version in Debian := "3.0.0~rc3-1",
 	maintainer in Linux := "Børge Moe <borge.moe@met.no>",
 	parallelExecution in Test := false,
 

@@ -6,7 +6,7 @@ name := "kv2kl"
 
 description := "kv2kl - listen to data from kvalobs and load into a klima database"
 
-version in Debian := "3.0.0~rc4-1"
+version in Debian := "3.0.0~rc5-1"
 
 // Enables publishing to maven repo
 publishMavenStyle := true

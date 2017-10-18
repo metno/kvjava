@@ -2,6 +2,7 @@ package no.met.kvalobs.kl;
 
 import no.met.kvclient.service.DataElem;
 import no.met.kvclient.service.TextDataElem;
+import no.met.kvutil.DateTimeUtil;
 import no.met.kvutil.dbutil.IExec;
 import org.apache.log4j.Logger;
 
@@ -69,11 +70,30 @@ public class OracleKlSql extends KlTblNames implements IKlSql {
 
                 return s.executeUpdate();
             }
+
+            @Override
+            public String toString() {
+                return "UPDATE " + getDataTableName() +
+                        " SET " +
+                        "  original=" +d.original+ "," +
+                        "  kvstamp="+ d.getQuotedTbTime()+"," +
+                        "  useinfo='"+d.useinfo+"'" +
+                        "  corrected="+d.corrected+"," +
+                        "  controlinfo='"+d.controlinfo+"'," +
+                        "  cfailed='"+d.cfailed+"'," +
+                        "WHERE " +
+                        "  stnr="+d.stationID+" AND " +
+                        "  dato="+d.getQuotedObsTime() +" AND " +
+                        "  paramid="+d.paramID +" AND " +
+                        "  typeid="+d.typeID+" AND " +
+                        "  xlevel="+d.level+" AND " +
+                        "  sensor="+d.sensor;
+            }
         };
     }
 
     public IExec createDataInsertQuery( DataElem elem ){
-        logger.debug("Insert into a SQL92 database("+getDataTableName()+") sid: "+elem.stationID+" tid: " +
+        logger.debug("Insert into a oracle database("+getDataTableName()+") sid: "+elem.stationID+" tid: " +
                 elem.typeID + " pid: " + elem.paramID+ " obstime: '"+elem.obstime+"' tbtime: "+elem.tbtime);
         return new IExec() {
             final private DataElem d=elem;
@@ -107,11 +127,22 @@ public class OracleKlSql extends KlTblNames implements IKlSql {
                 s.setString(12,d.cfailed);
                 return s.executeUpdate();
             }
+
+            @Override
+            public String toString() {
+                return "INSERT INTO " + getDataTableName() +
+                        "(stnr,dato,original,kvstamp,paramid,typeid,xlevel,sensor,useinfo," +
+                        "corrected,controlinfo,cfailed) values (" +
+                        d.stationID+","+d.getQuotedObsTime()+"," + d.original+"," +
+                        d.getQuotedTbTime()+","+ d.paramID+","+d.typeID+"," +d.level+"," +
+                        d.sensor+",'"+ d.useinfo+"',"+d.corrected+",'"+d.controlinfo+"','"+d.cfailed+"')";
+
+            }
         };
     }
 
     public IExec createTextDataUpdateQuery( TextDataElem elem ){
-        logger.debug("Update textData in a SQL92 database ("+getTextDataTableName()+") sid: "+elem.stationID+" tid: " +
+        logger.debug("Update textData in a oracle database ("+getTextDataTableName()+") sid: "+elem.stationID+" tid: " +
                 elem.typeID + " pid: " + elem.paramID+ " obstime: '"+elem.obstime+"' tbtime: "+elem.tbtime);
         return new IExec() {
             final TextDataElem e=elem;
@@ -144,12 +175,27 @@ public class OracleKlSql extends KlTblNames implements IKlSql {
                 s.setObject(6,e.typeID, Types.NUMERIC);
                 return s.executeUpdate();
             }
+
+            @Override
+            public String toString() {
+                return "UPDATE " + getTextDataTableName() +
+                        " SET " +
+                        "  original='" +e.original+ "'," +
+                        "  tbtime="+ e.getQuotedTbTime()+" " +
+                        "WHERE " +
+                        "  stnr="+e.stationID+" AND " +
+                        "  obstime="+e.getQuotedObsTime() +" AND " +
+                        "  paramid="+e.paramID +" AND " +
+                        "  typeid="+e.typeID;
+            }
+
+
         };
     }
 
 
     public IExec createTextDataInsertQuery( TextDataElem elem ) {
-        logger.debug("Insert textData into a SQL92 database ("+getTextDataTableName()+") sid: "+elem.stationID+" tid: " +
+        logger.debug("Insert textData into a oracle database ("+getTextDataTableName()+") sid: "+elem.stationID+" tid: " +
                 elem.typeID + " pid: " + elem.paramID+ " obstime: '"+elem.obstime+"' tbtime: "+elem.tbtime);
 
         return new IExec() {
@@ -178,6 +224,16 @@ public class OracleKlSql extends KlTblNames implements IKlSql {
                 return s.executeUpdate();
 
             }
+
+            @Override
+            public String toString() {
+                return "INSERT INTO "+getTextDataTableName() +
+                                "(stationid,obstime,original,paramid,tbtime,typeid) "+
+                                "values ("+e.stationID+","+ e.getObsTime()+",'"+e.original+","
+                                +e.paramID+","+e.getQuotedTbTime()+","+e.typeID+")";
+
+            }
+
         };
     }
 
