@@ -30,6 +30,10 @@
 */
 package no.met.kvalobs.kl;
 
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import no.met.kvutil.PidFileUtil;
 import no.met.kvutil.ProcUtil;
 import no.met.kvutil.PropertiesHelper;
@@ -40,13 +44,11 @@ import no.met.kvclient.service.SendDataToKv;
 import no.met.kvclient.service.SendDataToKv.Result.EResult;
 
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
+import java.io.IOException;
 import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
+import org.json.JSONObject;
 
 public class KlApp extends KafkaApp  implements SendDataToKv
 {
@@ -61,9 +63,11 @@ public class KlApp extends KafkaApp  implements SendDataToKv
     String foreignDataTableName=null;
     String foreignTextDataTableName=null;
     boolean enableKlConMgr =true;
+    boolean enableFilter=true;
     static String           kvpath=null;
 	static String           appName=null;
 	static String           confname=null;
+	String kvHost;
 
     static public PropertiesHelper getConfile(String conf){
     	if(conf==null){
@@ -124,6 +128,19 @@ public class KlApp extends KafkaApp  implements SendDataToKv
 	static public String getConfName(){return confname;}
 	static public String setAppName(String name){return appName=name;}
 
+	public boolean getEnableFilter() {
+		String sEnableFilter=getConf().getProperty("kl.filter.enable", "true").trim();
+
+		if( !sEnableFilter.isEmpty() ) {
+			if( sEnableFilter.startsWith("t") || sEnableFilter.startsWith("T") )
+				enableFilter = true;
+			else
+				enableFilter = false;
+		}
+
+		return enableFilter;
+	}
+
 	public String getDataTableName() {
     	return dataTableName;
     }
@@ -157,6 +174,7 @@ public class KlApp extends KafkaApp  implements SendDataToKv
 		appName = conf.getProperty("appname", "").trim();
 		confname= conf.getProperty("confname", "").trim();
 		this.enableKlConMgr = enableKlConMgr;
+		kvHost=conf.getProperty("kvhost", "localhost:8090").trim();
 		conKlMgr=getConnectionMgr(conf, "kl");
 		conKvMgr=(DbConnectionMgr)super.getInfo().get("kv.dbmanager");
 
@@ -253,15 +271,25 @@ public class KlApp extends KafkaApp  implements SendDataToKv
     protected void onExit(){
     	
     	System.err.println("*** KlApp.onExit: \n" + ProcUtil.getStackTrace());
-    	if( conKlMgr != null )
+
+		try {
+			Unirest.shutdown();
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.err.println("Failed to shutdown the Unirest (Http Client) ("+e.getMessage()+")." );
+		}
+
+		if( conKlMgr != null )
     		conKlMgr.closeDbDriver();
 		if( conKvMgr != null)
 			conKvMgr.closeDbDriver();
+
+
     }
     
     public DbConnection newKlDbConnection(){
         
-    	if( conKlMgr != null ) {
+    	if( conKlMgr == null ) {
     		logger.warn("The ConnectionMgr is disabled.");
     		logger.debug(ProcUtil.getStackTrace());
     		return null;
@@ -378,8 +406,6 @@ public class KlApp extends KafkaApp  implements SendDataToKv
 	
 	/**
 	 * Remove a previous created pidfile.
-	 * 
-	 * @see createPidFile
 	 */
 	synchronized public void removePidFile() {
 		PidFileUtil.removePidFile();
@@ -388,8 +414,47 @@ public class KlApp extends KafkaApp  implements SendDataToKv
 
 
 	@Override
-	public Result sendData(String data, String decoder) {
-		// TODO Implement the http rest interface to kvdatainputd.
-		return new Result(EResult.ERROR,"Not implemented");
+	public Result sendData(String data, String decoder) throws Exception{
+		String url = "http://"+kvHost+"/v1/observation";
+		String contenType="text/plain";
+		String body=decoder+"\n"+data;
+		HttpResponse<JsonNode> response;
+
+		try {
+
+			response = Unirest.post(url)
+            	.header("accept", "application/json")
+                .header("Content-Type", contenType)
+                .body(body)
+                .asJson();
+		} catch (UnirestException e) {
+			e.printStackTrace();
+			System.out.println(e.getMessage());
+			System.err.println("Failed to send data to: "+ url +"\n"+decoder+"\n"+data);
+			throw new Exception(e.getMessage());
+		}
+
+		if( response.getStatus() != 200 ) {
+			throw new Exception("HttpError: " + response.getStatusText() + " (" + response.getStatus()+"). url: " + url +".");
+
+		}
+
+		JsonNode json=response.getBody();
+		JSONObject obj = json.getObject();
+		EResult eres;
+		int rc=obj.isNull("res")?-1:obj.getInt("res");
+		String msg = obj.isNull("message")?"":obj.getString("message");
+		String msgid = obj.isNull("messageid")?"":obj.getString("messageid");
+		switch( rc ) {
+			case 0: eres=EResult.OK; break;
+			case 1: eres=EResult.NODECODER; break;
+			case 2: eres=EResult.DECODEERROR; break;
+			case 3: eres=EResult.NOTSAVED; break;
+			case 4: eres=EResult.ERROR; break;
+			default:
+				throw new Exception("Unknown response from kvalobs. Result code: " + rc+ ". Message: " + msg);
+		}
+
+		return new Result(eres, msg, msgid);
 	}
 }

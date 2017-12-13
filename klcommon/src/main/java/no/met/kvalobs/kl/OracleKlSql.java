@@ -238,7 +238,11 @@ public class OracleKlSql extends KlTblNames implements IKlSql {
     }
 
     public String dateString( Instant time ) {
-        return "'" + time +"'";
+        String ts=time.toString();
+        ts=ts.replaceAll("Z","");
+        ts=ts.replaceAll("T"," ");
+
+        return "to_date('" + ts + "','yyyy-mm-dd hh24:mi:ss')";
     }
 
 

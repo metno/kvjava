@@ -45,7 +45,6 @@ public class Kv2KlApp extends KlApp
 {
 	static Logger logger=Logger.getLogger(Kv2KlApp.class);
 
-    //DbConnectionMgr conMgr=null;
     Timer        dbCleanupTimer=null;
     Timer        isUpTimer=null;
     boolean     kvIsUp;
@@ -142,34 +141,6 @@ public class Kv2KlApp extends KlApp
 		//when the application is about to terminate.
 		dbCleanupTimer=new Timer(true);
 		dbCleanupTimer.schedule(new DbCleanup(this), 60000, 60000);
-
-
-		//Try to register an Admin interface in the CORBA name server.
-		//The interface is registered in the same context as the kvalobs
-		//server we are set up to receive data from. If we succeed an
-		//timerthread is started that update a logfile every 15th seconds
-		//with status information.
-//        if(admin!=null && admin.length()>0){
-//        	kvIsUpLogFile=getKvpath()+"/var/log/kv2kl_"+admin+".log";
-//
-//        	String kvServer=getKvserver();
-//
-//        	if(kvServer!=null){
-//        		String nsname=kvServer+"/"+admin;
-//
-//        		Admin myAdmin=new Admin();
-//
-//        		if(registerAdmin(nsname, myAdmin)){
-//        			logger.info("Registred a 'Admin' interface in CORBA name service: '"+nsname+"'.");
-//        			isUpTimer=new Timer(true);
-//
-//        			//Run every 15th second.
-//        			isUpTimer.schedule(new IsUp(this, kvIsUpLogFile), 0, 15000);
-//        		}else{
-//        			logger.warn("Cant registred a 'Admin' interface in CORBA name service: '"+nsname+"'.");
-//        		}
-//        	}
-//        }
 	}
 
 

@@ -30,7 +30,6 @@
 */
 package no.met.kvalobs.kl2kv;
 
-import java.nio.file.FileSystems;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -52,16 +51,16 @@ public class Kl2KvMain {
 	public static void use(int exitcode, String extra ){
 		
 		System.out.println(
-		    "Bruk: kl2kv [-h] [-n] [-s kvserver] [-c configFile] [-l obstimelist] -t typeidlist stationlist\n\n"+
-		    "\t-h Skriv ut denne hjelpeteksten!\n"+
+		    "Bruk: kl2kv [--kvtbl-type|--klimatbl-type] |[--help] [-n] [-s kvserver] [-c configFile] [-l obstimelist] -t typeidlist stationlist\n\n"+
+		    "\t--help Skriv ut denne hjelpeteksten!\n"+
 		    "\t-c configFile Angi en alternativ konfigurasjonsfil.\n"+
 		    "\t   Default konfigurasjonsfil er: $KVALOBS/etc/kl2kv.conf\n"+
-		    "\t-s kvserver Bruk kvserver som kvalobsserver i stedet for den\n"+
-		    "\t   som er angitt i konfigurasjonsfilen!\n"+
 		    "\t-n \n" +
 		    "\t--no-qc1 Disable kjøring av QC1 i qaBase. Dette gjøres ved å settes hqcflagg til 3\n"+
 		    "\t   i controlinfo for hver enkelt observasjon.\n"+
 		    "\t-l \n" +
+			"\t--dry-run Do not send data to kvalobs\n"+
+			"\t--kvtbl-type|--klimatbl-type Tabeltypen dataene er lagret i klimadatabasen. Default: klimatbl-type\n"+
 		    "\t--time-list Kommaseparert liste over obstime som skal brukes. \n" +
 		    "\t   Format: fromtime-totime, hvor formatet på fromtime og totime er:\n"+
 		    "\t     YYYY-MM-DDThh[:mm:ss] \n"+
@@ -94,21 +93,26 @@ public class Kl2KvMain {
     {
     	//Set the default timezone to GMT.
     	TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
-    	
+
     	String kvpath=KlApp.getKvpath();
     	String typeid=null;
     	String optTimeList=null;
+		String[] typeidlist=null;
     	List<TimeRange> obstimes=null;
     	boolean disableQC1=false;
     	boolean error=false;
-    	
+    	Kl2KvApp.Kl2KvTblType tblType=Kl2KvApp.Kl2KvTblType.KLTblType;
+    	boolean dryRun=false;
     	GetOptDesc options[] = {
     	            new GetOptDesc('t', "typeid", true),
     	            new GetOptDesc('c', "conf-file", true),
     	            new GetOptDesc('h', "help", false),
-    	            new GetOptDesc('s', "kvalobs-server", true),
     	            new GetOptDesc('l', "time-list", true),
-    	            new GetOptDesc('n', "no-qc1", false)
+    	            new GetOptDesc('n', "no-qc1", false),
+					new GetOptDesc('k', "klimatbl-type", false),
+				    new GetOptDesc('v', "kvtbl-type", false),
+					new GetOptDesc('d', "dry-run", false)
+
     	        };
     	    	
     	if(kvpath==null){
@@ -117,14 +121,13 @@ public class Kl2KvMain {
     	}
     	    	
     	Kl2KvApp app;
-    	SendData  sendData;          
-    	String configfile="kl2kvnew.conf";
+    	SendDataToKv sendData;
+    	String configfile=null;
     	Instant start=Instant.now();
-    	
+    	boolean helpCmd=false;
+
     	GetOpt go = new GetOpt( options );
-    	String kvserver=null;
-    	
-    	
+
     	Map<String,String> optArgs = go.parseArguments( args );
     	Set<String> optKeys=optArgs.keySet();
     	
@@ -132,7 +135,8 @@ public class Kl2KvMain {
     	for( String opt : optKeys ) {
              switch( opt.charAt( 0 ) ) {
              case 'h':
-                 use(0, null);
+                 helpCmd=true;
+
                  break;
              case 'c':
                  configfile= optArgs.get( opt );
@@ -143,21 +147,39 @@ public class Kl2KvMain {
              case 'l':
             	 optTimeList=optArgs.get( opt );
             	 break;
-             case 's':
-            	 kvserver=go.optarg();
-            	 break;
              case 'n':
             	 disableQC1=true;
             	 break;
+             case 'k':
+				 tblType= Kl2KvApp.Kl2KvTblType.KLTblType;
+			 	break;
+			 case 'v':
+				 tblType= Kl2KvApp.Kl2KvTblType.Kv2KvTblType;
+				 break;
+			 case 'd':
+				 dryRun=true;
+				 break;
              case '?':
             	 use( 1,  new String( "*** Unknown option: " + optArgs.get( opt ) ) );
              default:
                  use(1, new String( "*** Unknown option: " +  opt ) );
              }
          }
-    	
-    	    	 
-    	 if( optTimeList != null ) {
+
+        KvConfig myConf = KvConfig.config("kl2kv", configfile);
+
+    	if( helpCmd ) {
+            System.out.println(myConf.toString());
+            use(0, null);
+        }
+
+		if (typeid == null) {
+			use(1,"No typeid is specified. Use -t typeidlist to specify on or more typeids.");
+		}
+
+		typeidlist=typeid.split(",");
+
+		if( optTimeList != null ) {
     		 obstimes = TimeDecoder.decodeTimeList( optTimeList );
     		 
     		 if( obstimes == null ) {
@@ -166,33 +188,21 @@ public class Kl2KvMain {
     		 
     		 obstimes = TimeDecoder.ensureResolution( obstimes, 6 );
     	 }
-    	
-    	 int i=configfile.lastIndexOf(".conf");
-    	
-    	 if(i<=0 || i != configfile.length()-5 || configfile.charAt(i-1) == '/') {
-    		 System.out.println("FATAL: the configuration file <" + configfile + "> is not named like 'name.conf'");
-    		 System.exit(1);
-    	 }
-        
-    	 
-    	//    	Konfigurer loggesystemet, log4j.
-     	PropertyConfigurator.configure(InitLogger.getLogProperties(configfile, FileSystems.getDefault().getPath(".")));
-    	 
-    	 List<String> stations=go.getFilenameList();
+
+		PropertyConfigurator.configure(InitLogger.getLogProperties(myConf));
+
+		List<String> stations=go.getFilenameList();
     	 
          go=null; //We dont need it anymore.
 
-         String[] typeidlist;
-         if(typeid==null) {
-        	 typeidlist = new String[1];
-        	 typeidlist[0] = null;
-         } else {
-        	 typeidlist=typeid.split(",");
-         }
-         
-         app=new Kl2KvApp(args, configfile, kvserver, false);
-         
-    	 sendData=new SendData(app);          
+
+
+         app=new Kl2KvApp(args, myConf.conf, tblType);
+
+         if( tblType == Kl2KvApp.Kl2KvTblType.KLTblType )
+         	sendData = new SendKlData(app, dryRun);
+         else
+    	 	sendData=new SendKv2KvData(app, dryRun);
     	 
     	 logger.info("Program started at: " + start);
 

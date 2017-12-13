@@ -1,0 +1,34 @@
+Download ojdbc7 or ojdbc8 from oracle. You need a user account on oracle to download.
+
+http://www.oracle.com/technetwork/database/features/jdbc/index-091264.html
+
+Upload the jar file to the local maven repository
+
+
+mvn install:install-file -Dfile=$HOME/Downloads/ojdbc7.jar -DgroupId=com.oracle
+   -DartifactId=ojdbc7 -Dversion=12.1.0.2 -Dpackaging=jar
+
+or
+
+mvn install:install-file -Dfile=$HOME/Downloads/ojdbc8.jar -DgroupId=com.oracle
+   -DartifactId=ojdbc8 -Dversion=12.2.0.1 -Dpackaging=jar
+
+
+
+Replace version and where the ojdbc.jar file is.
+
+
+
+
+I cant get The following to work. Since oracle don't allow browsing of the repo
+we just have to relay on guess work.
+
+Or setup to use oracle maven repository.
+
+Folow the guide here.
+
+http://www.oracle.com/webfolder/application/maven/index.html
+
+Look at this guide on how to manage passwords in maven
+
+http://maven.apache.org/guides/mini/guide-encryption.html

@@ -10,8 +10,17 @@ lazy val commonSettings = Seq(
 	version in Debian := "3.0.0~rc3-1",
 	maintainer in Linux := "Børge Moe <borge.moe@met.no>",
 	parallelExecution in Test := false,
+	credentials += Credentials(Path.userHome / ".ivy2" / ".credentials"),
+	//credentials += Credentials(Path.userHome / ".ivy2" / ".credentials_oracle"),
 
-	libraryDependencies ++= Seq	(
+	//Replace user and password with your oracle account details. (But it dont work)
+  //credentials += Credentials("WebLogic Server", "login.oracle.com", "user", "password"),
+	/*resolvers ++= Seq(
+		 "Oracle maven repo" at "https://maven.oracle.com"
+	),
+*/
+
+		libraryDependencies ++= Seq	(
 		"log4j" % "log4j" % "1.2.17",
 		"junit" % "junit" % "4.10" % Test,
 		"org.hsqldb" % "hsqldb" % "2.3.4" % Test,
@@ -52,3 +61,10 @@ lazy val kv2klgetdata = (project in file("kv2klgetdata"))
 	.dependsOn(kvutil, kvclient, klcommon, kvdistuser)
 	.settings(commonSettings: _*)
 	.enablePlugins(JavaAppPackaging,DebianPlugin)
+
+
+lazy val kl2kv = (project in file("kl2kv"))
+	.dependsOn(kvutil, kvclient, klcommon, kvdistuser)
+	.settings(commonSettings: _*)
+	.enablePlugins(JavaAppPackaging,DebianPlugin)
+

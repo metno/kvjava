@@ -244,8 +244,10 @@ public class Filter {
 			              Instant obstime_, StringHolder msg){
 		Kv2KlimaFilter dbElem;
 
-		if(!filterEnabled)
+		if(!filterEnabled) {
+			addToString(msg, "Filter disabled.");
 			return true;
+		}
 		
 		logger.debug(" -- Filter:  sid: "+stationID.getValue() + " tid: "+typeID_
 		             + " paramID: "+paramID + " obstime: " + obstime_);

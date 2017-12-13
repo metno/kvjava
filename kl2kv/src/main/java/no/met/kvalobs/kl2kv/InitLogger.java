@@ -1,6 +1,7 @@
 package no.met.kvalobs.kl2kv;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Properties;
 
 import org.apache.log4j.PropertyConfigurator;
@@ -33,7 +34,7 @@ log4j.appender.R.layout.ConversionPattern=%d [%t] %-5p %c %x - %m%n
 
 
 public class InitLogger {
-	static public Properties getLogProperties(Properties conf, Path logPath){
+	static public Properties getLogProperties(Properties conf, Path logPath, String appName){
 		String loglevelDefault = conf.getProperty("log.level", "debug");
 		String maxsizeDefault = conf.getProperty("log.maxsize", "10MB");
 		String path = conf.getProperty("log.path",logPath.toString());
@@ -45,17 +46,17 @@ public class InitLogger {
 	    prop.setProperty("log4j.appender.stdout.layout","org.apache.log4j.PatternLayout");
 		prop.setProperty("log4j.appender.stdout.layout.ConversionPattern","%5p [%t] - %m%n");
 		prop.setProperty("log4j.appender.R","org.apache.log4j.RollingFileAppender");
-		prop.setProperty("log4j.appender.R.File", path+"/kl2kv.log");
+		prop.setProperty("log4j.appender.R.File", path+"/" + appName+".log");
 		prop.setProperty("log4j.appender.R.MaxFileSize", maxsizeDefault);
 		prop.setProperty("log4j.appender.R.MaxBackupIndex", maxBackupDafault);
 		prop.setProperty("log4j.appender.R.layout","org.apache.log4j.PatternLayout");
 		prop.setProperty("log4j.appender.R.layout.ConversionPattern","%d [%t] %-5p %c %x - %m%n");
-		
-		
+
 		return prop;
 	}
-	
-	static public Properties getLogProperties(String file, Path logPath){
-		return getLogProperties(PropertiesHelper.loadFile(file), logPath);
+
+	static public Properties getLogProperties(KvConfig conf){
+		return getLogProperties(conf.conf, Paths.get(conf.logdir), conf.appName);
 	}
+
 }

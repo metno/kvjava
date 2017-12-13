@@ -236,8 +236,7 @@ public class KlInsertHelper {
         boolean filterRet;
         boolean ret = true;
 
-        if (!enableFilter)
-            filter.setFilterEnabled(false);
+        filter.setFilterEnabled(enableFilter);
 
         logger.debug("InsertData (Enter): " + Instant.now());
 
@@ -316,8 +315,12 @@ public class KlInsertHelper {
                     if (!filterRet)
                         continue;
 
-                    if (!doInsertData(dbconn, dh.createInsertQuery(), dh.createUpdateQuery()))
+                    if (!doInsertData(dbconn, dh.createInsertQuery(), dh.createUpdateQuery())) {
+                        logger.error("DBERROR: stationid: " + dh.getStationID() +
+                                " typid: " + dh.getTypeID() +
+                                " obstime: " + dh.getObstime());
                         ret = false;
+                    }
                 }
             }
             status.updateLastDbTime();

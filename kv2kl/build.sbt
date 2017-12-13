@@ -6,7 +6,7 @@ name := "kv2kl"
 
 description := "kv2kl - listen to data from kvalobs and load into a klima database"
 
-version in Debian := "3.0.0~rc5-1"
+version in Debian := "3.0.0~rc7-1"
 
 // Enables publishing to maven repo
 publishMavenStyle := true
@@ -17,9 +17,20 @@ crossPaths := false
 // This forbids including Scala related libraries into the dependency
 autoScalaLibrary := false
 
+//credentials += Credentials("OAM 11g", "login.oracle.com", "borgem.moe@met.no", "Xgtlfp9al")
+
+//libraryDependencies ++= Seq	(
+//	"org.postgresql" % "postgresql" % "9.4.1212.jre7",
+//	"com.oracle" % "ojdbc14" % "10.2.0.1.0"
+//)
+
+
 libraryDependencies ++= Seq	(
 	"org.postgresql" % "postgresql" % "9.4.1212.jre7",
-	"com.oracle" % "ojdbc14" % "10.2.0.1.0"
+	"com.oracle" % "ojdbc8" % "12.2.0.1"
+
+
+	//"com.oracle" % "ojdbc7" % "12.1.0.2"
 )
 
 

@@ -1,3 +1,9 @@
+kv2kl (3.0.0~rc7-1) UNRELEASED; urgency=medium
+  * Upgrade to kafka-client 0.10.2.1
+
+ -- Borge Moe <borge.moe@met.no>  Thu, 2 Nov 2017 11:00:00 +0100
+
+
 kv2kl (3.0.0~rc4-1) UNRELEASED; urgency=medium
   * Activate monitoring for db.
 

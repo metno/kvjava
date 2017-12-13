@@ -42,12 +42,9 @@ import no.met.kvclient.service.StatusId;
 import no.met.kvclient.service.SubscribeId;
 import no.met.kvclient.service.WhichData;
 import no.met.kvclient.service.WhichDataList;
-import no.met.kvutil.GetOpt;
-import no.met.kvutil.ProcUtil;
-import no.met.kvutil.FileUtil;
+import no.met.kvutil.*;
 
 
-import no.met.kvutil.PropertiesHelper;
 import org.apache.log4j.Logger;
 import org.apache.log4j.NDC;
 import org.apache.log4j.PropertyConfigurator;
@@ -58,16 +55,17 @@ public class Kv2KlMain {
     static Logger logger = Logger.getLogger(Kv2KlMain.class);
 
     public static void use(int exitcode) {
-        System.out.println("Usage: kv2kl [-h] [-c configFile] -d [-p directory]");
+        System.out.println("Usage: kv2kl OPTIONS");
         System.out.println("  OPTIONS");
-        System.out.println("    -d disable the data filter.");
-        System.out.println("    -c configfile Use configfile.");
-        System.out.println("    -p do not create a pid file.");
-        System.out.println("    -n do not save data to the database.");
-        System.out.println("    -l hours Connect to kvalobs at startup and load hours times");
+        System.out.println("    -d|--disable-filter Disable the data filter.");
+        System.out.println("    -e|--enable-filter Enable the data filter.");
+        System.out.println("    -c|--conf configfile Use configfile.");
+        System.out.println("    -p|--no-pid-file Do not create a pid file.");
+        System.out.println("    -n|--no-db Do not save data to the database.");
+        System.out.println("    -l|--load-hours hours Connect to kvalobs at startup and load hours times");
         System.err.println("       of data to the database. Default 0.");
-        System.err.println("    -k Print out the configuration and exit.");
-        System.out.println("    -h This help message.");
+        System.err.println("    -k|list-conf Print out the configuration and exit.");
+        System.out.println("    -h|--help This help message.");
         exit(exitcode);
     }
 
@@ -95,6 +93,20 @@ public class Kv2KlMain {
         }
     }
 
+    static GetOptDesc[] getOptDescription() {
+        return new GetOptDesc[] {
+                new GetOptDesc('c', "conf", true),
+                new GetOptDesc('h', "help", false),
+                new GetOptDesc('k', "list-conf", false),
+                new GetOptDesc('d', "disable-filter", false),
+                new GetOptDesc('e', "enable-filter", false),
+                new GetOptDesc('p', "no-pid-file", false),
+                new GetOptDesc('n', "no-db", false),
+                new GetOptDesc('l', "load-hours", true)
+        };
+
+    }
+
 
     public static void main(String[] args) {
         //Set the default timezone to GMT.
@@ -118,11 +130,10 @@ public class Kv2KlMain {
         SubscribeId subscriberid;
         SubscribeId hintid;
         Instant now = Instant.now();
-        GetOpt go = new GetOpt("c:hkdpnl:");
+        GetOpt go = new GetOpt(getOptDescription());
 //        String kvserver = null;
 //        String kvname = null;
         int hoursBack = 0;
-        boolean enableFilter = true;
         boolean createPidFile = true;
         boolean saveDataToDb = true;
         boolean printConfigAndExit = false;
@@ -141,7 +152,10 @@ public class Kv2KlMain {
                     printConfigAndExit = true;
                     break;
                 case 'd':
-                    enableFilter = false;
+                    conf.conf.setProperty("filter.enable", "false");
+                    break;
+                case 'e':
+                    conf.conf.setProperty("filter.enable", "true");
                     break;
                 case 'p':
                     createPidFile = false;
@@ -175,29 +189,6 @@ public class Kv2KlMain {
 
         System.out.println("Configfile (in): " + conf.configfile);
 
-//    	 int i=configfile.lastIndexOf(".conf");
-//         	
-//    	 if(i<=0 || i != configfile.length()-5 || configfile.charAt(i-1) == '/') {
-//    		 System.out.println("FATAL: the configuration file <" + configfile + "> is not named like 'name.conf'");
-//    		 System.exit(1);
-//    	 }
-//        
-//    	 kvname=configfile.substring(0, i);
-//    	 i=kvname.lastIndexOf('/');
-//    	 
-//    	 if(i>-1){
-//    		 if(i<kvname.length()){
-//    			 kvname = kvname.substring(i+1);
-//    		 }else{
-//    			 System.out.println("FATAL: the name of the configuration file must be on the form 'name.conf' <" + configfile +">");
-//        		 System.exit(1);
-//    		 }
-//    	 }
-//    	 
-//    	 String logfile=kvname+"_log.conf";
-//    	 
-//    	//    	Konfigurer loggesystemet, log4j.
-//     	System.out.println("log4j conf: "+kvpath+"/etc/"+logfile);
         FileUtil.writeStr2File(conf.logdir+"/"+conf.appName+"_conf.properties",conf.toString());
 
         Properties logProperties=InitLogger.getLogProperties(conf);
@@ -209,7 +200,7 @@ public class Kv2KlMain {
 
         app = new Kv2KlApp(args, conf, false);
         dataSubscribeInfo = new KvDataSubscribeInfo();
-        dataReceiver = new KlDataReceiver(app, kvState,conf.appName + ".dat", enableFilter, saveDataToDb);
+        dataReceiver = new KlDataReceiver(app, kvState,conf.appName + ".dat", app.getEnableFilter(), saveDataToDb);
         hint = new KvHintListener(app);
 
         logger.info("Starting: " + now);

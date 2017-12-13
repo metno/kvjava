@@ -104,7 +104,22 @@ public class Station {
 		
 		return " stationid>="+first + " AND stationid<="+last;
 	}
-	
+
+	public String klQuery(){
+
+		if(last<0 || first<0)
+			return null;
+
+		if(last==0 && first==0)
+			return "";
+
+		if(last==0)
+			return "stnr="+first;
+
+		return "stnr>="+first + " AND stnr<="+last;
+	}
+
+
 	public String toString(){
 		return new String("["+first+"-"+last+"]");
 	}

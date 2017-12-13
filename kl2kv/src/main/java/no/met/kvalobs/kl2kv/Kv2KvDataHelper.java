@@ -31,21 +31,17 @@
 package no.met.kvalobs.kl2kv;
 
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.*;
 import no.met.kvalobs.kl.*;
-import no.met.kvutil.*;
 import org.apache.log4j.Logger;
 
 import no.met.kvutil.dbutil.DbConnection;
-import no.met.kvutil.dbutil.DbConnectionMgr;
 
 
 /**
  * This class is used to create a message that is to be sendt to the 
- * kldecoder in kvalobs. The data is read from the table KL2KVALOBS 
+ * kv2kvdecoder in kvalobs. The data is read from the table KL2KVALOBS
  * in an open database.
  * 
  * The format on the message to be sendt is.
@@ -73,10 +69,10 @@ import no.met.kvutil.dbutil.DbConnectionMgr;
  * @author borgem
  *
  */
-public class DataHelper{
+public class Kv2KvDataHelper {
 	int MAX_COUNT;
 		
-	static Logger logger = Logger.getLogger(DataHelper.class);
+	static Logger logger = Logger.getLogger(Kv2KvDataHelper.class);
 	static final float MISSING_VAL=-32767.0f;
 	String tablename="KLOPP.T_KL2KVALOBS_HIST";
 	String typeid;
@@ -116,13 +112,13 @@ public class DataHelper{
     		return false;
     }
     
-    public DataHelper(DbConnection con, DataToKv dataToKv,  
-	                   String typeid, boolean disableQC1 ){
+    public Kv2KvDataHelper(DbConnection con, DataToKv dataToKv,
+						   String typeid, boolean disableQC1 ){
     	this(con, dataToKv, typeid, null, disableQC1, null, 20);
     }
     
-    public DataHelper(DbConnection con, DataToKv dataToKv,  
-                       String typeid, List<TimeRange> obstimes, boolean disableQC1, String table){
+    public Kv2KvDataHelper(DbConnection con, DataToKv dataToKv,
+						   String typeid, List<TimeRange> obstimes, boolean disableQC1, String table){
     	this(con, dataToKv, typeid, obstimes, disableQC1, table, 20);
     }
     
@@ -136,9 +132,9 @@ public class DataHelper{
      * @param max_count The data to be sendt to kvalobs is
      *        split up in max_count chuncks. 
      */
-    public DataHelper(DbConnection con, DataToKv dataToKv,  
-    		           String typeid, List<TimeRange> obstimes, boolean disableQC1,
-    		           String table, int max_count){
+    public Kv2KvDataHelper(DbConnection con, DataToKv dataToKv,
+						   String typeid, List<TimeRange> obstimes, boolean disableQC1,
+						   String table, int max_count){
     	params=null;
     	msgCount=0;
     	obsCount=0;
@@ -159,7 +155,7 @@ public class DataHelper{
     }
     
     protected String createQuery(Station st, TimeRange obstime ){
-    	IQuery sqlHelper = Kl2KvApp.sqlHelper;
+    	IKlSql sqlHelper = Kl2KvApp.getSqlHelper();
     	String query="";
     	String stQuery=st.query();
     	String typeQuery=null;

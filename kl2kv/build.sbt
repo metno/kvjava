@@ -3,6 +3,8 @@ import NativePackagerHelper._
 
 name := "kl2kv"
 
+version in Debian := "3.0.0~rc1-1"
+
 description := "kl2kv - transfer data from a klima database to kvalobs."
 
 // Enables publishing to maven repo
@@ -16,16 +18,15 @@ autoScalaLibrary := false
 
 libraryDependencies ++= Seq	(
   "org.postgresql" % "postgresql" % "9.4.1211",
-  "com.oracle" % "ojdbc14" % "10.2.0.1.0"
-
+  "com.oracle" % "ojdbc8" % "12.2.0.1"
 )
 
 
 //changelog in Debian := baseDirectory.value / "debian_changelog"
 
-packageSummary := "Utility to transfer data from a kvalobs data base to the klimadb"
+packageSummary := "Utility to transfer data from a klima database to kvalobs."
 
-packageDescription := """Utility to transfer data from a kvalobs data base to the \"klimadb\"."""
+packageDescription := """Utility to transfer data from a klima database to the \"kvalobs\"."""
 
 debianPackageDependencies in Debian ++= Seq("kvdistuser","kv2kl")
 

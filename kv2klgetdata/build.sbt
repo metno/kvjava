@@ -10,6 +10,7 @@ version in Debian := "3.0.0~rc3-1"
 // Enables publishing to maven repo
 publishMavenStyle := true
 
+
 // Do not append Scala versions to the generated artifacts
 crossPaths := false
 
@@ -18,7 +19,7 @@ autoScalaLibrary := false
 
 libraryDependencies ++= Seq	(
 	"org.postgresql" % "postgresql" % "9.4.1211",
-	"com.oracle" % "ojdbc14" % "10.2.0.1.0"
+	"com.oracle" % "ojdbc8" % "12.2.0.1"
 )
 
 debianChangelog in Debian := Some( baseDirectory.value / "debian_changelog")

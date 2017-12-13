@@ -32,39 +32,46 @@ package no.met.kvalobs.kl2kv;
 
 import no.met.kvalobs.kl.KlApp;
 import no.met.kvutil.PropertiesHelper;
-import no.met.kvalobs.kl.IQuery;
-import no.met.kvalobs.kl.QueryFactory;
+import no.met.kvalobs.kl.IKlSql;
+import no.met.kvalobs.kl.KlSqlFactory;
 
 import org.apache.log4j.Logger;
 
 public class Kl2KvApp extends KlApp
 {
+
 	static Logger logger=Logger.getLogger(Kl2KvApp.class);
-	
+	public enum Kl2KvTblType {KLTblType, Kv2KvTblType};
     String stations;
-    String tablename="T_KL2KVALOBS_HIST";
-    
-    public static IQuery sqlHelper=null; 
-    
-    public Kl2KvApp(String[] args, String conffile, String kvserver, boolean usingSwing){
-    	super(args, conffile, kvserver, usingSwing);
+    String Kv2KvTablename="T_KL2KVALOBS_HIST";
+    String KlTablename="kl2kvalobs";
+    String tablename;
+    static IKlSql sqlHelper=null;
+
+    public Kl2KvApp(String[] args, PropertiesHelper prop, Kl2KvTblType tblType){
+    	super(args, prop, false, true);
     	
     	PropertiesHelper conf=getConf();
     	
-    	String tmpTablename=conf.getProperty("kl2kv.table","T_KL2KVALOBS_HIST");
-    	
-    	String dbdriver = conf.getProperty( "dbdriver" );
-    	
-    	if( dbdriver == null || dbdriver.length() == 0 ) {
-    		logger.fatal( "dbdriver must be set in the configuration file." );
-    		System.exit( 1 );
-    	}
-    	
-    	sqlHelper = QueryFactory.createQuery( dbdriver );
+    	String dbdriver=conf.getProperty("kl.dbdriver");
+        String datatable=conf.getProperty("kl.datatable","kv2klima");
+        String textdatatable=conf.getProperty("kl.textdatatable","T_TEXT_DATA");
+        Kv2KvTablename=conf.getProperty("kl2kv.table.kv2kv", "T_KL2KVALOBS_HIST");
+        KlTablename=conf.getProperty("kl2kv.table.kl", "kl2kvalobs");
+
+        if( tblType == Kl2KvTblType.KLTblType)
+            tablename = KlTablename;
+        else
+            tablename = Kv2KvTablename;
+
+        sqlHelper=KlSqlFactory.createQuery(dbdriver,datatable,textdatatable);
     }
     
     public String getTablename(){
     	return tablename;
     }
-    
+
+    static public IKlSql getSqlHelper() {
+        return sqlHelper;
+    }
 }
