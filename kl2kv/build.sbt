@@ -3,7 +3,7 @@ import NativePackagerHelper._
 
 name := "kl2kv"
 
-version in Debian := "3.0.0~rc1-1"
+version in Debian := "3.0.0~rc2-1"
 
 description := "kl2kv - transfer data from a klima database to kvalobs."
 

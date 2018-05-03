@@ -41,7 +41,14 @@ public class KafkaDataSubscriber implements KvSubsribeData {
 		if(conf==null)
 			conf =  new Properties();
 		
-		topic = conf.getProperty("kafks.topic", "kvalobs.production.checked");
+		topic = conf.getProperty("kafka.topic", null);
+
+		if( topic==null)
+			topic = conf.getProperty("topic", null);
+
+		if( topic==null)
+			topic="kvalobs.production.checked";
+
 		groupId = conf.getProperty("kafka.group.id");
 		brokers=conf.getProperty("kafka.connect");
 		

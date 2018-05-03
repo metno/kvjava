@@ -1,3 +1,8 @@
+kv2klgetdata (3.0.0~rc4-1) UNRELEASED; urgency=medium
+  * Fix kafka topic.
+
+ -- Borge Moe <borge.moe@met.no>  Thu, 3 May 2018 15:55:00 +0200
+
 kv2klgetdata (3.0.0~rc3-1) UNRELEASED; urgency=medium
   * Fix todate to be inclusive .
 
