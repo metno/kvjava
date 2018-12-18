@@ -39,6 +39,7 @@ import java.util.TimeZone;
 import no.met.kvalobs.kl.KlApp;
 import no.met.kvalobs.kl.KlInsertHelper;
 import no.met.kvalobs.kl.Range;
+import no.met.kvalobs.kl.TypeRouter;
 import no.met.kvclient.KvBaseConfig;
 import no.met.kvclient.service.*;
 import no.met.kvutil.*;
@@ -263,14 +264,17 @@ public class Main {
             }
         }
 
-        if (disableFilter)
-            insertstmt = new KlInsertHelper(app.getKlConnectionMgr(), null, false);
+        TypeRouter router = new TypeRouter();
+
+        router.setDefaultTable(app.getDataTableName(),false);
+        router.setDefaultTextTable(app.getTextDataTableName(), false);
+
+        if( disableFilter)
+            router.setEnableFilter(false, false);
         else
-            insertstmt = new KlInsertHelper(app.getKlConnectionMgr(), null, true);
+            router.setEnableFilter(true, false);
 
-        insertstmt.setDataTableName(app.getDataTableName());
-        insertstmt.setTextDataTableName(app.getTextDataTableName());
-
+        insertstmt = new KlInsertHelper(app.getKlConnectionMgr(), null, router);
         MiGMTTime start = new MiGMTTime();
 
         logger.info("Options: ");
@@ -351,6 +355,3 @@ public class Main {
         logger.info("# observations: " + nObservations);
     }
 }
-
-
-	
