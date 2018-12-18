@@ -165,7 +165,7 @@ public class KvDataContainer {
 		} else if( (kvParam.isMissingOriginal() && kvParam.isMissingCorrected()) &&
 				   ( (int)Math.round( original) != KvDataContainer.MISSING_VALUE || 
 				     (int)Math.round( corrected ) != KvDataContainer.MISSING_VALUE ) ) {
-			System.out.println("KvDataContainer::add: Replace [" + stationid + "," +typeid + "," + paramid + "," +level + "," + nSensor + "," + obstime.toString()+"]" );
+			//System.out.println("KvDataContainer::add: Replace [" + stationid + "," +typeid + "," + paramid + "," +level + "," + nSensor + "," + obstime.toString()+"]" );
 			kvParam = new KvDataParam( paramid, original, corrected, controlinfo, useinfo, cfailed );
 			kvLevel.add( kvParam );
 		} else {
@@ -210,42 +210,36 @@ public class KvDataContainer {
     			stationid =  rs.getInt( iStationid);
     			
     			if( rs.wasNull() ) {
-    				System.out.println("KvDataContainer::add: stationid is NULL." );
     				continue;
     			}
     				
     			tsobstime=rs.getTimestamp( iObstime );
     			
     			if( rs.wasNull() ) {
-    				System.out.println("KvDataContainer::add: obstime is NULL." );
     				continue;
     			}
     			
     			original = rs.getFloat( iOriginal);
     			
     			if( rs.wasNull() ) {
-    				System.out.println("KvDataContainer::add: original is NULL." );
     				continue;
     			}
     			
     			paramid = rs.getInt( iParamid);
     			
     			if( rs.wasNull() ) {
-    				System.out.println("KvDataContainer::add: paramid is NULL." );
     				continue;
     			}
     			
     			typeid = rs.getInt(iTypeid);
     			
     			if( rs.wasNull() ) {
-    				System.out.println("KvDataContainer::add: typeid is NULL." );
     				continue;
     			}
     			
     			sensor = rs.getString( iSensor );
     			
     			if( rs.wasNull() ) {
-    				//System.out.println("KvDataContainer::add: sensor is NULL. Seting it to 0." );
     				sensor = "0";
     			}
     			
@@ -254,14 +248,12 @@ public class KvDataContainer {
     			corrected = rs.getFloat( iCorrected );
     			
     			if( rs.wasNull() ) {
-    				//System.out.println("KvDataContainer::add: corrected is NULL. Setting it to original." );
     				corrected = original;
     			}
 
     			controlinfo = rs.getString( iControlinfo );
     			
     			if( rs.wasNull() ) {
-    				//System.out.println("KvDataContainer::add: controlinfo is NULL." );
     				controlinfo = "0000000000000000";
     			} else {
     				//As a hack we set hqc flag to 3 if the flag is '0'.

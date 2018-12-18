@@ -23,19 +23,20 @@ public class DefaultKlSql extends KlTblNames implements IKlSql {
     }
 
     public IExec createDataUpdateQuery(DataElem elem ){
-        logger.debug("Update data in a SQL92 database ("+getDataTableName()+") sid: "+elem.stationID+" tid: " +
+        logger.debug("Update data: SQL92 database ("+getDataTableName()+") sid: "+elem.stationID+" tid: " +
                 elem.typeID + " pid: " + elem.paramID+ " obstime: '"+elem.obstime+"' tbtime: "+elem.tbtime);
         return new IExec() {
             final private DataElem d=elem;
+            final private String tableName=getDataTableName();
 
             @Override
             public String name() {
-                return "DataElemUpdate";
+                return "DataElemUpdate_"+tableName;
             }
 
             @Override
             public String create() {
-                return "UPDATE " + getDataTableName() +
+                return "UPDATE " + tableName +
                         " SET " +
                         "  original=?," +
                         "  kvstamp=?," +
@@ -72,7 +73,7 @@ public class DefaultKlSql extends KlTblNames implements IKlSql {
 
             @Override
             public String toString() {
-                return "UPDATE " + getDataTableName() +
+                return "UPDATE " + tableName +
                         " SET " +
                         "  original=" +d.original+ "," +
                         "  kvstamp="+ d.getQuotedTbTime()+"," +
@@ -93,19 +94,21 @@ public class DefaultKlSql extends KlTblNames implements IKlSql {
     }
 
     public IExec createDataInsertQuery( DataElem elem ){
-        logger.debug("Insert into a SQL92 database("+getDataTableName()+") sid: "+elem.stationID+" tid: " +
+        logger.debug("Insert data: SQL92 database("+getDataTableName()+") sid: "+elem.stationID+" tid: " +
                 elem.typeID + " pid: " + elem.paramID+ " obstime: '"+elem.obstime+"' tbtime: "+elem.tbtime);
         return new IExec() {
             final private DataElem d=elem;
+            final private String tableName = getDataTableName();
 
             @Override
             public String name() {
-                return "DataElemInsert";
+                return "DataElemInsert_"+tableName;
             }
 
             @Override
             public String create() {
-                return "INSERT INTO " + getDataTableName() +
+                //System.out.println("createDataInsertQuery: IExec: table: " + tableName);
+                return "INSERT INTO " + tableName +
                         "(stnr,dato,original,kvstamp,paramid,typeid,xlevel,sensor,useinfo,corrected,controlinfo,cfailed) values (" +
                         "?,?,?,?,?,?,?,?,?,?,?,?)";
             }
@@ -130,7 +133,7 @@ public class DefaultKlSql extends KlTblNames implements IKlSql {
 
             @Override
             public String toString() {
-                return "INSERT INTO " + getDataTableName() +
+                return "INSERT INTO " + tableName +
                         "(stnr,dato,original,kvstamp,paramid,typeid,xlevel,sensor,useinfo," +
                         "corrected,controlinfo,cfailed) values (" +
                         d.stationID+","+d.getQuotedObsTime()+"," + d.original+"," +
@@ -143,19 +146,21 @@ public class DefaultKlSql extends KlTblNames implements IKlSql {
     }
 
     public IExec createTextDataUpdateQuery( TextDataElem elem ){
-        logger.debug("Update textData in a SQL92 database ("+getTextDataTableName()+") sid: "+elem.stationID+" tid: " +
+        logger.debug("Update textData: SQL92 database ("+getTextDataTableName()+") sid: "+elem.stationID+" tid: " +
                 elem.typeID + " pid: " + elem.paramID+ " obstime: '"+elem.obstime+"' tbtime: "+elem.tbtime);
         return new IExec() {
-            final TextDataElem e=elem;
+            final private TextDataElem e=elem;
+            final private String tableName=getTextDataTableName();
+
             @Override
             public String name() {
-                return "TextDataElemUpdate";
+                return "TextDataElemUpdate_"+tableName;
             }
 
             @Override
             public String create() {
                 return
-                        "UPDATE " + getTextDataTableName() +
+                        "UPDATE " + tableName +
                                 " SET " +
                                 "  original=?," +
                                 "  tbtime=?" +
@@ -179,12 +184,12 @@ public class DefaultKlSql extends KlTblNames implements IKlSql {
 
             @Override
             public String toString() {
-                return "UPDATE " + getTextDataTableName() +
+                return "UPDATE " + tableName +
                         " SET " +
                         "  original='" +e.original+ "'," +
                         "  tbtime="+ e.getQuotedTbTime()+" " +
                         "WHERE " +
-                        "  stnr="+e.stationID+" AND " +
+                        "  stationid="+e.stationID+" AND " +
                         "  obstime="+e.getQuotedObsTime() +" AND " +
                         "  paramid="+e.paramID +" AND " +
                         "  typeid="+e.typeID;
@@ -194,19 +199,21 @@ public class DefaultKlSql extends KlTblNames implements IKlSql {
 
 
     public IExec createTextDataInsertQuery( TextDataElem elem ) {
-        logger.debug("Insert textData into a SQL92 database ("+getTextDataTableName()+") sid: "+elem.stationID+" tid: " +
+        logger.debug("Insert textData: SQL92 database ("+getTextDataTableName()+") sid: "+elem.stationID+" tid: " +
                 elem.typeID + " pid: " + elem.paramID+ " obstime: '"+elem.obstime+"' tbtime: "+elem.tbtime);
 
         return new IExec() {
-            private final TextDataElem e=elem;
+            final private  TextDataElem e=elem;
+            final private String tableName=getTextDataTableName();
+
             @Override
             public String name() {
-                return "TextDataElemInsert";
+                return "TextDataElemInsert_"+tableName;
             }
 
             @Override
             public String create() {
-                return "INSERT INTO "+getTextDataTableName() +
+                return "INSERT INTO "+tableName +
                         "(stationid,obstime,original,paramid,tbtime,typeid) "+
                         "values (?,?,?,?,?,?)";
 
@@ -225,7 +232,7 @@ public class DefaultKlSql extends KlTblNames implements IKlSql {
 
             @Override
             public String toString() {
-                return "INSERT INTO "+getTextDataTableName() +
+                return "INSERT INTO "+tableName +
                         "(stationid,obstime,original,paramid,tbtime,typeid) "+
                         "values ("+e.stationID+","+ e.getObsTime()+",'"+e.original+","
                         +e.paramID+","+e.getQuotedTbTime()+","+e.typeID+")";
@@ -237,6 +244,5 @@ public class DefaultKlSql extends KlTblNames implements IKlSql {
     public String dateString( Instant time ) {
         return "'" + time +"'";
     }
-
 
 }

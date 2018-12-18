@@ -17,7 +17,7 @@ public class Kv2KvXml {
 			return r.getObsData();
 		} catch (XMLStreamException ex) {
 			ex.printStackTrace();
-			throw new FormatException("Could not parse xml. " + ex.getMessage());
+			throw new FormatException("Could not parse xml. " + ex.getMessage()+"\nxml '" + xml + "'");
 		}
 	}
 
@@ -27,7 +27,7 @@ public class Kv2KvXml {
 			return r.getObsData();
 		} catch (XMLStreamException ex) {
 			ex.printStackTrace();
-			throw new FormatException("Could not parse xml. " + ex.getMessage());
+			throw new FormatException("Could not parse xml. " + ex.getMessage()+ ". File: '" + file.toString()+"'");
 		}
 	}
 

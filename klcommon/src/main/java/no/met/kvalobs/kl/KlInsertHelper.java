@@ -61,6 +61,7 @@ public class KlInsertHelper {
     String textDataTableName = null;
     String foreignDataTableName = null;
     String foreignTextDataTableName = null;
+    TypeRouter typeRouter=null;
     boolean enableFilter;
 
     class DummyStatus implements IDbStatus {
@@ -86,6 +87,8 @@ public class KlInsertHelper {
         fout = null;
         this.conMgr = conMgr;
         this.enableFilter = enableFilter;
+        this.typeRouter = new TypeRouter();
+        typeRouter.setEnableFilter(enableFilter, false);
 
         if (backupfile != null) {
             try {
@@ -97,17 +100,43 @@ public class KlInsertHelper {
         }
     }
 
-    public KlInsertHelper(DbConnectionMgr conMgr, String backupfile, boolean enableFilter) {
-        this(conMgr, null, backupfile,enableFilter);
+    public KlInsertHelper(DbConnectionMgr conMgr, IDbStatus status, String backupfile, TypeRouter typeRouter_) {
+        if( status==null )
+            this.status=new DummyStatus();
+        else
+            this.status=status;
+
+        fout = null;
+        this.conMgr = conMgr;
+        this.typeRouter=typeRouter_;
+        this.enableFilter = typeRouter.getEnableFilter();
+        setDataTableName(typeRouter.getDefaultTable());
+        setTextDataTableName(typeRouter.getDefaultTextTable());
+        setForeignDataTable(typeRouter.getForeignTable());
+        setForeignTextDataTable(typeRouter.getForeignTextTable());
+
+        if (backupfile != null) {
+            try {
+                fout = new PrintWriter(new FileWriter(backupfile, true), true);
+                fout.println("Starter her:");
+            } catch (IOException e) {
+                logger.error(e);
+            }
+        }
+    }
+
+
+    public KlInsertHelper(DbConnectionMgr conMgr, String backupfile, TypeRouter typeRouter) {
+        this(conMgr, null, backupfile,typeRouter);
     }
 
 
     public KlInsertHelper(DbConnectionMgr conMgr, String backupfile) {
-        this(conMgr, backupfile, true);
+        this(conMgr, backupfile, new TypeRouter());
     }
 
     public KlInsertHelper(DbConnectionMgr conMgr) {
-        this(conMgr, null, true);
+        this(conMgr, null, new TypeRouter());
     }
 
     public DbConnection newDbConnection() {
@@ -232,6 +261,7 @@ public class KlInsertHelper {
         boolean loggedFilter;
         boolean loggedNewObs;
         long typeid = 0;
+        TypeRouter.RouterElement routerElement=null;
         StringHolder msg = new StringHolder();
         boolean filterRet;
         boolean ret = true;
@@ -261,9 +291,7 @@ public class KlInsertHelper {
             }*/
 
 
-            KlDataHelper dh = new KlDataHelper(dbconn.getDbdriver(),
-                    dataTableName, textDataTableName,
-                    foreignDataTableName, foreignTextDataTableName);
+            KlDataHelper dh = new KlDataHelper(dbconn.getDbdriver());
 
             Iterator<ObsData> itObsData = obsData.iterator();
             while (itObsData.hasNext()) {
@@ -276,12 +304,15 @@ public class KlInsertHelper {
                 dh.init(data.dataList, data.textDataList);
                 LongHolder stationID = new LongHolder();
 
-
                 while (dh.next()) {
                     if (typeid != dh.getTypeID()) {
                         typeid = dh.getTypeID();
+                        routerElement = typeRouter.getTable(typeid);
+                        dh.setDataTables(routerElement);
+                        filter.setFilterEnabled(routerElement.enableFilter(true));
                         loggedNewObs = false;
                     }
+
                     if (!usetypeid(dh.getTypeID(), typelist)) {
                         continue;
                     }

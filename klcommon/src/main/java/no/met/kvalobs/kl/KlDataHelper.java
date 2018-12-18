@@ -56,6 +56,23 @@ public class KlDataHelper {
         init( dataElem, textDataElem );
     }
 
+    public void setDataTables(TypeRouter.RouterElement re ) {
+        if( re.getTable() != null && !re.getTable().isEmpty())
+            query.setDataTableName(re.getTable());
+
+        if( re.getTextTable() != null && !re.getTextTable().isEmpty())
+            query.setTextDataTableName(re.getTextTable());
+
+        this.foreignDataTable = re.getForeignTableName();
+        this.foreignTextDataTable = re.getForeignTextTableName();
+
+        if( this.foreignDataTable == null && !this.foreignDataTable.isEmpty() )
+            this.foreignDataTable = null;
+
+        if( this.foreignTextDataTable == null && !this.foreignTextDataTable.isEmpty() )
+            this.foreignTextDataTable = null;
+    }
+
     public void init( DataElemList dataElem,
                       TextDataElemList textDataElem ){
         this.dataElem = dataElem;
@@ -86,7 +103,7 @@ public class KlDataHelper {
         String oldtable=null;
 
         if( currentDataElem != null) {
-            if( currentDataElem.stationID > 100000 ) {
+            if( currentDataElem.stationID >= 100000 ) {
                 if( foreignDataTable != null && !foreignDataTable.isEmpty()) {
                     oldtable = query.setDataTableName( foreignDataTable );
                 }
@@ -97,7 +114,7 @@ public class KlDataHelper {
             if( oldtable != null )
                 query.setDataTableName( oldtable );
         } else if( currentTextDataElem!= null && !foreignTextDataTable.isEmpty()) {
-            if( currentTextDataElem.stationID > 100000 ) {
+            if( currentTextDataElem.stationID >= 100000 ) {
                 if( foreignTextDataTable != null  && !foreignTextDataTable.isEmpty() ) {
                    oldtable = query.setTextDataTableName( foreignTextDataTable );
                 }
@@ -117,7 +134,7 @@ public class KlDataHelper {
         String oldtable=null;
 
         if( currentDataElem != null) {
-            if( currentDataElem.stationID > 100000 ) {
+            if( currentDataElem.stationID >= 100000 ) {
                 if( foreignDataTable != null && !foreignDataTable.isEmpty()) {
                     oldtable = query.setDataTableName( foreignDataTable );
                 }
@@ -129,7 +146,7 @@ public class KlDataHelper {
                 query.setDataTableName( oldtable );
 
         } else if( currentTextDataElem != null) {
-            if( currentTextDataElem.stationID > 100000 ) {
+            if( currentTextDataElem.stationID >= 100000 ) {
                 if( foreignTextDataTable != null && !foreignTextDataTable.isEmpty() ) {
                     oldtable = query.setTextDataTableName( foreignTextDataTable);
                 }
@@ -152,6 +169,7 @@ public class KlDataHelper {
 
         while( itData != null && itData.hasNext()) {
             currentDataElem = itData.next();
+
             //fhqc == 3 is an hack to disable running of qc1. If it is set
             //skip this element.
             if( currentDataElem.controlinfo != null && currentDataElem.controlinfo.length() >= 16 ) {

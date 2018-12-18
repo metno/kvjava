@@ -23,6 +23,7 @@ public class KvConfig extends KvBaseConfig{
 			return new KvConfig(baseAppName);
 		}
 		catch( Exception ex ) {
+			ex.printStackTrace();
 			System.err.println("Error reading config: " + ex.getMessage());
 			System.exit(1);
 		}

@@ -31,6 +31,8 @@
 package no.met.kvutil;
 import java.io.*;
 import java.nio.file.*;
+import java.util.List;
+
 import static java.nio.file.StandardOpenOption.APPEND;
 import static java.nio.file.StandardOpenOption.CREATE;
 
@@ -58,13 +60,8 @@ public class FileUtil {
 			return null;
 		}
 
-		int size;
-		
-		if(f.length()<=Integer.MAX_VALUE)
-			size=(int)f.length();
-		else
-			size=Integer.MAX_VALUE;
-		
+		int size=(int)f.length();
+
 		StringBuffer sb=new StringBuffer(size);
 		char[] buf=new char[256];
 		int nRead;
@@ -111,6 +108,23 @@ public class FileUtil {
 		}
 	}
 
+
+	static public Reader getFileReader(String filename){
+		File f;
+		BufferedReader in;
+
+		f=new File(filename);
+
+		if(!(f.exists() && f.isFile() && f.canRead()))
+			return null;
+
+		try {
+			return  new BufferedReader(new FileReader(f));
+		} catch (FileNotFoundException e) {
+			return null;
+		}
+	}
+
 	static public boolean appendStr2File(String file2write, String buf){
 		try {
 			OutputStream out = Files.newOutputStream(Paths.get(file2write), CREATE, APPEND);
@@ -138,6 +152,18 @@ public class FileUtil {
 		}
 		
 		return true;
+	}
+
+	static public Path searchFile(String filename, List<String> pathList) {
+		for( String p : pathList ) {
+			Path file=Paths.get(p, filename);
+
+			if( Files.exists(file) && Files.isReadable(file ) && Files.isRegularFile(file) ) {
+				return file;
+			}
+		}
+
+		return null;
 	}
 
 }

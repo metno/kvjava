@@ -30,19 +30,18 @@
 */
 package no.met.kvalobs.kv2kl;
 
-import java.util.*;
-import java.io.IOException;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.io.IOException;
 
+import no.met.kvalobs.kl.TypeRouterParser;
 import no.met.kvclient.KvDataSubscribeInfo;
-import no.met.kvclient.service.ParamList;
-import no.met.kvclient.service.StatusId;
-import no.met.kvclient.service.SubscribeId;
-import no.met.kvclient.service.WhichData;
-import no.met.kvclient.service.WhichDataList;
+import no.met.kvclient.service.*;
 import no.met.kvutil.*;
+import no.met.kvalobs.kl.TypeRouter;
 
 
 import org.apache.log4j.Logger;
@@ -50,6 +49,8 @@ import org.apache.log4j.NDC;
 import org.apache.log4j.PropertyConfigurator;
 
 import static java.lang.System.exit;
+import static java.lang.System.getProperty;
+import static java.lang.System.setOut;
 
 public class Kv2KlMain {
     static Logger logger = Logger.getLogger(Kv2KlMain.class);
@@ -79,14 +80,14 @@ public class Kv2KlMain {
         }
     }
 
-    static class SaveKvState extends TimerTask{
+    static class SaveKvState extends TimerTask {
         KvState kvState;
 
         public SaveKvState(KvState kvState) {
-            this.kvState=kvState;
+            this.kvState = kvState;
         }
 
-        public void run(){
+        public void run() {
             NDC.push("SaveKvState");
             kvState.saveState();
             NDC.pop();
@@ -94,7 +95,7 @@ public class Kv2KlMain {
     }
 
     static GetOptDesc[] getOptDescription() {
-        return new GetOptDesc[] {
+        return new GetOptDesc[]{
                 new GetOptDesc('c', "conf", true),
                 new GetOptDesc('h', "help", false),
                 new GetOptDesc('k', "list-conf", false),
@@ -107,9 +108,54 @@ public class Kv2KlMain {
 
     }
 
+    static TypeRouter getTypeRouter(Kv2KlApp app, KvConfig conf) {
+        LinkedList<String> paths = new LinkedList<String>();
+        paths.addLast(System.getProperty("user.dir"));
+        paths.addLast(System.getProperty("user.home"));
+        paths.addLast(conf.etcdir);
+        String file = (conf.appName==null || conf.appName.isEmpty()?"kv2kl":conf.appName) + "_type_to_table.json";
+
+        Path typeToTableFile = FileUtil.searchFile(file, paths);
+        TypeRouter router = new TypeRouter();
+        if (typeToTableFile != null) {
+            try {
+                TypeRouterParser parser = new TypeRouterParser();
+                router = parser.parseConf(typeToTableFile.toString());
+            } catch (Exception e) {
+                logger.fatal("Failed to read (typeToTable) file '" + typeToTableFile + "'. " + e.getMessage());
+                System.out.println("Failed to read (typeToTable) file '" + typeToTableFile + "'. " + e.getMessage());
+                System.exit(1);
+            }
+        }
+        router.setDefaultTable(app.getDataTableName(), true);
+        router.setDefaultTextTable(app.getTextDataTableName(), true);
+        router.setForeignTable(app.getForeignDataTableName(), true);
+        router.setForeignTextTable(app.getForeignTextDataTableName(), true);
+
+        router.setDefaultTextTable("T_TEXT_DATA", true);
+        router.setDefaultTable("kv2klima", true);
+        router.setEnableFilter(app.getEnableFilter(), true);
+        System.out.println("TypeRouter routes\n" + router.toString());
+        logger.info("TypeRouter routes\n" + router.toString());
+        return router;
+    }
 
     public static void main(String[] args) {
         //Set the default timezone to GMT.
+
+/*
+        TypeRouterParser parser = new TypeRouterParser("kv2klima");
+        try {
+            TypeRouter router=parser.parseConf("kv2kl-testdb_type_to_table.json");
+            System.out.println("......completed\n"+router);
+        } catch (Exception e) {
+            System.out.println("IllException: " + e.getMessage());
+        }
+*/
+
+
+
+        System.out.println("CWD: '" + System.getProperty("user.dir") + "'");
         TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
         ParamList param;
         Kv2KlApp app;
@@ -117,9 +163,10 @@ public class Kv2KlMain {
         KvDataSubscribeInfo dataSubscribeInfo;
         KlDataReceiver dataReceiver;
         KvHintListener hint;
-        Timer saveStateTimer=new Timer(true);
+        Timer saveStateTimer = new Timer(true);
         KvConfig conf = KvConfig.config("kv2kl");
-        KvState kvState= KvState.loadState(conf);
+        String appName=(conf.appName==null || conf.appName.isEmpty()?"kv2kl":conf.appName);
+        KvState kvState = KvState.loadState(conf);
 
         System.out.println(conf);
 
@@ -185,22 +232,28 @@ public class Kv2KlMain {
             System.exit(0);
         }
 
+
         checkDirs(conf, true);
+
 
         System.out.println("Configfile (in): " + conf.configfile);
 
-        FileUtil.writeStr2File(conf.logdir+"/"+conf.appName+"_conf.properties",conf.toString());
+        FileUtil.writeStr2File(conf.logdir + "/" + appName + "_conf.properties", conf.toString());
 
-        Properties logProperties=InitLogger.getLogProperties(conf);
-        PropertiesHelper.saveToFile(logProperties, conf.logdir+"/"+conf.appName+"_log.properties");
+
+        Properties logProperties = InitLogger.getLogProperties(conf);
+        PropertiesHelper.saveToFile(logProperties, conf.logdir + "/" + appName + "_log.properties");
 
         PropertyConfigurator.configure(logProperties);
+
 
         go = null; //We dont need it anymore.
 
         app = new Kv2KlApp(args, conf, false);
+
+        TypeRouter typeRoutes = getTypeRouter(app, conf);
         dataSubscribeInfo = new KvDataSubscribeInfo();
-        dataReceiver = new KlDataReceiver(app, kvState,conf.appName + ".dat", app.getEnableFilter(), saveDataToDb);
+        dataReceiver = new KlDataReceiver(app, kvState, appName + ".dat", typeRoutes, saveDataToDb);
         hint = new KvHintListener(app);
 
         logger.info("Starting: " + now);
@@ -260,7 +313,7 @@ public class Kv2KlMain {
 
             //Save to the state file every 5 minute.
             //The statefile has some monitoring information and the kafka group var.
-            saveStateTimer.schedule(new SaveKvState(kvState),60000, 60000);
+            saveStateTimer.schedule(new SaveKvState(kvState), 60000, 60000);
 
             app.run();
         } catch (InterruptedException e) {

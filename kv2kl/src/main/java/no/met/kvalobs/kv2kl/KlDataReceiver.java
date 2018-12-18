@@ -31,6 +31,7 @@
 package no.met.kvalobs.kv2kl;
 
 import no.met.kvalobs.kl.KlInsertHelper;
+import no.met.kvalobs.kl.TypeRouter;
 import no.met.kvclient.KvDataEvent;
 import no.met.kvclient.KvDataEventListener;
 import no.met.kvclient.service.ObsDataList;
@@ -58,12 +59,24 @@ public class KlDataReceiver implements KvDataEventListener {
         if (!this.saveDataToDb)
             return;
 
-        insertstmt = new KlInsertHelper(app.getKlConnectionMgr(), kvState, backupfile, enableFilter);
+        insertstmt = new KlInsertHelper(app.getKlConnectionMgr(), kvState, backupfile, new TypeRouter());
         insertstmt.setDataTableName(app.getDataTableName());
         insertstmt.setTextDataTableName(app.getTextDataTableName());
         insertstmt.setForeignDataTable(app.getForeignDataTableName());
         insertstmt.setForeignTextDataTable(app.getForeignTextDataTableName());
     }
+
+    public KlDataReceiver(Kv2KlApp app, KvState kvState, String backupfile, TypeRouter typeRouter, boolean saveDataToDb) {
+        this.app = app;
+        this.saveDataToDb = saveDataToDb;
+        this.kvState = kvState;
+
+        if (!this.saveDataToDb)
+            return;
+
+        insertstmt = new KlInsertHelper(app.getKlConnectionMgr(), kvState, backupfile, typeRouter);
+    }
+
 
     public void kvDataEvent(KvDataEvent event) {
         ObsDataList obsData = event.getObsData();

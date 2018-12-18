@@ -22,6 +22,7 @@ lazy val commonSettings = Seq(
 
 		libraryDependencies ++= Seq	(
 		"log4j" % "log4j" % "1.2.17",
+		"com.google.code.gson" % "gson" % "2.8.5",
 		"junit" % "junit" % "4.10" % Test,
 		"org.hsqldb" % "hsqldb" % "2.3.4" % Test,
 		"com.novocode" % "junit-interface" % "0.11" % Test
@@ -55,7 +56,7 @@ lazy val klcommon = (project in file("klcommon")).
 lazy val kv2kl = (project in file("kv2kl"))
 	.dependsOn(kvutil, kvclient, klcommon, kvdistuser)
 	.settings(commonSettings: _*)
-	.enablePlugins(JavaAppPackaging,DebianPlugin)
+	.enablePlugins(ClasspathJarPlugin,JavaAppPackaging,DebianPlugin)
 
 lazy val kv2klgetdata = (project in file("kv2klgetdata"))
 	.dependsOn(kvutil, kvclient, klcommon, kvdistuser)

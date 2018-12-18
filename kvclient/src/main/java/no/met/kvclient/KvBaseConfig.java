@@ -116,6 +116,8 @@ public class KvBaseConfig {
     }
 
     public void getDbCredentials(String dbPrefix, PropertiesHelper fromProp) {
+        if ( fromProp == null)
+            fromProp = new PropertiesHelper();
         String dbuser="default."+dbPrefix+".dbuser";
         String dbpasswd="default."+dbPrefix+".dbpasswd";
         String dbuserVal=fromProp.getProperty(dbuser, "");
@@ -206,6 +208,7 @@ public class KvBaseConfig {
             }
 
             configfile = cf.toString();
+            System.out.println("Reading file: '" + configfile +"'");
             Tuple2<PropertiesHelper, Path> r = loadFromFile(Paths.get(configfile), true);
             conf = r._1;
             loadIncluds(conf);
@@ -228,7 +231,7 @@ public class KvBaseConfig {
         catch( Exception ex) {
             String msg=ex.getMessage();
             if( msg==null)
-                System.err.println("@@@@@What the fuck");
+                System.err.println("@@@@@ WTF");
             else
                 System.err.println("Failed to load configuration file(s).\n"+ex.getMessage() );
             ex.printStackTrace();

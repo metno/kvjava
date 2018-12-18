@@ -76,6 +76,9 @@ public class KvState implements IDbStatus {
     synchronized public void setDbError(String message) {
         stateProp.setProperty("db_last_error_time", now());
         stateProp.setProperty("db_error", "true");
+        if (message ==null) {
+            message="Unknown error";
+        }
         stateProp.setProperty("db_last_error_message", message);
         stateProp.setProperty("db_error_count", Integer.toString(++dbErrorCount));
         hasChanges=true;
