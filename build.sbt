@@ -61,11 +61,11 @@ lazy val kv2kl = (project in file("kv2kl"))
 lazy val kv2klgetdata = (project in file("kv2klgetdata"))
 	.dependsOn(kvutil, kvclient, klcommon, kvdistuser)
 	.settings(commonSettings: _*)
-	.enablePlugins(JavaAppPackaging,DebianPlugin)
+	.enablePlugins(ClasspathJarPlugin,JavaAppPackaging,DebianPlugin)
 
 
 lazy val kl2kv = (project in file("kl2kv"))
 	.dependsOn(kvutil, kvclient, klcommon, kvdistuser)
 	.settings(commonSettings: _*)
-	.enablePlugins(JavaAppPackaging,DebianPlugin)
+	.enablePlugins(ClasspathJarPlugin,JavaAppPackaging,DebianPlugin)
 

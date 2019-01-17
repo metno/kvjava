@@ -1,3 +1,8 @@
+kv2kl (3.0.0~rc9-1) UNRELEASED; urgency=medium
+  * Implement routing types to different tables.
+
+ -- Borge Moe <borge.moe@met.no>  Thu, 17 Jan 2018 13:15:00 +0100
+
 kv2kl (3.0.0~rc8-1) UNRELEASED; urgency=medium
   * Fix kafka topic.
 

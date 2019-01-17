@@ -1,6 +1,3 @@
-import com.typesafe.sbt.packager.linux._
-import NativePackagerHelper._
-
 name := "kl2kv"
 
 version in Debian := "3.0.0~rc2-1"
@@ -22,7 +19,7 @@ libraryDependencies ++= Seq	(
 )
 
 
-//changelog in Debian := baseDirectory.value / "debian_changelog"
+debianChangelog in Debian := Some( baseDirectory.value / "debian_changelog")
 
 packageSummary := "Utility to transfer data from a klima database to kvalobs."
 

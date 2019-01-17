@@ -1,11 +1,11 @@
-import com.typesafe.sbt.packager.linux._
-import NativePackagerHelper._
+//import com.typesafe.sbt.packager.linux._
+//import NativePackagerHelper._
 
 name := "kv2klgetdata"
 
 description := "kv2klgetdata - get data from kvalobs and load into a klima database"
 
-version in Debian := "3.0.0~rc4-1"
+version in Debian := "3.0.0~rc5-1"
 
 // Enables publishing to maven repo
 publishMavenStyle := true

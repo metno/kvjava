@@ -6,7 +6,7 @@ name := "kv2kl"
 
 description := "kv2kl - listen to data from kvalobs and load into a klima database"
 
-version in Debian := "3.0.0~rc8-1"
+version in Debian := "3.0.0~rc9-1"
 
 // Enables publishing to maven repo
 publishMavenStyle := true
@@ -34,7 +34,9 @@ libraryDependencies ++= Seq	(
 )
 
 
-debianChangelog in Debian := Some( baseDirectory.value / "debian_changelog")
+//changelog in Debian := Some( baseDirectory.value / "debian_changelog")
+
+debianChangelog in Debian := Some( baseDirectory.value / "debian_changelog" )
 
 packageSummary := "Utility to transfer data from a kvalobs data base to the klimadb"
 
