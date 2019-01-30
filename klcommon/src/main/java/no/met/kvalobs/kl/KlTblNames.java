@@ -57,9 +57,10 @@ public class KlTblNames {
     public String getDataTableName() {
         return dataTable;
     }
-
     public String getTextDataTableName(){
         return textDataTable;
     }
 
+    public boolean isDataTableNullOrEmpty() { return dataTable==null || dataTable.isEmpty();}
+    public boolean isTextDataTableNullOrEmpty() { return textDataTable==null || textDataTable.isEmpty();}
 }

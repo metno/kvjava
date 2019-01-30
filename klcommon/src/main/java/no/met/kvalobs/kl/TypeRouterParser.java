@@ -88,15 +88,13 @@ public class TypeRouterParser extends JsonParser {
     public void endObject(String path) {
         if( path.compareTo("/kv2kl/type_to_table_filter/filters@/") == 0){
             filterIndex++;
-            if( currentRE.tableName.isEmpty()) {
-                System.out.println("WARNING: filter element at index "+(filterIndex-1)+" do not contain a definition for table. Ignoring the filter element.");
-                currentRE=null;
-                return;
+            if( currentRE.tableName == null || currentRE.tableName.isEmpty()) {
+                System.out.println("WARNING: filter element at index "+(filterIndex-1)+" do not contain a definition for table. Do not save data to DB for this definition.");
             }
 
             if (currentRE.types.isEmpty()) {
-                System.out.println("WARNING: filter element at index "+(filterIndex-1)+" has no types or empty types definition. Ignoring the filter element.");
-                currentRE=null;
+                System.out.println("WARNING: filter element at index "+(filterIndex-1)+" has no types or empty types definition. Ignoring this definition.");
+                currentRE = null;
                 return;
             }
 
@@ -158,18 +156,26 @@ public class TypeRouterParser extends JsonParser {
                     case "table":
                         if ( value != null)
                             currentRE.setTable(value);
+                        else
+                            currentRE.setTable("");
                         break;
                     case "text_table":
                         if ( value != null)
                             currentRE.setTextTable(value);
+                        else
+                            currentRE.setTextTable("");
                         break;
                    case "foreign_table":
                         if ( value != null)
                             currentRE.setForeignTable(value);
+                        else
+                            currentRE.setForeignTable("");
                         break;
                     case "foreign_text_table":
                         if ( value != null)
                             currentRE.setForeignTextTable(value);
+                        else
+                            currentRE.setForeignTextTable("");
                         break;
                     case "enable_filter":
                         if ( value != null && !value.isEmpty()) {

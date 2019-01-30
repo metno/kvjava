@@ -201,11 +201,15 @@ public class KlInsertHelper {
     }
 
 
-    protected boolean doInsertData(DbConnection dbcon, IExec insertQuery, IExec updateQuery) {
-        IExec query = insertQuery;
+    protected boolean doInsertData(DbConnection dbcon, KlDataHelper dh) throws NoData{
+        IExec query = dh.createInsertQuery();
 
-        if (query == null)
+        if (query == null) {
+            logger.info("SKIPPING: stationid: " + dh.getStationID() +
+                    " typid: " + dh.getTypeID() );
+
             return true;
+        }
 
         logger.debug(query);
 
@@ -218,7 +222,7 @@ public class KlInsertHelper {
             if (sqlState != null &&
                     sqlState.startsWith("23")) {
                 logger.warn(Instant.now() + ": " + SQLe);
-                query = updateQuery;
+                query = dh.createUpdateQuery();
                 return updateData(dbcon, query);
             } else {
                 logger.error(Instant.now() + ": " + SQLe);
@@ -346,7 +350,7 @@ public class KlInsertHelper {
                     if (!filterRet)
                         continue;
 
-                    if (!doInsertData(dbconn, dh.createInsertQuery(), dh.createUpdateQuery())) {
+                    if (!doInsertData(dbconn, dh)) {
                         logger.error("DBERROR: stationid: " + dh.getStationID() +
                                 " typid: " + dh.getTypeID() +
                                 " obstime: " + dh.getObstime());

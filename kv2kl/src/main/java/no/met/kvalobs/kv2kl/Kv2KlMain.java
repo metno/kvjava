@@ -143,17 +143,18 @@ public class Kv2KlMain {
     public static void main(String[] args) {
         //Set the default timezone to GMT.
 
-/*
-        TypeRouterParser parser = new TypeRouterParser("kv2klima");
+
+/*        TypeRouterParser parser = new TypeRouterParser();
         try {
-            TypeRouter router=parser.parseConf("kv2kl-testdb_type_to_table.json");
+            TypeRouter router=parser.parseConf("/disk1/kvdist/etc/kvalobs/kv2kl-testdb_type_to_table.json");
             System.out.println("......completed\n"+router);
         } catch (Exception e) {
             System.out.println("IllException: " + e.getMessage());
         }
+
+
+        System.exit(1);
 */
-
-
 
         System.out.println("CWD: '" + System.getProperty("user.dir") + "'");
         TimeZone.setDefault(TimeZone.getTimeZone("GMT"));

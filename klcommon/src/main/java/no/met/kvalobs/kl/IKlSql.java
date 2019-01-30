@@ -11,6 +11,8 @@ public interface IKlSql {
     public String getTextDataTableName();
     public String setDataTableName( String tableName );
     public String setTextDataTableName( String tableName );
+    public boolean isDataTableNullOrEmpty();
+    public boolean isTextDataTableNullOrEmpty();
 
     /*Data*/
     public IExec createDataUpdateQuery(DataElem elem );

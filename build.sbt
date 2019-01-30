@@ -8,6 +8,7 @@ lazy val commonSettings = Seq(
 	organization := "no.met.kvalobs",
 	version := "3.0.0-SNAPSHOT",
 	version in Debian := "3.0.0~rc8-1",
+	maintainer := "Børge Moe <borge.moe@met.no>",
 	maintainer in Linux := "Børge Moe <borge.moe@met.no>",
 	parallelExecution in Test := false,
 	credentials += Credentials(Path.userHome / ".ivy2" / ".credentials"),

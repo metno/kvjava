@@ -1,3 +1,14 @@
+kv2klgetdata (3.0.0~rc7-1) UNRELEASED; urgency=medium
+  * Fix KlDataHelper nullpointer in setDataTables.
+
+ -- Borge Moe <borge.moe@met.no>  Tue, 29 Jan 2018 07:30:00 +0100
+
+kv2klgetdata (3.0.0~rc6-1) UNRELEASED; urgency=medium
+  * Allow the typerouter to define skipping, ie not save, for certain types.
+
+ -- Borge Moe <borge.moe@met.no>  Mon, 28 Jan 2018 09:30:00 +0100
+
+
 kv2klgetdata (3.0.0~rc5-1) UNRELEASED; urgency=medium
   * Implement routing types to different tables.
 

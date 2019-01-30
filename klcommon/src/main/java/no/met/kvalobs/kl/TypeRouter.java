@@ -59,6 +59,7 @@ public class TypeRouter {
         String foreignTableName = null;
         String name = "";
         Boolean enableFilter = null;
+        Boolean skip = false;
 
         RouterElement() {
         }
@@ -72,19 +73,27 @@ public class TypeRouter {
         }
 
         void setTable(String table) {
-            this.tableName = table;
+            this.tableName = null;
+            if( table != null )
+                this.tableName = table.trim();
         }
 
         void setTextTable(String table) {
-            this.textTableName = table;
+            this.textTableName=null;
+            if ( table != null)
+                this.textTableName=table.trim();
         }
 
         void setForeignTable(String table) {
-            this.foreignTableName = table;
+            this.foreignTableName=null;
+            if( table != null)
+                this.foreignTableName = table.trim();
         }
 
         void setForeignTextTable(String table) {
-            this.foreignTextTableName = table;
+            this.foreignTextTableName=null;
+            if( table != null )
+                this.foreignTextTableName = table.trim();
         }
 
         void setEnableFilter(boolean doFilter ){
@@ -184,13 +193,12 @@ public class TypeRouter {
         int typeid = Math.abs(typeid_);
         for (RouterElement r : routes) {
             String table = r.getTable(typeid, isTextData);
-            if (table != null)
-                return new Tuple2<String, Boolean>(table, r.getEnableFilter(enableFilter));
+            return new Tuple2<String, Boolean>(table, r.getEnableFilter(enableFilter));
         }
 
-        if (isTextData && textTable != null) {
+        if (isTextData ) {
             return new Tuple2<String, Boolean>(textTable, getEnableFilter());
-        } else if (!isTextData && table != null) {
+        } else if (!isTextData ) {
             return new Tuple2<String, Boolean>(table, getEnableFilter());
         }
 

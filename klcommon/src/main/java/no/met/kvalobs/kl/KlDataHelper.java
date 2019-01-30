@@ -57,19 +57,16 @@ public class KlDataHelper {
     }
 
     public void setDataTables(TypeRouter.RouterElement re ) {
-        if( re.getTable() != null && !re.getTable().isEmpty())
-            query.setDataTableName(re.getTable());
-
-        if( re.getTextTable() != null && !re.getTextTable().isEmpty())
-            query.setTextDataTableName(re.getTextTable());
+        query.setDataTableName(re.getTable());
+        query.setTextDataTableName(re.getTextTable());
 
         this.foreignDataTable = re.getForeignTableName();
         this.foreignTextDataTable = re.getForeignTextTableName();
 
-        if( this.foreignDataTable == null && !this.foreignDataTable.isEmpty() )
+        if( this.foreignDataTable == null || this.foreignDataTable.isEmpty() )
             this.foreignDataTable = null;
 
-        if( this.foreignTextDataTable == null && !this.foreignTextDataTable.isEmpty() )
+        if( this.foreignTextDataTable == null || this.foreignTextDataTable.isEmpty() )
             this.foreignTextDataTable = null;
     }
 
@@ -109,10 +106,13 @@ public class KlDataHelper {
                 }
             }
 
-            retQ = query.createDataInsertQuery( currentDataElem );
+            if( ! query.isDataTableNullOrEmpty() ) {
+                retQ = query.createDataInsertQuery(currentDataElem);
+            }
 
-            if( oldtable != null )
-                query.setDataTableName( oldtable );
+            if (oldtable != null)
+                query.setDataTableName(oldtable);
+
         } else if( currentTextDataElem!= null && !foreignTextDataTable.isEmpty()) {
             if( currentTextDataElem.stationID >= 100000 ) {
                 if( foreignTextDataTable != null  && !foreignTextDataTable.isEmpty() ) {
@@ -120,7 +120,9 @@ public class KlDataHelper {
                 }
             }
 
-            retQ = query.createTextDataInsertQuery( currentTextDataElem );
+            if( ! query.isTextDataTableNullOrEmpty() ) {
+                retQ = query.createTextDataInsertQuery(currentTextDataElem);
+            }
 
             if( oldtable != null  )
                 query.setTextDataTableName( oldtable );
@@ -140,7 +142,9 @@ public class KlDataHelper {
                 }
             }
 
-            retQ = query.createDataUpdateQuery( currentDataElem );
+            if( ! query.isDataTableNullOrEmpty() ) {
+                retQ = query.createDataUpdateQuery(currentDataElem);
+            }
 
             if( oldtable != null )
                 query.setDataTableName( oldtable );
@@ -152,7 +156,9 @@ public class KlDataHelper {
                 }
             }
 
-            retQ = query.createTextDataUpdateQuery( currentTextDataElem );
+            if( ! query.isTextDataTableNullOrEmpty() ) {
+                retQ = query.createTextDataUpdateQuery(currentTextDataElem);
+            }
 
             if( oldtable != null )
                 query.setTextDataTableName( oldtable );
