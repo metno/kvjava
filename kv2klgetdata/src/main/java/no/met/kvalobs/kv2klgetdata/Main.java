@@ -145,8 +145,8 @@ public class Main {
         }
 
         Path typeToTableFile = FileUtil.searchFile(file, paths);
-        System.err.println("Using type route file: '" + typeToTableFile.toString()+"'.");
-        logger.info("Using type route file: '" + typeToTableFile.toString()+"'.");
+        System.err.println("Using type route file: '" + conf.configTypeRouter+"'.");
+        logger.info("Using type route file: '" + conf.configTypeRouter+"'.");
             
         if (typeToTableFile != null) {
             try {
