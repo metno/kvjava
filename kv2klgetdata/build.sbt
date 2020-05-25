@@ -5,7 +5,7 @@ name := "kv2klgetdata"
 
 description := "kv2klgetdata - get data from kvalobs and load into a klima database"
 
-version in Debian := "3.0.0~rc7-1"
+version in Debian := "3.0.0~rc8-1"
 
 // Enables publishing to maven repo
 publishMavenStyle := true
