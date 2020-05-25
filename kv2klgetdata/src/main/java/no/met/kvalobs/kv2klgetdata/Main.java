@@ -150,6 +150,7 @@ public class Main {
             
         if (typeToTableFile != null) {
             try {
+                System.err.println("Parsing type route file: '" + conf.configTypeRouter+"'.");
                 TypeRouterParser parser = new TypeRouterParser();
                 router = parser.parseConf(typeToTableFile.toString());
             } catch (Exception e) {
@@ -157,6 +158,8 @@ public class Main {
                 System.out.println("Failed to read (typeToTable) file '" + typeToTableFile + "'. " + e.getMessage());
                 System.exit(1);
             }
+        } else {
+            System.err.println("Type route file: '" + file+"' do not exict.");
         }
 
         router.setDefaultTable(app.getDataTableName(), true);
@@ -323,6 +326,8 @@ public class Main {
             router.setEnableFilter(false, false);
         else
             router.setEnableFilter(true, false);
+
+        //System.err.println("TypeRouter definition: \n"+router.toString());
 
         insertstmt = new KlInsertHelper(app.getKlConnectionMgr(), null, router);
         MiGMTTime start = new MiGMTTime();
