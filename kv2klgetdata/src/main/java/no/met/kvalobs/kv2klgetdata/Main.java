@@ -30,6 +30,7 @@
 */
 package no.met.kvalobs.kv2klgetdata;
 
+import java.nio.file.Path;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.LinkedList;
@@ -40,6 +41,7 @@ import no.met.kvalobs.kl.KlApp;
 import no.met.kvalobs.kl.KlInsertHelper;
 import no.met.kvalobs.kl.Range;
 import no.met.kvalobs.kl.TypeRouter;
+import no.met.kvalobs.kl.TypeRouterParser;
 import no.met.kvclient.KvBaseConfig;
 import no.met.kvclient.service.*;
 import no.met.kvutil.*;
@@ -49,8 +51,8 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 public class Main {
-    static Logger logger = Logger.getLogger(Main.class);
-
+    //static java.util.logging.Logger logger = Logger.getLogger(Main.class);
+    static org.apache.log4j.Logger logger = Logger.getLogger(Main.class);
     static void use(int no) {
         System.out.println("\n\n  kv2klgetdata -- -f fromdate [-s kvserver] [-c conffile] [-t todate] \n");
         System.out.println("         [-i typeidlist]  [-dd] [-nf] [-e,--termin obstime] stnr1 stnr2 .. stnrN");
@@ -122,6 +124,54 @@ public class Main {
 
         return ll;
     }
+
+
+    static TypeRouter getTypeRouter(App app, KvBaseConfig conf) {
+        LinkedList<String> paths = new LinkedList<String>();
+        paths.addLast(System.getProperty("user.dir"));
+        paths.addLast(System.getProperty("user.home"));
+        paths.addLast(conf.etcdir);
+        
+        
+        String file = conf.configTypeRouter;
+        TypeRouter router = new TypeRouter();
+
+        if( file.isEmpty() ) {
+            System.err.println("No type router file is defined. Using default.");
+            //logger.warning("No type router file is defined. Using default.");
+            router.setDefaultTable(app.getDataTableName(), false);
+            router.setDefaultTextTable(app.getTextDataTableName(), false);
+            return router;
+        }
+
+        Path typeToTableFile = FileUtil.searchFile(file, paths);
+        System.err.println("Using type route file: '" + typeToTableFile.toString()+"'.");
+        logger.info("Using type route file: '" + typeToTableFile.toString()+"'.");
+            
+        if (typeToTableFile != null) {
+            try {
+                TypeRouterParser parser = new TypeRouterParser();
+                router = parser.parseConf(typeToTableFile.toString());
+            } catch (Exception e) {
+              //  logger.fatal("Failed to read (typeToTable) file '" + typeToTableFile + "'. " + e.getMessage());
+                System.out.println("Failed to read (typeToTable) file '" + typeToTableFile + "'. " + e.getMessage());
+                System.exit(1);
+            }
+        }
+
+        router.setDefaultTable(app.getDataTableName(), true);
+        router.setDefaultTextTable(app.getTextDataTableName(), true);
+        router.setForeignTable(app.getForeignDataTableName(), true);
+        router.setForeignTextTable(app.getForeignTextDataTableName(), true);
+
+        router.setDefaultTextTable("T_TEXT_DATA", true);
+        router.setDefaultTable("kv2klima", true);
+        router.setEnableFilter(app.getEnableFilter(), true);
+        System.err.println("TypeRouter routes\n" + router.toString());
+        //logger.info("TypeRouter routes\n" + router.toString());
+        return router;
+    }
+
 
     public static void main(String[] args) {
         //Set the default timezone to GMT.
@@ -211,7 +261,7 @@ public class Main {
         list = (List<String>) opt.getFilenameList();
 
         app = new App(args, myConf.conf);
-
+      
 
         System.err.println(myConf);
 
@@ -264,10 +314,10 @@ public class Main {
             }
         }
 
-        TypeRouter router = new TypeRouter();
-
-        router.setDefaultTable(app.getDataTableName(),false);
-        router.setDefaultTextTable(app.getTextDataTableName(), false);
+        //TypeRouter router = new TypeRouter();
+        TypeRouter router = getTypeRouter(app, myConf);
+        //router.setDefaultTable(app.getDataTableName(),false);
+        //router.setDefaultTextTable(app.getTextDataTableName(), false);
 
         if( disableFilter)
             router.setEnableFilter(false, false);

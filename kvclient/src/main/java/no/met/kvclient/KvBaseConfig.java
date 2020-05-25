@@ -17,6 +17,7 @@ import java.util.Set;
 
 public class KvBaseConfig {
     public String configfile="";
+    public String configTypeRouter="";
     public String credfile="";
     public String includeFile="";
     public String appName="";
@@ -187,6 +188,7 @@ public class KvBaseConfig {
         baseAppName = getBaseAppName(appName);
         confname = getConfName(appName);
         configfile = baseConfigName + (!confname.isEmpty()?"-":"")+confname +".conf";
+        configTypeRouter = baseConfigName + (!confname.isEmpty()?"-":"")+confname +"_type_to_table.json";
 
 //        System.err.println("etcdir: '"+etcdir+"'");
 //
@@ -198,16 +200,36 @@ public class KvBaseConfig {
 
             if( useConf != null)
                 configfile= useConf;
-            if( configfile==null)
+            if( configfile==null){
+                for( String prop : p.stringPropertyNames()) {
+                  System.err.println(prop+": '"+p.getProperty(prop,"")+"'");
+                }
                 throw new Exception("ERROR: No config file!");
+            }
+
             System.err.println("Configfile: " + configfile);
             Path cf=locateFile(Paths.get(configfile)); //Resolve the config file.
             if( cf == null) {
+                for( String prop : p.stringPropertyNames()) {
+                  System.err.println(prop+": '"+p.getProperty(prop,"")+"'");
+                }
                 System.err.println("Cant locate config file: " + configfile);
                 throw new Exception("Cant locate config file: " + configfile);
             }
 
             configfile = cf.toString();
+
+            cf=locateFile(Paths.get(configTypeRouter)); //Resolve the config file.
+            if( cf == null) {
+                for( String prop : p.stringPropertyNames()) {
+                  System.err.println(prop+": '"+p.getProperty(prop,"")+"'");
+                }
+                System.err.println("Cant locate configTypeRouter file: " + configTypeRouter);
+             } else {
+                configTypeRouter = cf.toString();
+            }
+
+
             System.out.println("Reading file: '" + configfile +"'");
             Tuple2<PropertiesHelper, Path> r = loadFromFile(Paths.get(configfile), true);
             conf = r._1;
@@ -271,19 +293,20 @@ public class KvBaseConfig {
     @Override
     public String toString() {
         String res=
-                "   AppName: " + appName +"\n"
-                        + "     confname: " + confname+"\n"
-                        + " baseapp name: " + baseAppName +"\n"
-                        + "       kvdist: " + kvdist + "\n"
-                        + "       etcdir: " + etcdir +"\n"
-                        + "       logdir: " + logdir +"\n"
-                        + "       libdir: " + libdir +"\n"
-                        + "       rundir: " + rundir + "\n"
-                        + "          pid: " + pid +"\n"
-                        + "      pidfile: " + getPidPath() + "\n"
-                        + "   configfile: " + configfile + "\n"
-                        + "  includefile: " + includeFile + "\n"
-                        + "     credfile: " + getConfPath() + "\n"
+                          "          AppName: " + appName +"\n"
+                        + "         confname: " + confname+"\n"
+                        + "     baseapp name: " + baseAppName +"\n"
+                        + "           kvdist: " + kvdist + "\n"
+                        + "           etcdir: " + etcdir +"\n"
+                        + "           logdir: " + logdir +"\n"
+                        + "           libdir: " + libdir +"\n"
+                        + "           rundir: " + rundir + "\n"
+                        + "              pid: " + pid +"\n"
+                        + "          pidfile: " + getPidPath() + "\n"
+                        + "       configfile: " + configfile + "\n"
+                        + "      includefile: " + includeFile + "\n"
+                        + "         credfile: " + getConfPath() + "\n"
+                        + " configTypeRouter: " + configTypeRouter +"\n"
                         + toStringExtra();
 
         if( ! conf.isEmpty() ) {
