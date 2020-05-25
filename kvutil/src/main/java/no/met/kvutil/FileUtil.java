@@ -155,6 +155,15 @@ public class FileUtil {
 	}
 
 	static public Path searchFile(String filename, List<String> pathList) {
+		Path fpath = Paths.get(filename);
+		if( fpath.isAbsolute() ) {
+			if( Files.exists(fpath) && Files.isReadable(fpath) && Files.isRegularFile(fpath) ) {
+				return fpath;
+			} else {
+				return null;
+			}
+		} 
+
 		for( String p : pathList ) {
 			Path file=Paths.get(p, filename);
 
