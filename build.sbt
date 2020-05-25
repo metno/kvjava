@@ -23,7 +23,7 @@ lazy val commonSettings = Seq(
 
 		libraryDependencies ++= Seq	(
 		"log4j" % "log4j" % "1.2.17",
-		"com.google.code.gson" % "gson" % "2.8.5",
+		"com.google.code.gson" % "gson" % "2.8.6",
 		"junit" % "junit" % "4.10" % Test,
 		"org.hsqldb" % "hsqldb" % "2.3.4" % Test,
 		"com.novocode" % "junit-interface" % "0.11" % Test

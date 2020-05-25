@@ -30,10 +30,10 @@
 */
 package no.met.kvalobs.kl;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
+import kong.unirest.HttpResponse;
+import kong.unirest.JsonNode;
+import kong.unirest.Unirest;
+import kong.unirest.UnirestException;
 import no.met.kvutil.PidFileUtil;
 import no.met.kvutil.ProcUtil;
 import no.met.kvutil.PropertiesHelper;
@@ -48,7 +48,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
-import org.json.JSONObject;
+import kong.unirest.json.JSONObject;
 
 public class KlApp extends KafkaApp  implements SendDataToKv
 {
@@ -270,14 +270,22 @@ public class KlApp extends KafkaApp  implements SendDataToKv
      */ 
     protected void onExit(){
     	
-    	System.err.println("*** KlApp.onExit: \n" + ProcUtil.getStackTrace());
+    System.err.println("*** KlApp.onExit: \n" + ProcUtil.getStackTrace());
 
 		try {
-			Unirest.shutdown();
-		} catch (IOException e) {
+			Unirest.shutDown();
+		} catch (Exception e) {
 			e.printStackTrace();
 			System.err.println("Failed to shutdown the Unirest (Http Client) ("+e.getMessage()+")." );
 		}
+
+
+		// try {
+		// 	Unirest.shutDown();
+		// } catch (IOException e) {
+		// 	e.printStackTrace();
+		// 	System.err.println("Failed to shutdown the Unirest (Http Client) ("+e.getMessage()+")." );
+		// }
 
 		if( conKlMgr != null )
     		conKlMgr.closeDbDriver();

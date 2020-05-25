@@ -12,7 +12,8 @@ crossPaths := false
 autoScalaLibrary := false
 
 
-libraryDependencies +=  "com.mashape.unirest" % "unirest-java" % "1.4.9"
+//libraryDependencies +=  "com.mashape.unirest" % "unirest-java" % "1.4.9"
+libraryDependencies +=  "com.konghq" % "unirest-java" % "3.7.02"
 
 //libraryDependencies ++=  Seq(
 //  "com.mashape.unirest" % "unirest-java" % "1.4.9",
