@@ -1,0 +1,37 @@
+zookeeper.connect=10.99.2.228:2181
+zookeeper.session.timeout.ms=500
+zookeeper.sync.time.ms=250
+auto.commit.interval.ms=1000
+
+#Group id must be unique for each instance of kv2kl that is running.
+#group.id=kvclient-borge-ea29af5c-1699-4299-a4dd-8cc272319436
+topic=kvalobs.data
+
+#Log
+#log.path=.
+log.level=debug
+log.level.filter=info
+log.maxsize=10MB
+log.maxsize.filter=10MB
+log.maxbackup=1
+log.maxbackup.filter=1
+
+#Write the pid to path.
+pid.path=
+
+
+dbconnect=jdbc:postgresql://localhost:5432/dvh
+dbdriver=org.postgresql.Driver
+dbuser=kvalobs
+dbpasswd=kvalobs12
+
+##Hvilke data og textdata tabeller skal vi laste data inn i
+##default er kv2klima (data) og T_TEXT_DATA (textdata).
+datatable=kv2klima
+textdatatable=T_TEXT_DATA
+
+kvserver=kvalobs
+
+#Hvilken navn skal overv�kings grensesnitt registreres under
+#i CORBA navnetjeneren.
+admin=kv2kl-kvtest

@@ -1,0 +1,4 @@
+#This file is empty.
+#kv2kl programs will allays load kv2kl-common.conf
+#
+#We can override configuration from kv2kl-common.conf here.

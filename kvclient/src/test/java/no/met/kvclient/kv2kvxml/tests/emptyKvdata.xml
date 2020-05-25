@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<KvalobsData>
+  <station val="29350">
+    <typeid val="502">
+      <obstime val="2015-11-17 12:00:00">
+        <kvdata paramid="104">
+        </kvdata>
+        <kvdata paramid="106">
+        </kvdata>
+        <kvdata paramid="211">
+        </kvdata>
+        <kvtextdata paramid="1022">
+        </kvtextdata>
+        <sensor val="1">
+          <kvdata paramid="211">
+          </kvdata>
+          <kvdata paramid="213">
+          </kvdata>
+          <kvdata paramid="215">
+          </kvdata>
+        </sensor>
+        
+        <level val="3">
+          <kvdata paramid="211">
+          </kvdata>
+          <kvdata paramid="213">
+          </kvdata>
+          <kvdata paramid="215">
+          </kvdata>
+        </level>
+        
+        <sensor val="2">
+          <level val="3">
+            <kvdata paramid="211">
+            </kvdata>
+            <kvdata paramid="213">
+            </kvdata>
+            <kvdata paramid="215">
+            </kvdata>
+          </level>
+        </sensor>
+        
+        <sensor val="3">
+          <level val="3">
+            <kvdata paramid="211">
+            </kvdata>
+            <kvdata paramid="213">
+            </kvdata>
+            <kvdata paramid="215">
+            </kvdata>
+          </level>
+        </sensor>
+      </obstime>
+    </typeid>
+  </station>
+</KvalobsData>

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<KvalobsData>
+  <station val="46610">
+    <typeid val="330">
+      <obstime val="2016-09-20 13:00:00">
+        <tbtime val="2016-09-20 10:57:10.746935">
+          <kvdata paramid="1">
+            <original>8</original>
+            <controlinfo>0110000000000010</controlinfo>
+            <useinfo>7100000300000000</useinfo>
+          </kvdata>
+          <kvdata paramid="104">
+            <original>329.049988</original>
+            <controlinfo>0100000000000110</controlinfo>
+            <useinfo>7100000300000000</useinfo>
+          </kvdata>
+          <kvdata paramid="173">
+            <original>1020.90002</original>
+            <controlinfo>0100000000000000</controlinfo>
+            <useinfo>7100000300000000</useinfo>
+          </kvdata>
+          <kvdata paramid="177">
+            <original>0.360000014</original>
+            <controlinfo>0110000000000010</controlinfo>
+            <useinfo>7100000300000000</useinfo>
+          </kvdata>
+          <kvdata paramid="211">
+            <original>99999</original>
+            <corrected>19.6000004</corrected>
+            <controlinfo>0610604000000000</controlinfo>
+            <useinfo>7133700300000002</useinfo>
+            <cfailed>QC1-1-211,QC1-4-211</cfailed>
+          </kvdata>
+          <kvdata paramid="213">
+            <original>99999</original>
+            <corrected>-32766</corrected>
+            <controlinfo>0610102000000000</controlinfo>
+            <useinfo>7138100300000001</useinfo>
+            <cfailed>QC1-1-213</cfailed>
+          </kvdata>
+          <kvdata paramid="215">
+            <original>99999</original>
+            <corrected>-32766</corrected>
+            <controlinfo>0610102000000000</controlinfo>
+            <useinfo>7138100300000001</useinfo>
+            <cfailed>QC1-1-215</cfailed>
+          </kvdata>
+          <kvdata paramid="262">
+            <original>69.9179993</original>
+            <controlinfo>0100200000000010</controlinfo>
+            <useinfo>7100000300000001</useinfo>
+            <cfailed>QC1-4-262</cfailed>
+          </kvdata>
+          <kvtextdata paramid="1022">
+            <original>20160920130000</original>
+          </kvtextdata>
+        </tbtime>
+        <tbtime val="2016-09-20 10:57:11.615849">
+          <kvdata paramid="178">
+            <original>-32767</original>
+            <corrected>1020.59998</corrected>
+            <controlinfo>0000601000000000</controlinfo>
+            <useinfo>7894700000000001</useinfo>
+            <cfailed>QC1-4-178</cfailed>
+          </kvdata>
+        </tbtime>
+      </obstime>
+      <obstime val="2016-09-20 14:00:00">
+        <tbtime val="2016-09-20 12:57:10.346935">
+          <kvdata paramid="1">
+            <original>8</original>
+            <controlinfo>0110000000000010</controlinfo>
+            <useinfo>7100000300000000</useinfo>
+          </kvdata>
+          <kvdata paramid="104">
+            <original>329.049988</original>
+            <controlinfo>0100000000000110</controlinfo>
+            <useinfo>7100000300000000</useinfo>
+          </kvdata>
+          <kvdata paramid="173">
+            <original>1020.90002</original>
+            <controlinfo>0100000000000000</controlinfo>
+            <useinfo>7100000300000000</useinfo>
+          </kvdata>
+          <kvdata paramid="177">
+            <original>0.360000014</original>
+            <controlinfo>0110000000000010</controlinfo>
+            <useinfo>7100000300000000</useinfo>
+          </kvdata>
+          <kvdata paramid="211">
+            <original>99999</original>
+            <corrected>19.6000004</corrected>
+            <controlinfo>0610604000000000</controlinfo>
+            <useinfo>7133700300000002</useinfo>
+            <cfailed>QC1-1-211,QC1-4-211</cfailed>
+          </kvdata>
+          <kvdata paramid="213">
+            <original>99999</original>
+            <corrected>-32766</corrected>
+            <controlinfo>0610102000000000</controlinfo>
+            <useinfo>7138100300000001</useinfo>
+            <cfailed>QC1-1-213</cfailed>
+          </kvdata>
+          <kvdata paramid="215">
+            <original>99999</original>
+            <corrected>-32766</corrected>
+            <controlinfo>0610102000000000</controlinfo>
+            <useinfo>7138100300000001</useinfo>
+            <cfailed>QC1-1-215</cfailed>
+          </kvdata>
+          <kvdata paramid="262">
+            <original>69.9179993</original>
+            <controlinfo>0100200000000010</controlinfo>
+            <useinfo>7100000300000001</useinfo>
+            <cfailed>QC1-4-262</cfailed>
+          </kvdata>
+          <kvtextdata paramid="1022">
+            <original>20160920130000</original>
+          </kvtextdata>
+        </tbtime>
+        <tbtime val="2016-09-20 11:57:11.615849">
+          <kvdata paramid="178">
+            <original>-32767</original>
+            <corrected>1020.59998</corrected>
+            <controlinfo>0000601000000000</controlinfo>
+            <useinfo>7894700000000001</useinfo>
+            <cfailed>QC1-4-178</cfailed>
+          </kvdata>
+        </tbtime>
+      </obstime>
+    </typeid>
+  </station>
+</KvalobsData>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<KvalobsData>
+  <station val="29350">
+    <typeid val="502">
+      <obstime val="2015-11-17 12:00:00">
+         <sensor val="1">
+            <kvdata paramid="104">
+               <original>338.799988</original>
+               <controlinfo>0101000000000110</controlinfo>
+               <useinfo>7100000400000000</useinfo>
+            </kvdata>
+         </sensor>
+         <sensor val="2">
+            <kvdata paramid="104">
+               <original>338.799988</original>
+               <controlinfo>0101000000000110</controlinfo>
+               <useinfo>7100000400000000</useinfo>
+            </kvdata>
+         </sensor>
+         <kvtextdata paramid="1022">
+            <original>20151117120000</original>
+         </kvtextdata>
+      </obstime>
+      <obstime val="2015-11-17 13:00:00">
+         <level val="1">
+            <kvdata paramid="104">
+               <original>338.799988</original>
+               <controlinfo>0101000000000110</controlinfo>
+               <useinfo>7100000400000000</useinfo>
+            </kvdata>
+        </level>
+        <level val="2">
+            <kvdata paramid="104">
+               <original>338.799988</original>
+               <controlinfo>0101000000000110</controlinfo>
+               <useinfo>7100000400000000</useinfo>
+            </kvdata>
+        </level>
+        <kvtextdata paramid="1022">
+          <original>20151117120000</original>
+        </kvtextdata>
+      </obstime>
+      <obstime val="2015-11-17 14:00:00">
+         <sensor val="1">
+            <level val="1">
+               <kvdata paramid="104">
+                  <original>338.799988</original>
+                  <controlinfo>0101000000000110</controlinfo>
+                  <useinfo>7100000400000000</useinfo>
+               </kvdata>
+            </level>
+            <level val="2">
+               <kvdata paramid="104">
+                  <original>338.799988</original>
+                  <controlinfo>0101000000000110</controlinfo>
+                  <useinfo>7100000400000000</useinfo>
+               </kvdata>
+            </level>
+         </sensor>
+         <sensor val="2">
+            <kvdata paramid="104">
+               <original>338.799988</original>
+               <controlinfo>0101000000000110</controlinfo>
+               <useinfo>7100000400000000</useinfo>
+               <cfailed>QC1</cfailed>
+            </kvdata>
+         </sensor>
+         <kvtextdata paramid="1022">
+            <original>20151117120000</original>
+         </kvtextdata>
+      </obstime>
+    </typeid>
+  </station>
+</KvalobsData>

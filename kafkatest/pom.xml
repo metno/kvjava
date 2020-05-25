@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>no.met.kvalobs</groupId>
+  <artifactId>kafkatest</artifactId>
+  <packaging>jar</packaging>
+  <name>Test kvservice with kafka</name>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+ <parent>
+    <groupId>no.met.kvalobs</groupId>
+    <artifactId>kvjava</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+
+  <dependencies>
+    <dependency>
+      <groupId>no.met.kvalobs</groupId>
+      <artifactId>kvutil</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>no.met.kvalobs</groupId>
+      <artifactId>kvclient</artifactId>
+      <version>1.0-SNAPSHOT</version>
+   </dependency>
+  </dependencies>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.6</version>
+        <configuration>
+          <archive>
+            <index>true</index>
+            <manifest>
+              <addClasspath>true</addClasspath>
+              <classpathPrefix>../target/dependency</classpathPrefix>
+              <mainClass>no.met.kvalobs.kafkatest.KafkaTest</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  
+</project>

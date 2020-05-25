@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<KvalobsData>
+  <station val="29350">
+    <typeid val="502">
+      <obstime val="2015-11-17 12:00:00">
+        <kvdata paramid="104">
+          <original>338.799988</original>
+          <controlinfo>0101000000000110</controlinfo>
+          <useinfo>7100000400000000</useinfo>
+        </kvdata>
+        <kvdata paramid="106">
+          <original>0</original>
+          <controlinfo>0100000000000000</controlinfo>
+          <useinfo>7100000400000000</useinfo>
+        </kvdata>
+        <kvdata paramid="211">
+          <original>-0.600000024</original>
+          <controlinfo>0101100000100010</controlinfo>
+          <useinfo>7100000400000000</useinfo>
+        </kvdata>
+        <kvtextdata paramid="1022">
+          <original>20151117120000</original>
+        </kvtextdata>
+      </obstime>
+      <obstime val="2015-11-17 13:00:00">
+        <kvdata paramid="104">
+          <original>338.799988</original>
+          <controlinfo>0101000000000110</controlinfo>
+          <useinfo>7100000400000000</useinfo>
+        </kvdata>
+        <kvdata paramid="106">
+          <original>0</original>
+          <controlinfo>0100000000000000</controlinfo>
+          <useinfo>7100000400000000</useinfo>
+        </kvdata>
+        <kvdata paramid="211">
+          <original>-0.600000024</original>
+          <controlinfo>0101100000100010</controlinfo>
+          <useinfo>7100000400000000</useinfo>
+        </kvdata>
+        <kvtextdata paramid="1022">
+          <original>20151117120000</original>
+        </kvtextdata>
+      </obstime>
+    </typeid>
+    <typeid val="32">
+      <obstime val="2015-11-17 13:00:00">
+        <kvdata paramid="104">
+          <original>338.799988</original>
+          <controlinfo>0101000000000110</controlinfo>
+          <useinfo>7100000400000000</useinfo>
+        </kvdata>
+        <kvdata paramid="106">
+          <original>0</original>
+          <controlinfo>0100000000000000</controlinfo>
+          <useinfo>7100000400000000</useinfo>
+        </kvdata>
+        <kvdata paramid="211">
+          <original>-0.600000024</original>
+          <controlinfo>0101100000100010</controlinfo>
+          <useinfo>7100000400000000</useinfo>
+        </kvdata>
+        <kvtextdata paramid="1022">
+          <original>20151117120000</original>
+        </kvtextdata>
+      </obstime>
+    </typeid>
+  </station>
+  <station val="18700">
+    <typeid val="502">
+      <obstime val="2015-11-17 12:00:00">
+        <kvdata paramid="104">
+          <original>338.799988</original>
+          <controlinfo>0101000000000110</controlinfo>
+          <useinfo>7100000400000000</useinfo>
+        </kvdata>
+        <kvdata paramid="106">
+          <original>0</original>
+          <controlinfo>0100000000000000</controlinfo>
+          <useinfo>7100000400000000</useinfo>
+        </kvdata>
+        <kvdata paramid="211">
+          <original>-0.600000024</original>
+          <controlinfo>0101100000100010</controlinfo>
+          <useinfo>7100000400000000</useinfo>
+        </kvdata>
+        <kvtextdata paramid="1022">
+          <original>20151117120000</original>
+        </kvtextdata>
+      </obstime>
+      <obstime val="2015-11-17 13:00:00">
+        <kvdata paramid="104">
+          <original>338.799988</original>
+          <controlinfo>0101000000000110</controlinfo>
+          <useinfo>7100000400000000</useinfo>
+        </kvdata>
+        <kvdata paramid="106">
+          <original>0</original>
+          <controlinfo>0100000000000000</controlinfo>
+          <useinfo>7100000400000000</useinfo>
+        </kvdata>
+        <kvdata paramid="211">
+          <original>-0.600000024</original>
+          <controlinfo>0101100000100010</controlinfo>
+          <useinfo>7100000400000000</useinfo>
+        </kvdata>
+        <kvtextdata paramid="1022">
+          <original>20151117120000</original>
+        </kvtextdata>
+      </obstime>
+    </typeid>
+    <typeid val="32">
+      <obstime val="2015-11-17 13:00:00">
+        <kvdata paramid="104">
+          <original>338.799988</original>
+          <controlinfo>0101000000000110</controlinfo>
+          <useinfo>7100000400000000</useinfo>
+        </kvdata>
+        <kvdata paramid="106">
+          <original>0</original>
+          <controlinfo>0100000000000000</controlinfo>
+          <useinfo>7100000400000000</useinfo>
+        </kvdata>
+        <kvdata paramid="211">
+          <original>-0.600000024</original>
+          <controlinfo>0101100000100010</controlinfo>
+          <useinfo>7100000400000000</useinfo>
+        </kvdata>
+        <kvtextdata paramid="1022">
+          <original>20151117120000</original>
+        </kvtextdata>
+      </obstime>
+    </typeid>
+  </station>
+</KvalobsData>
